@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Record Sale - Fuji Mobile Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #fafafa;
+        }
+
+        .card-sale {
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(20, 20, 50, 0.06);
+            padding: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Fuji Mobile Shop</a>
+            <div class="ms-auto">
+                <a class="btn btn-outline-secondary" href="inventory.html">Inventory</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="card-sale">
+            <h4>บันทึกการขาย</h4>
+            <form id="saleForm">
+                <div class="mb-3">
+                    <label for="productSelect" class="form-label">เลือกสินค้า</label>
+                    <select id="productSelect" class="form-select" required></select>
+                </div>
+                <div class="mb-3">
+                    <label for="qtyInput" class="form-label">จำนวน</label>
+                    <input type="number" id="qtyInput" class="form-control" value="1" min="1" required>
+                </div>
+                <div class="mb-3">
+                    <label for="priceInput" class="form-label">ราคาขาย (Kip)</label>
+                    <input type="number" id="priceInput" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="noteInput" class="form-label">หมายเหตุ</label>
+                    <textarea id="noteInput" class="form-control" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">บันทึกขาย</button>
+            </form>
+            <div id="message" class="mt-3"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+        import { getDatabase, ref, onValue, push, update } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: "",
+            databaseURL: "https://fuji-mobile-shop-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const productsRef = ref(db, 'products');
+        const salesRef = ref(db, 'sales');
+
+        const productSelect = document.getElementById('productSelect');
+        const saleForm = document.getElementById('saleForm');
+        const qtyInput = document.getElementById('qtyInput');
+        const priceInput = document.getElementById('priceInput');
+        const noteInput = document.getElementById('noteInput');
+        const message = document.getElementById('message');
+
+        let productsData = {};
+
+        onValue(productsRef, (snapshot) => {
+            productsData = snapshot.val() || {};
+            productSelect.innerHTML = '';
+            for (let key in productsData) {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = `${productsData[key].name} (Stock: ${productsData[key].stock_now})`;
+                productSelect.appendChild(opt);
+            }
+        });
+
+        saleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const productId = productSelect.value;
+            const qty = Number(qtyInput.value);
+            const price = Number(priceInput.value);
+            const note = noteInput.value.trim();
+
+            if (!productId || qty <= 0 || price <= 0) {
+                message.textContent = 'กรุณากรอกข้อมูลให้ถูกต้อง';
+                message.className = 'text-danger';
+                return;
+            }
+
+            const product = productsData[productId];
+            if (!product) return;
+            if (product.stock_now < qty) {
+                message.textContent = 'จำนวนสินค้าที่ขายมากกว่าคงเหลือ';
+                message.className = 'text-danger';
+                return;
+            }
+
+            const saleData = {
+                date: new Date().toISOString().split('T')[0],
+                product_id: productId,
+                price: price,
+                qty: qty,
+                note: note
+            };
+
+            // push sale record
+            await push(salesRef, saleData);
+
+            // update stock
+            await update(ref(db, `products/${productId}`), {
+                stock_now: product.stock_now - qty
+            });
+
+            message.textContent = 'บันทึกขายเรียบร้อย';
+            message.className = 'text-success';
+            saleForm.reset();
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

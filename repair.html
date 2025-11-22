@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Repair / Service - Fuji Mobile Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f6f7fb;
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .card-shop {
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(20, 20, 50, 0.06);
+        }
+
+        .expired {
+            background: rgba(220, 53, 69, 0.08) !important;
+        }
+
+        .near-expire {
+            background: rgba(255, 193, 7, 0.06) !important;
+        }
+
+        .small-muted {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .table-fixed tbody {
+            max-height: 380px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        .table-fixed thead,
+        .table-fixed tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand nav-brand" href="index.html">Fuji Mobile Shop</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="inventory.html">Inventory</a></li>
+                    <li class="nav-item"><a class="nav-link" href="record_sale.html">Record Sale</a></li>
+                    <li class="nav-item"><a class="nav-link" href="summary.html">Summary</a></li>
+                    <li class="nav-item"><a class="nav-link" href="chart.html">Charts</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="repair.html">Repair</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        <div class="card card-shop p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h4 class="mb-1">รายการซ่อม (Repairs)</h4>
+                    <div class="small-muted">เพิ่มรายการซ่อม กำหนดราคาซ่อม ใส่วันที่รับประกัน
+                        และตรวจสอบรายการที่หมดประกัน</div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-outline-secondary" href="index.html">กลับหน้าแรก</a>
+                    <button class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#modalRepair">เพิ่มรายการซ่อม</button>
+                </div>
+            </div>
+
+            <div class="row g-2 mb-3">
+                <div class="col-md-4">
+                    <input id="searchRepair" class="form-control" placeholder="ค้นหารุ่น / รายละเอียด ...">
+                </div>
+                <div class="col-md-3">
+                    <select id="filterRepair" class="form-select">
+                        <option value="all">ทั้งหมด</option>
+                        <option value="active">ยังไม่หมดประกัน</option>
+                        <option value="expired">หมดประกัน</option>
+                        <option value="near">ใกล้หมด (7 วัน)</option>
+                    </select>
+                </div>
+                <div class="col-md-5 text-end small-muted">
+                    <span id="countSummary">โหลดข้อมูล...</span>
+                </div>
+            </div>
+
+            <div class="table-responsive table-fixed">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:18%;">Model / ลูกค้า</th>
+                            <th style="width:28%;">รายละเอียด</th>
+                            <th style="width:10%;">ราคาซ่อม (Kip)</th>
+                            <th style="width:12%;">Warranty until</th>
+                            <th style="width:12%;">Status</th>
+                            <th style="width:20%;">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="repairsBody">
+                        <!-- rows from Firebase -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Add/Edit Repair -->
+    <div class="modal fade" id="modalRepair" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="modalTitle" class="modal-title">เพิ่ม / แก้ไข รายการซ่อม</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="repairForm">
+                        <input type="hidden" id="repairId">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Model / ลูกค้า (เช่น: iPhone 8 - Somchai)</label>
+                                <input id="repairModel" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">ราคาซ่อม (Kip)</label>
+                                <input id="repairPrice" type="number" class="form-control" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">รายละเอียด</label>
+                                <textarea id="repairDetail" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">วันที่รับประกัน (Warranty until)</label>
+                                <input id="repairWarranty" type="date" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">วันที่สร้าง (อ่านอย่างเดียว)</label>
+                                <input id="repairCreated" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">วันที่แก้ไขล่าสุด (อ่านอย่างเดียว)</label>
+                                <input id="repairUpdated" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button id="saveRepair" class="btn btn-primary">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase + Script -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js'
+        import { getDatabase, ref, set, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js'
+
+        // ===== CONFIG =====
+        const firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: "",
+            databaseURL: "https://fuji-mobile-shop-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        }
+        const app = initializeApp(firebaseConfig)
+        const db = getDatabase(app)
+
+        // ===== Refs =====
+        const repairsRef = ref(db, 'repairs')
+
+        // DOM
+        const repairsBody = document.getElementById('repairsBody')
+        const searchInput = document.getElementById('searchRepair')
+        const filterSelect = document.getElementById('filterRepair')
+        const countSummary = document.getElementById('countSummary')
+
+        // modal fields
+        const repairForm = document.getElementById('repairForm')
+        const repairIdInput = document.getElementById('repairId')
+        const repairModelInput = document.getElementById('repairModel')
+        const repairPriceInput = document.getElementById('repairPrice')
+        const repairDetailInput = document.getElementById('repairDetail')
+        const repairWarrantyInput = document.getElementById('repairWarranty')
+        const repairCreatedInput = document.getElementById('repairCreated')
+        const repairUpdatedInput = document.getElementById('repairUpdated')
+        const modalTitle = document.getElementById('modalTitle')
+
+        let lastRepairs = {}
+
+        // realtime load
+        onValue(repairsRef, snapshot => {
+            lastRepairs = snapshot.val() || {}
+            renderRepairs()
+        })
+
+        // render
+        function renderRepairs() {
+            repairsBody.innerHTML = ''
+            const q = (searchInput.value || '').trim().toLowerCase()
+            const filter = filterSelect.value
+            const ids = Object.keys(lastRepairs).sort((a, b) => {
+                const ta = lastRepairs[a].created_at || ''
+                const tb = lastRepairs[b].created_at || ''
+                return tb.localeCompare(ta)
+            })
+
+            let totalItems = 0
+            let todayIncome = 0
+            let monthIncome = 0
+
+            const now = new Date()
+            const nowLA = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Vientiane" }))
+            const todayStr = nowLA.toISOString().slice(0, 10)
+            const monthStartStr = `${nowLA.getFullYear()}-${String(nowLA.getMonth() + 1).padStart(2, '0')}-01`
+
+            ids.forEach(id => {
+                const r = lastRepairs[id]
+                const price = Number(r.price_repair || 0)
+                const created = r.created_at || ''
+                const createdLA = created ? new Date(new Date(created).toLocaleString("en-US", { timeZone: "Asia/Vientiane" })) : null
+                const createdDateStr = createdLA ? createdLA.toISOString().slice(0, 10) : ''
+
+                // รวมรายได้
+                if (createdDateStr === todayStr) todayIncome += price
+                if (createdDateStr >= monthStartStr) monthIncome += price
+
+                totalItems++
+                // ---- render row ----
+                const model = r.phone_model || r.model || ''
+                const detail = r.detail || ''
+                const warranty = r.warranty_until || ''
+                let rowClass = ''
+                let statusText = 'Active'
+                if (warranty) {
+                    const warrantyDate = new Date(warranty + 'T00:00:00')
+                    const diffDays = Math.ceil((warrantyDate - new Date(nowLA.getFullYear(), nowLA.getMonth(), nowLA.getDate())) / (24 * 60 * 60 * 1000))
+                    if (diffDays < 0) { statusText = 'Expired'; rowClass = 'expired' }
+                    else if (diffDays <= 7) { statusText = `Near expiry (${diffDays} วัน)`; rowClass = 'near-expire' }
+                }
+
+                const textToSearch = (model + ' ' + detail + ' ' + (r.customer || '')).toLowerCase()
+                if (q && !textToSearch.includes(q)) return
+                if (filter === 'expired' && rowClass !== 'expired') return
+                if (filter === 'near' && rowClass !== 'near-expire') return
+                if (filter === 'active' && rowClass === 'expired') return
+
+                const tr = document.createElement('tr')
+                if (rowClass) tr.classList.add(rowClass)
+                tr.innerHTML = `
+                  <td style="word-break:break-word;"><strong>${escapeHtml(model)}</strong><div class="small-muted">${escapeHtml(r.customer || '')}</div></td>
+                  <td style="word-break:break-word;">${escapeHtml(detail)}</td>
+                  <td>${price.toLocaleString('en-US')} Kip</td>
+                  <td>${warranty || ''}</td>
+                  <td>${statusText}</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editRepair('${id}')">แก้ไข</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRepair('${id}')">ลบ</button>
+                  </td>
+                `
+                repairsBody.appendChild(tr)
+            })
+
+            // render summary มุมขวาบน
+            countSummary.innerText = `ทั้งหมด ${totalItems} รายการ • วันนี้ ${todayIncome.toLocaleString('en-US')} Kip • เดือนนี้ ${monthIncome.toLocaleString('en-US')} Kip`
+        }
+
+        // helpers
+        function escapeHtml(s) { return String(s || '').replace(/[&<>\"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])) }
+
+        // search / filter listeners
+        searchInput.addEventListener('input', renderRepairs)
+        filterSelect.addEventListener('change', renderRepairs)
+
+        // Save (create / update)
+        document.getElementById('saveRepair').addEventListener('click', async () => {
+            const id = repairIdInput.value || crypto.randomUUID()
+            const model = repairModelInput.value.trim()
+            const price = Number(repairPriceInput.value) || 0
+            const detail = repairDetailInput.value.trim()
+            const warranty = repairWarrantyInput.value || ''
+            const nowIso = new Date().toISOString()
+            const isEdit = !!repairIdInput.value
+
+            const payload = {
+                phone_model: model,
+                detail: detail,
+                price_repair: price,
+                warranty_until: warranty,
+            }
+
+            if (isEdit) {
+                payload.updated_at = nowIso
+                await update(ref(db, `repairs/${id}`), payload)
+            } else {
+                payload.created_at = nowIso
+                payload.updated_at = nowIso
+                await set(ref(db, `repairs/${id}`), payload)
+            }
+
+            // reset & hide
+            repairForm.reset()
+            repairIdInput.value = ''
+            repairCreatedInput.value = ''
+            repairUpdatedInput.value = ''
+            bootstrap.Modal.getInstance(document.getElementById('modalRepair')).hide()
+        })
+
+        // edit
+        window.editRepair = function (id) {
+            const r = lastRepairs[id]
+            if (!r) return alert('ไม่พบข้อมูล')
+            repairIdInput.value = id
+            repairModelInput.value = r.phone_model || r.model || ''
+            repairPriceInput.value = r.price_repair || r.price || 0
+            repairDetailInput.value = r.detail || ''
+            repairWarrantyInput.value = r.warranty_until || ''
+            repairCreatedInput.value = r.created_at ? (new Date(r.created_at)).toLocaleString() : ''
+            repairUpdatedInput.value = r.updated_at ? (new Date(r.updated_at)).toLocaleString() : ''
+            modalTitle.innerText = 'แก้ไขรายการซ่อม'
+            new bootstrap.Modal(document.getElementById('modalRepair')).show()
+        }
+
+        // delete
+        window.deleteRepair = async function (id) {
+            if (!confirm('ต้องการลบรายการซ่อมนี้ใช่หรือไม่?')) return
+            await remove(ref(db, `repairs/${id}`))
+        }
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

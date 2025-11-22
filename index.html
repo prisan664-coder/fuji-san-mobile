@@ -1,0 +1,409 @@
+<!-- FILE: index.html -->
+<!doctype html>
+<html lang="English">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fuji Mobile Shop - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f6f7fb;
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            letter-spacing: 1px
+        }
+
+        .hero {
+            padding: 40px 0
+        }
+
+        .card-shop {
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(20, 20, 50, 0.06)
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand nav-brand" href="#"> Fuji Mobile Shop</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">ຫນ້າແຣກ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="sale-record.html">ລາຍການສະຫຼຸບຍອດຂາຍ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="inventory.html">ບັນທຶກລາຍການສິນຄ້າ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="record_sale.html"> ບັນທຶກການຂາຍ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="summary.html"> ສະຫຼຸບຍອດຂາຍ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="chart.html">ສະແດງກາຟ</a></li>
+
+                    <!-- ADD THIS -->
+                    <li class="nav-item"><a class="nav-link" href="repair.html">ບັນທຶກລາຍການແປງໂທລະສັບ</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <main class="container hero">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card card-shop p-4">
+                    <h4>ໂປຣແກມບັນທຶກຍອດຂາຍ</h4>
+                    <p class="text-muted">ລະບົບເຊື່ອມຕໍ່ກັນ</p>
+                    <div class="row g-3">
+                        <div class="col-sm-4"><a href="inventory.html"
+                                class="btn btn-light w-100">ບັນທຶກລາຍການສິນຄ້າ</a></div>
+                        <div class="col-sm-4 d-flex gap-2">
+                            <a href="record_sale.html" class="btn btn-primary w-100">ບັນທຶກການຂາຍ</a>
+                            <a href="myemail.html" class="btn btn-sm btn-outline-info align-self-center"
+                                title="My Email">📧</a>
+                        </div>
+                        <div class="col-sm-4"><a href="summary.html"
+                                class="btn btn-outline-secondary w-100">ສະຫຼຸບຍອດຂາຍ</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-shop p-3">
+                    <h5>ອົງກອນຊ່ວຍຍອດຂາຍ</h5>
+                    <ul class="list-unstyled small">
+                        <li>Currency: ສະກຸມເງິນກີບ</li>
+                        <li>Record Sale: ຮອງຮັບ qty (B)</li>
+                        <li>Inventory: ຮອງຮັບ 50+ ລຸ້ນ</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
+
+
+
+<!-- FILE: inventory.html -->
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventory - Fuji Mobile Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f6f7fb
+        }
+
+        .container-lg {
+            padding-top: 24px
+        }
+
+        .card-inv {
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(20, 20, 50, 0.06)
+        }
+
+        .low-stock {
+            background: #ffe9e9
+        }
+
+        .normal-stock {
+            background: #f3fff6
+        }
+
+        .table-fixed tbody {
+            height: 520px;
+            overflow: auto
+        }
+
+        .search-input {
+            max-width: 420px
+        }
+
+        .mini {
+            font-size: 0.85rem
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand nav-brand" href="index.html">Fuji Mobile Shop</a>
+            <div class="ms-auto">
+                <a class="btn btn-outline-secondary" href="record_sale.html">บันทึกขาย</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container-lg">
+        <div class="card card-inv p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>Inventory</h4>
+                <div class="d-flex gap-2 align-items-center">
+                    <input id="search" class="form-control search-input" placeholder="ค้นหา รุ่น / ชื่อ ...">
+                    <button class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#modalAdd">เพิ่มสินค้า</button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Model ID</th>
+                            <th>ชื่อ (Model)</th>
+                            <th>ราคาทุน (Kip)</th>
+                            <th>ราคาขาย (Kip)</th>
+                            <th>จำนวนคงเหลือ</th>
+                            <th>Min Stock</th>
+                            <th>สถานะ</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsBody">
+                        <!-- rows from firebase -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal add/edit -->
+    <div class="modal fade" id="modalAdd" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="modalTitle" class="modal-title">เพิ่มสินค้าใหม่</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <input type="hidden" id="productId">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Model ID (ไม่ซ้ำ)</label>
+                                <input id="modelId" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">ชื่อสินค้า</label>
+                                <input id="name" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">ราคาทุน (Kip)</label>
+                                <input id="cost" type="number" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">ราคาขาย (Kip)</label>
+                                <input id="sell_price" type="number" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">จำนวนคงเหลือ</label>
+                                <input id="stock_now" type="number" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Min Stock</label>
+                                <input id="min_stock" type="number" class="form-control" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">หมายเหตุ</label>
+                                <textarea id="note" class="form-control mini" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button id="saveBtn" class="btn btn-primary">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase + App JS (module) -->
+    <script type="module">
+        // Firebase v9 modular import (CDN)
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js'
+        import { getDatabase, ref, set, push, onValue, update, remove, query, orderByChild } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js'
+
+        // ====== CONFIGURE THIS ======
+        const firebaseConfig = {
+            // เปลี่ยนค่าตามโปรเจคคุณ
+            apiKey: "",
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: "",
+            databaseURL: "https://fuji-mobile-shop-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        }
+        // ===========================
+
+        const app = initializeApp(firebaseConfig)
+        const db = getDatabase(app)
+        const productsRef = ref(db, 'products')
+
+        const productsBody = document.getElementById('productsBody')
+        const searchInput = document.getElementById('search')
+
+        // โหลดข้อมูล realtime
+        onValue(productsRef, (snapshot) => {
+            const data = snapshot.val() || {}
+            renderTable(data)
+        })
+
+        function renderTable(data) {
+            const q = searchInput.value.trim().toLowerCase()
+            productsBody.innerHTML = ''
+            const keys = Object.keys(data).sort()
+            for (const k of keys) {
+                const p = data[k]
+                const text = (k + ' ' + (p.name || '')).toLowerCase()
+                if (q && !text.includes(q)) continue
+
+                const tr = document.createElement('tr')
+
+                // status class
+                const statusClass = (Number(p.stock_now) <= Number(p.min_stock)) ? 'low-stock' : 'normal-stock'
+
+                tr.innerHTML = `
+        <td class="fw-bold">${k}</td>
+        <td>${escapeHtml(p.name || '')}</td>
+        <td>${formatNum(p.cost)}</td>
+        <td>${formatNum(p.sell_price)}</td>
+        <td>${Number(p.stock_now)}</td>
+        <td>${Number(p.min_stock)}</td>
+        <td class="mini">${Number(p.stock_now) <= Number(p.min_stock) ? '<span class="badge bg-danger">Low</span>' : '<span class="badge bg-success">OK</span>'}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary me-1" data-id="${k}" onclick="editProduct('${k}')">แก้ไข</button>
+          <button class="btn btn-sm btn-outline-danger" data-id="${k}" onclick="deleteProduct('${k}')">ลบ</button>
+        </td>
+      `
+
+                // apply background status
+                tr.className = statusClass
+                productsBody.appendChild(tr)
+            }
+        }
+
+        // escape html to be safe
+        function escapeHtml(s) { return String(s || '').replace(/[&<>\"]+/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" })[m] || m) }
+        function formatNum(n) { if (n == null || n === '') return ''; return Number(n).toLocaleString('en-US') }
+
+        // Search
+        searchInput.addEventListener('input', () => {
+            // onValue will re-render since we keep data in memory — but simple: refetch snapshot by reading current once
+            // We'll read value once and call renderTable
+            // But easiest: trigger onValue's stored data by fetching once
+            // (we'll just call renderTable with last snapshot by reading current ref)
+            // For simplicity trigger a small get
+            // NOTE: using onValue above keeps page reactive; renderTable will be called on next change
+            // We'll simply re-run renderTable by reading cached DOM dataset (not stored). Simpler: call get once.
+            // To avoid extra imports, rely on latest snapshot — so do nothing here as onValue always calls renderTable whenever DB changes.
+            // Instead, re-run by iterating current rows: easiest approach is to refetch via onValue triggered once using get(). But omitted for brevity.
+            // Workaround: force a small delay to allow onValue to re-render; or just call onValue again. For now do nothing — table rerenders next DB update.
+            // But better: we will fetch snapshot via structured request using query. Simplicity: call onValue's callback by re-reading.
+            // TODO: if search seems slow, we can implement client-side caching. For now, user experience acceptable.
+            const event = new Event('forceRender')
+            window.dispatchEvent(event)
+        })
+
+        // Re-render when user types: attach listener to reconstruct table using last snapshot stored
+        // To store last snapshot, let's fetch once and cache
+        let lastData = {}
+        onValue(productsRef, (snap) => { lastData = snap.val() || {}; renderTable(lastData) })
+        window.addEventListener('forceRender', () => { renderTable(lastData) })
+
+        // Add / Edit
+        const productForm = document.getElementById('productForm')
+        const modalTitle = document.getElementById('modalTitle')
+        const productIdInput = document.getElementById('productId')
+        const modelIdInput = document.getElementById('modelId')
+        const nameInput = document.getElementById('name')
+        const costInput = document.getElementById('cost')
+        const sellInput = document.getElementById('sell_price')
+        const stockInput = document.getElementById('stock_now')
+        const minInput = document.getElementById('min_stock')
+        const noteInput = document.getElementById('note')
+        const saveBtn = document.getElementById('saveBtn')
+
+        // Save
+        saveBtn.addEventListener('click', async () => {
+            const id = modelIdInput.value.trim()
+            if (!id) { alert('กรุณาใส่ Model ID'); return }
+            const payload = {
+                name: nameInput.value.trim(),
+                cost: Number(costInput.value) || 0,
+                sell_price: Number(sellInput.value) || 0,
+                stock_now: Number(stockInput.value) || 0,
+                min_stock: Number(minInput.value) || 0,
+                note: noteInput.value.trim()
+            }
+            // if productId (hidden) set -> edit existing
+            const editing = productIdInput.value
+            if (editing) {
+                // if modelId changed, we will remove old key and set new
+                if (editing !== id) {
+                    // copy to new id then remove old
+                    await set(ref(db, `products/${id}`), payload)
+                    await remove(ref(db, `products/${editing}`))
+                } else {
+                    await update(ref(db, `products/${id}`), payload)
+                }
+            } else {
+                // create new
+                const exists = lastData && lastData[id]
+                if (exists) { if (!confirm('Model ID นี้มีอยู่แล้ว ต้องการแทนที่หรือไม่?')) return }
+                await set(ref(db, `products/${id}`), payload)
+            }
+
+            // reset form
+            productForm.reset()
+            productIdInput.value = ''
+            const modalEl = document.querySelector('#modalAdd')
+            const modal = bootstrap.Modal.getInstance(modalEl)
+            modal.hide()
+        })
+
+        // expose functions to window so buttons in table can call
+        window.editProduct = function (id) {
+            const p = lastData[id]
+            if (!p) return alert('ไม่พบข้อมูล')
+            productIdInput.value = id
+            modelIdInput.value = id
+            nameInput.value = p.name || ''
+            costInput.value = p.cost || 0
+            sellInput.value = p.sell_price || 0
+            stockInput.value = p.stock_now || 0
+            minInput.value = p.min_stock || 0
+            noteInput.value = p.note || ''
+            modalTitle.innerText = 'แก้ไขสินค้า'
+            const modal = new bootstrap.Modal(document.getElementById('modalAdd'))
+            modal.show()
+        }
+
+        window.deleteProduct = async function (id) {
+            if (!confirm('ต้องการลบสินค้ารายการนี้ใช่หรือไม่?')) return
+            await remove(ref(db, `products/${id}`))
+        }
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

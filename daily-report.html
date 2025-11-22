@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>📆 รายงานยอดขายรายวัน - Fuji Mobile Shop</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="container pt-3">
+
+        <!-- Header -->
+        <header class="text-center mb-4">
+            <img src="https://cdn.vectorstock.com/i/1000v/99/91/smartphone-repair-services-gear-up-for-mobile-vector-55249991.avif"
+                alt="logo" class="logo mb-2" style="width:100px; height:auto; object-fit:contain;">
+            <h4 class="mb-0">Fuji Mobile Shop</h4>
+            <small>ເບີໂທລະສັບ: 02091940568 | Whatsapp: 02098614336</small>
+        </header>
+
+        <div class="text-center mb-3">
+            <a href="index.html" class="btn btn-secondary btn-sm">⬅ กลับหน้าหลัก</a>
+            <a href="sale-record.html" class="btn btn-info btn-sm ml-2">📦 ขายสินค้า</a>
+        </div>
+
+        <div class="text-center my-4">
+            <h5>📆 รายงานยอดขายรายวัน</h5>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="mb-5">
+            <canvas id="profitChart" height="100"></canvas>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-responsive mb-5">
+            <table class="table table-bordered table-sm text-center">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>วันเดือนปี</th>
+                        <th>จำนวนรายการขาย</th>
+                        <th>กำไรรวม</th>
+                    </tr>
+                </thead>
+                <tbody id="dailyReportBody"></tbody>
+                <tfoot class="font-weight-bold bg-light text-center">
+                    <tr>
+                        <td>รวมทั้งหมด</td>
+                        <td id="totalSales">0</td>
+                        <td id="totalProfit">0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        let salesRecords = JSON.parse(localStorage.getItem('salesRecords')) || [];
+
+        const dailyReportBody = document.getElementById('dailyReportBody');
+        const totalSalesEl = document.getElementById('totalSales');
+        const totalProfitEl = document.getElementById('totalProfit');
+
+        function renderDailyReport() {
+            dailyReportBody.innerHTML = '';
+            let grandTotalSales = 0;
+            let grandTotalProfit = 0;
+
+            // เรียงตามวันที่ล่าสุด
+            salesRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const chartLabels = [];
+            const chartData = [];
+
+            salesRecords.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.date}</td>
+                    <td>${record.totalSales}</td>
+                    <td>${record.totalProfit.toFixed(2)}</td>
+                `;
+                dailyReportBody.appendChild(row);
+
+                grandTotalSales += record.totalSales;
+                grandTotalProfit += record.totalProfit;
+
+                chartLabels.push(record.date);
+                chartData.push(record.totalProfit.toFixed(2));
+            });
+
+            totalSalesEl.textContent = grandTotalSales;
+            totalProfitEl.textContent = grandTotalProfit.toFixed(2);
+
+            // ----- Chart.js -----
+            const ctx = document.getElementById('profitChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels.reverse(), // แสดงจากเก่าสุดไปใหม่สุด
+                    datasets: [{
+                        label: 'กำไรรายวัน',
+                        data: chartData.reverse(),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'วันเดือนปี' } },
+                        y: { title: { display: true, text: 'กำไร (บาท)' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        renderDailyReport();
+    </script>
+</body>
+
+</html>

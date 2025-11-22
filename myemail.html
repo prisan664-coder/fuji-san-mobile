@@ -1,0 +1,316 @@
+<!-- FILE: myemail.html -->
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Email - Fuji Mobile Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f6f7fb
+        }
+
+        .container-lg {
+            padding-top: 24px
+        }
+
+        .card-shop {
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(20, 20, 50, 0.06);
+            margin-bottom: 24px;
+        }
+
+        .mini {
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">Fuji Mobile Shop</a>
+            <div class="ms-auto">
+                <a class="btn btn-outline-secondary" href="index.html">กลับหน้าแรก</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container-lg">
+        <!-- Customers Table -->
+        <div class="card card-shop p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>ลูกค้า</h4>
+                <button class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#modalCustomer">เพิ่มลูกค้า</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name & Lastname</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Password</th>
+                            <th>Remark</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Second-hand Phones Table -->
+        <div class="card card-shop p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>โทรศัพท์มือสอง</h4>
+                <button class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#modalPhone">เพิ่มเครื่อง</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Model</th>
+                            <th>ราคาซื้อ</th>
+                            <th>ราคาขาย</th>
+                            <th>Remark</th>
+                            <th>สถานะ</th>
+                            <th>วันที่ขาย</th>
+                            <th>Warranty 15 วัน</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="phoneBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Customer -->
+    <div class="modal fade" id="modalCustomer" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">เพิ่มลูกค้า</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="customerForm">
+                        <input type="hidden" id="customerId">
+                        <div class="row g-2">
+                            <div class="col-md-6"><label>Name & Lastname</label><input id="custName"
+                                    class="form-control" required></div>
+                            <div class="col-md-6"><label>Phone</label><input id="custPhone" class="form-control"
+                                    required></div>
+                            <div class="col-md-6"><label>Email</label><input id="custEmail" type="email"
+                                    class="form-control" required></div>
+                            <div class="col-md-6"><label>Password</label><input id="custPass" type="password"
+                                    class="form-control" required></div>
+                            <div class="col-md-12"><label>Remark</label><textarea id="custRemark"
+                                    class="form-control mini" rows="2"></textarea></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button id="saveCustomer" class="btn btn-primary">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Phone -->
+    <div class="modal fade" id="modalPhone" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">เพิ่มเครื่องมือสอง</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="phoneForm">
+                        <input type="hidden" id="phoneId">
+                        <div class="row g-2">
+                            <div class="col-md-6"><label>Model</label><input id="phoneModel" class="form-control"
+                                    required></div>
+                            <div class="col-md-3"><label>ราคาซื้อ</label><input id="phoneBuy" type="number"
+                                    class="form-control" required></div>
+                            <div class="col-md-3"><label>ราคาขาย</label><input id="phoneSell" type="number"
+                                    class="form-control" required></div>
+                            <div class="col-md-12"><label>Remark</label><textarea id="phoneRemark"
+                                    class="form-control mini" rows="2"></textarea></div>
+                            <div class="col-md-3"><label>Sold</label><input id="phoneSold" type="checkbox"
+                                    class="form-check-input mt-2"></div>
+                            <div class="col-md-3"><label>Sell Date</label><input id="phoneSellDate" type="date"
+                                    class="form-control"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button id="savePhone" class="btn btn-primary">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase + JS -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js'
+        import { getDatabase, ref, set, onValue, remove } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js'
+
+        const firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: "",
+            databaseURL: "https://fuji-mobile-shop-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        }
+
+        const app = initializeApp(firebaseConfig)
+        const db = getDatabase(app)
+
+        // ===== Customers =====
+        const custRef = ref(db, 'customers')
+        let lastCust = {}
+        const custBody = document.getElementById('customerBody')
+
+        onValue(custRef, snap => { lastCust = snap.val() || {}; renderCust() })
+        function renderCust() {
+            custBody.innerHTML = ''
+            Object.keys(lastCust).sort().forEach(id => {
+                const c = lastCust[id]
+                const tr = document.createElement('tr')
+                tr.innerHTML = `
+                    <td>${c.name}</td>
+                    <td>${c.phone}</td>
+                    <td>${c.email}</td>
+                    <td>${c.password}</td>
+                    <td>${c.remark || ''}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editCust('${id}')">แก้ไข</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteCust('${id}')">ลบ</button>
+                    </td>
+                `
+                custBody.appendChild(tr)
+            })
+        }
+
+        document.getElementById('saveCustomer').addEventListener('click', async () => {
+            const id = document.getElementById('customerId').value || crypto.randomUUID()
+            const payload = {
+                name: document.getElementById('custName').value.trim(),
+                phone: document.getElementById('custPhone').value.trim(),
+                email: document.getElementById('custEmail').value.trim(),
+                password: document.getElementById('custPass').value.trim(),
+                remark: document.getElementById('custRemark').value.trim()
+            }
+            await set(ref(db, `customers/${id}`), payload)
+            document.getElementById('customerForm').reset()
+            document.getElementById('customerId').value = ''
+            bootstrap.Modal.getInstance(document.getElementById('modalCustomer')).hide()
+        })
+
+        window.editCust = function (id) {
+            const c = lastCust[id]; if (!c) return alert('ไม่พบข้อมูล')
+            document.getElementById('customerId').value = id
+            document.getElementById('custName').value = c.name
+            document.getElementById('custPhone').value = c.phone
+            document.getElementById('custEmail').value = c.email
+            document.getElementById('custPass').value = c.password
+            document.getElementById('custRemark').value = c.remark || ''
+            new bootstrap.Modal(document.getElementById('modalCustomer')).show()
+        }
+
+        window.deleteCust = async function (id) {
+            if (!confirm('ต้องการลบลูกค้ารายการนี้ใช่หรือไม่?')) return
+            await remove(ref(db, `customers/${id}`))
+        }
+
+        // ===== Second-hand Phones =====
+        const phoneRef = ref(db, 'secondhand_phones')
+        let lastPhones = {}
+        const phoneBody = document.getElementById('phoneBody')
+
+        onValue(phoneRef, snap => { lastPhones = snap.val() || {}; renderPhones() })
+
+        function renderPhones() {
+            phoneBody.innerHTML = ''
+            Object.keys(lastPhones).sort().forEach(id => {
+                const p = lastPhones[id]
+                const soldBadge = p.sold ? '<span class="badge bg-success">✅ Sold</span>' : '<span class="badge bg-secondary">❌ Not Sold</span>'
+                const tr = document.createElement('tr')
+                tr.innerHTML = `
+                    <td>${p.model}</td>
+                    <td>${p.buy_price}</td>
+                    <td>${p.sell_price}</td>
+                    <td>${p.remark || ''}</td>
+                    <td>${soldBadge}</td>
+                    <td>${p.sell_date || ''}</td>
+                    <td>${p.warranty || ''}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editPhone('${id}')">แก้ไข</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deletePhone('${id}')">ลบ</button>
+                    </td>
+                `
+                phoneBody.appendChild(tr)
+            })
+        }
+
+        document.getElementById('savePhone').addEventListener('click', async () => {
+            const id = document.getElementById('phoneId').value || crypto.randomUUID()
+            let sellDate = document.getElementById('phoneSellDate').value
+            const sold = document.getElementById('phoneSold').checked
+
+            if (sold && !sellDate) {
+                const today = new Date()
+                sellDate = today.toISOString().split('T')[0]
+                document.getElementById('phoneSellDate').value = sellDate
+            }
+
+            const warranty = sellDate ? new Date(new Date(sellDate).getTime() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : ''
+
+            const payload = {
+                model: document.getElementById('phoneModel').value.trim(),
+                buy_price: Number(document.getElementById('phoneBuy').value) || 0,
+                sell_price: Number(document.getElementById('phoneSell').value) || 0,
+                remark: document.getElementById('phoneRemark').value.trim(),
+                sold: sold,
+                sell_date: sellDate,
+                warranty: warranty
+            }
+
+            await set(ref(db, `secondhand_phones/${id}`), payload)
+            document.getElementById('phoneForm').reset()
+            document.getElementById('phoneId').value = ''
+            bootstrap.Modal.getInstance(document.getElementById('modalPhone')).hide()
+        })
+
+        window.editPhone = function (id) {
+            const p = lastPhones[id]; if (!p) return alert('ไม่พบข้อมูล')
+            document.getElementById('phoneId').value = id
+            document.getElementById('phoneModel').value = p.model
+            document.getElementById('phoneBuy').value = p.buy_price
+            document.getElementById('phoneSell').value = p.sell_price
+            document.getElementById('phoneRemark').value = p.remark || ''
+            document.getElementById('phoneSold').checked = p.sold
+            document.getElementById('phoneSellDate').value = p.sell_date || ''
+            new bootstrap.Modal(document.getElementById('modalPhone')).show()
+        }
+
+        window.deletePhone = async function (id) {
+            if (!confirm('ต้องการลบเครื่องนี้ใช่หรือไม่?')) return
+            await remove(ref(db, `secondhand_phones/${id}`))
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

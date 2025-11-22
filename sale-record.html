@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>📦 สต็อกสินค้า - Fuji Mobile Shop</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <div class="container pt-3">
+
+        <!-- Header -->
+        <header class="text-center mb-4">
+            <img src="https://cdn.vectorstock.com/i/1000v/99/91/smartphone-repair-services-gear-up-for-mobile-vector-55249991.avif"
+                alt="logo" class="logo mb-2" style="width:100px; height:auto; object-fit:contain;">
+            <h4 class="mb-0">Fuji Mobile Shop</h4>
+            <small>ເບີໂທລະສັບ: 02091940568 | Whatsapp: 02098614336</small>
+        </header>
+
+        <!-- Navigation -->
+        <div class="text-center mb-3">
+            <a href="index.html" class="btn btn-secondary btn-sm">⬅ ກັບໄປຫນ້າທຳອິດ</a>
+            <a href="print.html" class="btn btn-info btn-sm ml-2">🧾 ພິມໃບຮັບເງິນ</a>
+            <a href="summary.html" class="btn btn-info btn-sm ml-2">💹 ສະຫລູບຍອດຂາຍ</a>
+            <a href="daily-report.html" class="btn btn-info btn-sm ml-2">📆 ລາຍງານຍອດຂາຍລາຍວັນ</a>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="text-center my-4">
+            <h5>ສະຫລູບຍອດຂາຍພາຍໃນຫນື່ງເດືອນ</h5>
+        </div>
+
+        <div class="table-responsive mb-5">
+            <table class="table table-bordered table-sm text-center">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ເປົ້າຫມາຍເດືອນນີ້</th>
+                        <th>ຍອດຂາຍເດືອນນີ້</th>
+                        <th>ກຳໄລ/ຂາດທືນ</th>
+                        <th>ຈັດການ</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryTableBody"></tbody>
+            </table>
+
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                    <input type="number" id="monthlyTarget" class="form-control" placeholder="เป้าหมาย" step="0.01">
+                </div>
+                <div class="col-md-3">
+                    <input type="number" id="monthlySales" class="form-control" placeholder="ยอดขาย" step="0.01">
+                </div>
+                <div class="col-md-3">
+                    <button id="addSummary" class="btn btn-success btn-block">เพิ่มสรุป</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ลูกค้าค้างชำระ Section -->
+        <div class="text-center my-4">
+            <h5>📋 ບັນທຶກລາຍງານລູກຄ້າຄ້າງຊຳລະ</h5>
+        </div>
+
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered table-sm text-center">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>วันเดือนปี</th>
+                        <th>ชื่อลูกค้า</th>
+                        <th>รายการซ่อม</th>
+                        <th>ราคาซื้อ</th>
+                        <th>ราคาซ่อม</th>
+                        <th>สถานะ (ติดหนี้/ผ่อน)</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="debtTableBody"></tbody>
+            </table>
+
+            <div class="form-row mb-3">
+                <div class="col-md-2">
+                    <input type="text" id="debtDate" class="form-control" placeholder="วันเดือนปี">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="debtCustomer" class="form-control" placeholder="ชื่อลูกค้า">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="debtItem" class="form-control" placeholder="รายการซ่อม">
+                </div>
+                <div class="col-md-2">
+                    <input type="number" id="debtBuy" class="form-control" placeholder="ราคาซื้อ" step="0.01">
+                </div>
+                <div class="col-md-2">
+                    <input type="number" id="debtRepair" class="form-control" placeholder="ราคาซ่อม" step="0.01">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="debtStatus" class="form-control" placeholder="ติดหนี้/ผ่อน">
+                </div>
+            </div>
+            <div class="text-center mb-5">
+                <button id="addDebt" class="btn btn-primary">บันทึกเข้าตาราง</button>
+            </div>
+        </div>
+
+        <!-- 📦 รายการขายสินค้า Section -->
+        <div class="text-center my-4">
+            <h5>📦 ລາຍການຂາຍເຄື່ອງ</h5>
+        </div>
+
+        <!-- Add Form -->
+        <form id="addProductForm" class="mb-3">
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <input type="text" id="barcode" class="form-control" placeholder="วันเดือนปี">
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="text" id="name" class="form-control" placeholder="ชื่อสินค้า">
+                </div>
+                <div class="form-group col-md-2">
+                    <input type="number" id="qty" class="form-control" placeholder="จำนวน" min="0">
+                </div>
+                <div class="form-group col-md-2">
+                    <input type="number" id="buy" class="form-control" placeholder="ราคาซื้อ/ชิ้น" step="0.01" min="0">
+                </div>
+                <div class="form-group col-md-2">
+                    <input type="number" id="sell" class="form-control" placeholder="ราคาขาย/ชิ้น" step="0.01" min="0">
+                </div>
+                <div class="form-group col-md-1">
+                    <button type="submit" class="btn btn-primary btn-block">เพิ่ม</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="table-responsive mb-3">
+            <table class="table table-bordered table-hover table-sm">
+                <thead class="thead-dark text-center">
+                    <tr>
+                        <th>วันเดือนปี</th>
+                        <th>ชื่อสินค้า</th>
+                        <th>จำนวน</th>
+                        <th>ราคาซื้อ/อัน</th>
+                        <th>ราคาขาย/อัน</th>
+                        <th>กำไร/อัน</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="stockTableBody" class="text-center"></tbody>
+                <tfoot class="font-weight-bold text-center bg-light">
+                    <tr>
+                        <td colspan="3">รวมทั้งหมด</td>
+                        <td id="totalBuy">0.00</td>
+                        <td id="totalSell">0.00</td>
+                        <td id="totalProfit">0.00</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="text-right mb-4">
+            <button id="downloadExcel" class="btn btn-success">ดาวน์โหลด Excel</button>
+        </div>
+
+        <footer class="mt-4 small text-center">
+            Fuji Mobile Shop | เบอร์โทร: 02091940568 | Whatsapp: 02098614336<br>
+            พนักงานซ่อม: Venkhamxiong Yonglue
+        </footer>
+    </div>
+
+    <script>
+        let stock = JSON.parse(localStorage.getItem('stock')) || [];
+        let summary = JSON.parse(localStorage.getItem('summary')) || [];
+        let debts = JSON.parse(localStorage.getItem('debts')) || [];
+
+        const tableBody = document.getElementById('stockTableBody');
+        const summaryTableBody = document.getElementById('summaryTableBody');
+        const debtTableBody = document.getElementById('debtTableBody');
+
+        function saveStock() { localStorage.setItem('stock', JSON.stringify(stock)); }
+        function saveSummary() { localStorage.setItem('summary', JSON.stringify(summary)); }
+        function saveDebts() { localStorage.setItem('debts', JSON.stringify(debts)); }
+
+        // ----- STOCK -----
+        function renderStock() {
+            tableBody.innerHTML = '';
+            let totalBuy = 0, totalSell = 0, totalProfit = 0;
+            stock.forEach((item, index) => {
+                const profit = item.sell - item.buy;
+                totalBuy += item.buy * item.qty;
+                totalSell += item.sell * item.qty;
+                totalProfit += profit * item.qty;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.barcode}</td>
+                    <td>${item.name}</td>
+                    <td>${item.qty}</td>
+                    <td>${item.buy.toFixed(2)}</td>
+                    <td>${item.sell.toFixed(2)}</td>
+                    <td>${profit.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning edit">แก้ไข</button>
+                        <button class="btn btn-sm btn-danger delete">ลบ</button>
+                    </td>`;
+                row.querySelector('.delete').addEventListener('click', () => {
+                    if (confirm('ลบรายการนี้?')) { stock.splice(index, 1); saveStock(); renderStock(); }
+                });
+                row.querySelector('.edit').addEventListener('click', () => {
+                    const newName = prompt('ชื่อใหม่', item.name);
+                    if (newName) { item.name = newName; saveStock(); renderStock(); }
+                });
+                tableBody.appendChild(row);
+            });
+            document.getElementById('totalBuy').textContent = totalBuy.toFixed(2);
+            document.getElementById('totalSell').textContent = totalSell.toFixed(2);
+            document.getElementById('totalProfit').textContent = totalProfit.toFixed(2);
+        }
+
+        // ----- SUMMARY -----
+        function renderSummary() {
+            summaryTableBody.innerHTML = '';
+            summary.forEach((item, index) => {
+                const profit = item.sales - item.target;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.target.toFixed(2)}</td>
+                    <td>${item.sales.toFixed(2)}</td>
+                    <td>${profit.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning edit-summary">แก้ไข</button>
+                        <button class="btn btn-sm btn-danger delete-summary">ลบ</button>
+                    </td>`;
+                row.querySelector('.delete-summary').addEventListener('click', () => {
+                    if (confirm('ลบสรุปนี้?')) { summary.splice(index, 1); saveSummary(); renderSummary(); }
+                });
+                summaryTableBody.appendChild(row);
+            });
+        }
+
+        document.getElementById('addSummary').addEventListener('click', () => {
+            const target = parseFloat(document.getElementById('monthlyTarget').value) || 0;
+            const sales = parseFloat(document.getElementById('monthlySales').value) || 0;
+            summary.push({ target, sales });
+            saveSummary(); renderSummary();
+            document.getElementById('monthlyTarget').value = '';
+            document.getElementById('monthlySales').value = '';
+        });
+
+        // ----- DEBT -----
+        function renderDebts() {
+            debtTableBody.innerHTML = '';
+            debts.forEach((d, i) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${d.date}</td>
+                    <td>${d.customer}</td>
+                    <td>${d.item}</td>
+                    <td>${d.buy}</td>
+                    <td>${d.repair}</td>
+                    <td>${d.status}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning edit-debt">แก้ไข</button>
+                        <button class="btn btn-sm btn-danger delete-debt">ลบ</button>
+                    </td>`;
+                row.querySelector('.delete-debt').addEventListener('click', () => {
+                    if (confirm('ลบข้อมูลลูกค้านี้?')) { debts.splice(i, 1); saveDebts(); renderDebts(); }
+                });
+                row.querySelector('.edit-debt').addEventListener('click', () => {
+                    const newStatus = prompt('แก้ไขสถานะใหม่', d.status);
+                    if (newStatus !== null) { d.status = newStatus; saveDebts(); renderDebts(); }
+                });
+                debtTableBody.appendChild(row);
+            });
+        }
+
+        document.getElementById('addDebt').addEventListener('click', () => {
+            const date = document.getElementById('debtDate').value.trim();
+            const customer = document.getElementById('debtCustomer').value.trim();
+            const item = document.getElementById('debtItem').value.trim();
+            const buy = parseFloat(document.getElementById('debtBuy').value) || 0;
+            const repair = parseFloat(document.getElementById('debtRepair').value) || 0;
+            const status = document.getElementById('debtStatus').value.trim();
+
+            if (!date || !customer || !item) return alert('กรอกข้อมูลให้ครบ');
+            debts.push({ date, customer, item, buy, repair, status });
+            saveDebts(); renderDebts();
+            document.getElementById('debtDate').value =
+                document.getElementById('debtCustomer').value =
+                document.getElementById('debtItem').value =
+                document.getElementById('debtBuy').value =
+                document.getElementById('debtRepair').value =
+                document.getElementById('debtStatus').value = '';
+        });
+
+        // ----- ADD STOCK -----
+        document.getElementById('addProductForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const barcode = document.getElementById('barcode').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const qty = parseInt(document.getElementById('qty').value) || 0;
+            const buy = parseFloat(document.getElementById('buy').value) || 0;
+            const sell = parseFloat(document.getElementById('sell').value) || 0;
+            if (!barcode || !name) return alert('กรอกข้อมูลให้ครบ');
+
+            stock.push({ barcode, name, qty, buy, sell });
+            saveStock(); renderStock();
+
+            // ✅ บันทึกยอดขายรายวัน
+            const total = sell * qty;
+            const profit = (sell - buy) * qty;
+            saveSaleRecord(barcode, "ลูกค้าหน้าร้าน", name, total, profit);
+
+            document.getElementById('barcode').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('qty').value = '';
+            document.getElementById('buy').value = '';
+            document.getElementById('sell').value = '';
+        });
+
+        // ----- SALES RECORDS (รายงานรายวัน) -----
+        function saveSaleRecord(date, customer, detail, total, profit) {
+            let sales = JSON.parse(localStorage.getItem("salesRecords")) || [];
+            sales.push({
+                date: date,
+                customer: customer || "ลูกค้าหน้าร้าน",
+                detail: detail,
+                total: total,
+                profit: profit
+            });
+            localStorage.setItem("salesRecords", JSON.stringify(sales));
+        }
+
+        // ----- DOWNLOAD EXCEL -----
+        document.getElementById('downloadExcel').addEventListener('click', () => {
+            const wb = XLSX.utils.book_new();
+
+            const stockData = [['วันเดือนปี', 'ชื่อสินค้า', 'จำนวน', 'ราคาซื้อ', 'ราคาขาย']];
+            stock.forEach(s => stockData.push([s.barcode, s.name, s.qty, s.buy, s.sell]));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(stockData), 'Stock');
+
+            const summaryData = [['เป้าหมาย', 'ยอดขาย', 'กำไร']];
+            summary.forEach(s => summaryData.push([s.target, s.sales, s.sales - s.target]));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryData), 'Summary');
+
+            const debtData = [['วันเดือนปี', 'ชื่อลูกค้า', 'รายการซ่อม', 'ราคาซื้อ', 'ราคาซ่อม', 'สถานะ']];
+            debts.forEach(d => debtData.push([d.date, d.customer, d.item, d.buy, d.repair, d.status]));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(debtData), 'Debts');
+
+            XLSX.writeFile(wb, 'FujiMobile_Data.xlsx');
+        });
+
+        renderStock();
+        renderSummary();
+        renderDebts();
+    </script>
+</body>
+
+</html>

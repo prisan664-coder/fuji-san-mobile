@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>🧾 ໃບບິນຮັບເງິນ - Fuji Mobile Shop</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: "Kanit", "Noto Sans Lao", sans-serif;
+        }
+
+        .receipt-container {
+            max-width: 800px;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        header img {
+            width: 100px;
+            height: auto;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        h4,
+        h5 {
+            margin: 0;
+        }
+
+        .table th,
+        .table td {
+            vertical-align: middle;
+        }
+
+        .summary {
+            max-width: 300px;
+            float: right;
+            margin-top: 20px;
+        }
+
+        .summary td {
+            padding: 4px 8px;
+        }
+
+        .note {
+            border: 1px dashed #6c757d;
+            padding: 10px;
+            font-size: 14px;
+            margin-top: 50px;
+            background: #f9f9f9;
+        }
+
+        footer {
+            text-align: center;
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .no-print {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .receipt-container {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            input,
+            button {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="receipt-container">
+        <header>
+            <img src="https://cdn.vectorstock.com/i/1000v/99/91/smartphone-repair-services-gear-up-for-mobile-vector-55249991.avif"
+                alt="Logo">
+            <h4>ຮ້ານ Fuji Mobile Shop ບໍລິກັນແປງໂທລະສັບ</h4>
+            <p>ຮ້ານມືຖືຟູຈິ</p>
+            <small>Tel: 02091940568 | WhatsApp: 02098614336</small>
+            <hr>
+            <h5>🧾 ໃບບິນຮັບເງິນ-ຮັບປະກັນ (Receipt)</h5>
+        </header>
+
+        <!-- Customer Info -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <strong>ລູກຄ້າ:</strong>
+                <input type="text" id="customerName" class="form-control form-control-sm" placeholder="ชื่อลูกค้า">
+                <strong>ເບີໂທລະສັບ:</strong>
+                <input type="text" id="customerPhone" class="form-control form-control-sm" placeholder="เบอร์โทร">
+            </div>
+            <div class="col-md-6 text-right">
+                <strong>ວັນທີ:</strong>
+                <input type="date" id="receiptDate" class="form-control form-control-sm mb-1">
+                <strong>ເລກໃບບິນ:</strong>
+                <input type="text" id="receiptNumber" class="form-control form-control-sm" placeholder="#0001">
+            </div>
+        </div>
+
+        <!-- Table -->
+        <table class="table table-bordered text-center" id="itemTable">
+            <thead class="thead-light">
+                <tr>
+                    <th>ລາຍການ</th>
+                    <th>ຈຳນວນ</th>
+                    <th>ລາຄາຕໍ່ຫນ່ວຍ (₭)</th>
+                    <th>ລວມ (₭)</th>
+                    <th class="no-print">ຈັດການ</th>
+                </tr>
+            </thead>
+            <tbody id="receiptItems">
+                <tr>
+                    <td><input type="text" class="form-control form-control-sm item-name" placeholder="รายการ"></td>
+                    <td><input type="number" class="form-control form-control-sm item-qty" value="1" min="1"></td>
+                    <td><input type="number" class="form-control form-control-sm item-price" value="0" min="0"></td>
+                    <td class="item-total">0</td>
+                    <td class="no-print"><button class="btn btn-danger btn-sm remove">ລົບລາຍການ</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class="btn btn-success btn-sm no-print" id="addRow">➕ ເພີ່ມລາຍການ</button>
+
+        <!-- Summary -->
+        <table class="summary table-borderless">
+            <tr>
+                <td>ລວມລາຄາທັ້ງຫມົດ:</td>
+                <td class="text-right" id="sumTotal">0 ₭</td>
+            </tr>
+            <tr>
+                <td>ສ່ວນລົດ:</td>
+                <td class="text-right">
+                    <input type="number" id="discount" class="form-control form-control-sm text-right" value="0">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>ຍອດສຸດທິ:</strong></td>
+                <td class="text-right" id="netTotal"><strong>0 ₭</strong></td>
+            </tr>
+            <tr>
+                <td>ຊຳລະເງິນແລ້ວ:</td>
+                <td class="text-right">
+                    <input type="number" id="paid" class="form-control form-control-sm text-right" value="0">
+                </td>
+            </tr>
+            <tr>
+                <td>ຄ້າງຊຳລະ:</td>
+                <td class="text-right" id="remain">0 ₭</td>
+            </tr>
+        </table>
+
+        <div class="clearfix"></div>
+
+        <div class="note">
+            ຫມາຍເຫດ: ຮັບປະກັນ 15 ວັນ (ຍົກເວັ້ນເຄື່ອງຕົກ ຖືກນ້ຳ ໄຟຊ໊ອດ)<br>
+            ກະລຸນານຳໃບບິນນີ້ມາຮັບເຄື່ອງທຸກຄັ້ງ
+        </div>
+
+        <div class="text-right mt-5">
+            ລົງຊື່.....................................................<br>
+            ( Venkhamxiong Yonglue )<br>
+            ພະນັກງານແປງໂທລະສັບ
+        </div>
+
+        <footer>
+            ──────────────────────────────<br>
+            🙏 ขอบคุณที่ใช้บริการ Fuji Mobile Shop<br>
+            ຂອບໃຈທີ່ໃຊ້ບໍລິການ
+        </footer>
+    </div>
+
+    <div class="no-print">
+        <a href="sale-record.html" class="btn btn-secondary">⬅ ກັບໄປຫນ້າຂາຍ</a>
+        <button class="btn btn-primary" id="printBtn">🖨 ສັ່ງພິມໃບບິນ</button>
+    </div>
+
+    <script>
+        const tableBody = document.getElementById("receiptItems");
+        const addRowBtn = document.getElementById("addRow");
+
+        function updateTotals() {
+            let sum = 0;
+            document.querySelectorAll("#receiptItems tr").forEach(row => {
+                const qty = parseFloat(row.querySelector(".item-qty").value) || 0;
+                const price = parseFloat(row.querySelector(".item-price").value) || 0;
+                const total = qty * price;
+                row.querySelector(".item-total").textContent = total.toLocaleString();
+                sum += total;
+            });
+
+            const discount = parseFloat(document.getElementById("discount").value) || 0;
+            const paid = parseFloat(document.getElementById("paid").value) || 0;
+            const net = sum - discount;
+            const remain = net - paid;
+
+            document.getElementById("sumTotal").textContent = sum.toLocaleString() + " ₭";
+            document.getElementById("netTotal").innerHTML = "<strong>" + net.toLocaleString() + " ₭</strong>";
+            document.getElementById("remain").textContent = remain.toLocaleString() + " ₭";
+        }
+
+        addRowBtn.addEventListener("click", () => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><input type="text" class="form-control form-control-sm item-name" placeholder="รายการ"></td>
+                <td><input type="number" class="form-control form-control-sm item-qty" value="1" min="1"></td>
+                <td><input type="number" class="form-control form-control-sm item-price" value="0" min="0"></td>
+                <td class="item-total">0</td>
+                <td class="no-print"><button class="btn btn-danger btn-sm remove">ลบ</button></td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        tableBody.addEventListener("input", updateTotals);
+        document.getElementById("discount").addEventListener("input", updateTotals);
+        document.getElementById("paid").addEventListener("input", updateTotals);
+
+        tableBody.addEventListener("click", e => {
+            if (e.target.classList.contains("remove")) {
+                e.target.closest("tr").remove();
+                updateTotals();
+            }
+        });
+
+        // ✅ เปลี่ยน input → ข้อความ ก่อนพิมพ์
+        document.getElementById("printBtn").addEventListener("click", () => {
+            document.querySelectorAll("input").forEach(input => {
+                const span = document.createElement("span");
+                span.textContent = input.value || " ";
+                span.className = "printed";
+                input.parentNode.insertBefore(span, input);
+                input.style.display = "none";
+            });
+
+            window.print();
+
+            document.querySelectorAll(".printed").forEach(span => span.remove());
+            document.querySelectorAll("input").forEach(input => input.style.display = "block");
+        });
+    </script>
+</body>
+
+</html>
