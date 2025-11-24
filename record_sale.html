@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Record Sale - Fuji Mobile Shop</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         body {
             background: #fafafa;
@@ -17,6 +18,11 @@
             padding: 20px;
             margin-top: 20px;
         }
+
+        body.dark-mode {
+            background: #121212;
+            color: #f1f1f1;
+        }
     </style>
 </head>
 
@@ -27,32 +33,64 @@
             <a class="navbar-brand" href="index.html">Fuji Mobile Shop</a>
             <div class="ms-auto">
                 <a class="btn btn-outline-secondary" href="inventory.html">Inventory</a>
+                <a class="btn btn-outline-secondary" href="summary.html">ເຂົ້າຫນ້າບັນທຶກຍອດຂາຍ</a>
+                <button id="toggleDark" class="btn btn-outline-secondary me-2">Dark / Light Mode</button>
             </div>
         </div>
     </nav>
 
     <div class="container py-4">
         <div class="card-sale">
-            <h4>บันทึกการขาย</h4>
+            <h4>ບັນທຶກການຂາຍ</h4>
+
             <form id="saleForm">
+
+                <!-- เลือกสินค้า -->
                 <div class="mb-3">
-                    <label for="productSelect" class="form-label">เลือกสินค้า</label>
-                    <select id="productSelect" class="form-select" required></select>
+                    <label class="form-label">ເລືອກສິນຄ້າ</label>
+                    <select id="productSelect" class="form-select" required>
+                        <option value="">-- ເລືອກ --</option>
+                    </select>
                 </div>
+
+                <!-- วันเดือนปี -->
                 <div class="mb-3">
-                    <label for="qtyInput" class="form-label">จำนวน</label>
+                    <label class="form-label">ວັນທີແປງໂທລະສັບ</label>
+                    <input type="date" id="repairDate" class="form-control" required>
+                </div>
+
+                <!-- รายการซ่อม -->
+                <div class="mb-3">
+                    <label class="form-label">ຊື່ສິນຄ້າ / ລາຍການສ້ອມ</label>
+                    <input type="text" id="productNameInput" class="form-control" required>
+                </div>
+
+                <!-- จำนวน -->
+                <div class="mb-3">
+                    <label class="form-label">ຈຳນວນ</label>
                     <input type="number" id="qtyInput" class="form-control" value="1" min="1" required>
                 </div>
+
+                <!-- ราคาซื้อ -->
                 <div class="mb-3">
-                    <label for="priceInput" class="form-label">ราคาขาย (Kip)</label>
-                    <input type="number" id="priceInput" class="form-control" required>
+                    <label class="form-label">ລາຄາຊື້ (ต้นทุน) - Kip</label>
+                    <input type="number" id="purchasePriceInput" class="form-control" required>
                 </div>
+
+                <!-- ราคาขาย -->
                 <div class="mb-3">
-                    <label for="noteInput" class="form-label">หมายเหตุ</label>
-                    <textarea id="noteInput" class="form-control" rows="2"></textarea>
+                    <label class="form-label">ລາຄາຂາຍ - Kip</label>
+                    <input type="number" id="salePriceInput" class="form-control" required>
                 </div>
-                <button type="submit" class="btn btn-primary">บันทึกขาย</button>
+
+                <div class="mb-3">
+                    <label class="form-label">ໝາຍເຫດ</label>
+                    <textarea id="noteInput" class="form-control"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">ບັນທຶກການຂາຍ</button>
             </form>
+
             <div id="message" class="mt-3"></div>
         </div>
     </div>
@@ -73,69 +111,94 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+
         const productsRef = ref(db, 'products');
         const salesRef = ref(db, 'sales');
 
         const productSelect = document.getElementById('productSelect');
-        const saleForm = document.getElementById('saleForm');
+        const repairDateInput = document.getElementById('repairDate');
+        const productNameInput = document.getElementById('productNameInput');
         const qtyInput = document.getElementById('qtyInput');
-        const priceInput = document.getElementById('priceInput');
+        const purchasePriceInput = document.getElementById('purchasePriceInput');
+        const salePriceInput = document.getElementById('salePriceInput');
         const noteInput = document.getElementById('noteInput');
+        const saleForm = document.getElementById('saleForm');
         const message = document.getElementById('message');
 
         let productsData = {};
 
+        // โหลดสินค้า
         onValue(productsRef, (snapshot) => {
             productsData = snapshot.val() || {};
-            productSelect.innerHTML = '';
+            productSelect.innerHTML = '<option value="">-- ເລືອກ --</option>';
+
             for (let key in productsData) {
                 const opt = document.createElement('option');
                 opt.value = key;
-                opt.textContent = `${productsData[key].name} (Stock: ${productsData[key].stock_now})`;
+                opt.textContent = `${productsData[key].name} (คงเหลือ: ${productsData[key].stock_now})`;
                 productSelect.appendChild(opt);
             }
         });
 
+        // บันทึกการขาย
         saleForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const productId = productSelect.value;
-            const qty = Number(qtyInput.value);
-            const price = Number(priceInput.value);
-            const note = noteInput.value.trim();
 
-            if (!productId || qty <= 0 || price <= 0) {
-                message.textContent = 'กรุณากรอกข้อมูลให้ถูกต้อง';
+            const productId = productSelect.value;
+            const productName = productNameInput.value.trim();
+            const qty = Number(qtyInput.value);
+            const purchasePrice = Number(purchasePriceInput.value);
+            const salePrice = Number(salePriceInput.value);
+            const note = noteInput.value.trim();
+            const saleDate = repairDateInput.value; // ใช้วันที่จากฟอร์ม
+
+            if (!productId || !productName || !saleDate) {
+                message.textContent = 'กรุณากรอกข้อมูลให้ครบ';
                 message.className = 'text-danger';
                 return;
             }
 
             const product = productsData[productId];
             if (!product) return;
+
             if (product.stock_now < qty) {
-                message.textContent = 'จำนวนสินค้าที่ขายมากกว่าคงเหลือ';
+                message.textContent = 'สต็อกไม่พอ';
                 message.className = 'text-danger';
                 return;
             }
 
+            const totalCost = purchasePrice * qty;
+            const totalSale = salePrice * qty;
+            const profit = totalSale - totalCost;
+
             const saleData = {
-                date: new Date().toISOString().split('T')[0],
+                date: saleDate, // บันทึกตามวันที่ที่กรอก
                 product_id: productId,
-                price: price,
+                product_name: productName,
                 qty: qty,
+                purchase_price: purchasePrice,
+                sale_price: salePrice,
+                total_cost: totalCost,
+                total_sale: totalSale,
+                profit: profit,
                 note: note
             };
 
-            // push sale record
             await push(salesRef, saleData);
 
-            // update stock
+            // ตัดสต็อก
             await update(ref(db, `products/${productId}`), {
                 stock_now: product.stock_now - qty
             });
 
-            message.textContent = 'บันทึกขายเรียบร้อย';
+            message.textContent = 'บันทึกสำเร็จ ✅';
             message.className = 'text-success';
             saleForm.reset();
+        });
+
+        // Dark mode
+        document.getElementById('toggleDark').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
         });
     </script>
 
