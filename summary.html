@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Summary - Fuji Mobile Shop</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         body {
             background: #f8f9fa;
@@ -13,13 +15,13 @@
 
         .card-summary {
             border-radius: 12px;
-            box-shadow: 0 6px 18px rgba(20, 20, 50, 0.06);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
             padding: 20px;
             margin-top: 20px;
         }
 
         .table-fixed tbody {
-            height: 500px;
+            height: 450px;
             overflow-y: auto;
             display: block;
         }
@@ -30,6 +32,11 @@
             width: 100%;
             table-layout: fixed;
         }
+
+        body.dark-mode {
+            background: #121212;
+            color: #f1f1f1;
+        }
     </style>
 </head>
 
@@ -38,29 +45,65 @@
         <div class="container">
             <a class="navbar-brand" href="index.html">Fuji Mobile Shop</a>
             <div class="ms-auto">
-                <a class="btn btn-outline-secondary" href="record_sale.html">Record Sale</a>
+                <button id="toggleDark" class="btn btn-outline-secondary me-2">ໂໝດມືດ / ສວ່າງ</button>
+                <a class="btn btn-outline-secondary" href="record_sale.html">ກັບໜ້າບັນທຶກ</a>
+                <button id="downloadExcel" class="btn btn-success ms-2">ດາວໂຫຼດ Excel</button>
             </div>
         </div>
     </nav>
 
     <div class="container py-4">
         <div class="card-summary">
-            <h4>สรุปยอดขาย</h4>
-            <input id="search" class="form-control mb-3" placeholder="ค้นหา Model หรือ วันที่">
+            <h4>ຕາຕະລາງການຂາຍ</h4>
+
+            <!-- FILTER -->
+            <div class="row mb-3">
+                <div class="col-md-3 mb-2">
+                    <input id="search" class="form-control" placeholder="ຄົ້ນຫາ Model / ວັນທີ">
+                </div>
+
+                <div class="col-md-3 mb-2">
+                    <input type="month" id="monthFilter" class="form-control">
+                </div>
+
+                <div class="col-md-3 mb-2">
+                    <input type="date" id="startDate" class="form-control">
+                </div>
+                <div class="col-md-3 mb-2">
+                    <input type="date" id="endDate" class="form-control">
+                </div>
+            </div>
+
             <div class="table-responsive">
-                <table class="table table-hover table-fixed">
+                <table class="table table-hover table-fixed table-bordered">
                     <thead class="table-light">
                         <tr>
                             <th>วันที่</th>
                             <th>Model</th>
-                            <th>ราคาขาย (Kip)</th>
+                            <th>ชื่อสินค้า</th>
+                            <th>ราคาซื้อ</th>
+                            <th>ราคาขาย</th>
                             <th>จำนวน</th>
-                            <th>ยอดรวม (Kip)</th>
+                            <th>ต้นทุนรวม</th>
+                            <th>ขายรวม</th>
+                            <th>กำไร</th>
                             <th>หมายเหตุ</th>
                             <th>จัดการ</th>
                         </tr>
                     </thead>
-                    <tbody id="salesBody"></tbody>
+
+                    <tbody id="salesTableBody"></tbody>
+
+                    <tfoot>
+                        <tr>
+                            <th colspan="5" class="text-end">ລວມຍອດທັງເດືອນ:</th>
+                            <th id="totalQtyCell">0</th>
+                            <th id="totalCostCell">0</th>
+                            <th id="totalSaleCell">0</th>
+                            <th id="totalProfitCell">0</th>
+                            <th colspan="2"></th>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -82,53 +125,144 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+
         const salesRef = ref(db, 'sales');
         const productsRef = ref(db, 'products');
-        const salesBody = document.getElementById('salesBody');
+
+        const salesBody = document.getElementById('salesTableBody');
+        const totalQtyCell = document.getElementById('totalQtyCell');
+        const totalCostCell = document.getElementById('totalCostCell');
+        const totalSaleCell = document.getElementById('totalSaleCell');
+        const totalProfitCell = document.getElementById('totalProfitCell');
+
         let productsData = {};
         let salesData = {};
 
-        onValue(productsRef, (snapshot) => { productsData = snapshot.val() || {}; renderSales(salesData); });
-        onValue(salesRef, (snapshot) => { salesData = snapshot.val() || {}; renderSales(salesData); });
+        onValue(productsRef, (snap) => {
+            productsData = snap.val() || {};
+            renderSales();
+        });
 
-        function renderSales(data) {
+        onValue(salesRef, (snap) => {
+            salesData = snap.val() || {};
+            renderSales();
+        });
+
+        function renderSales() {
             salesBody.innerHTML = '';
-            const q = document.getElementById('search').value.toLowerCase();
-            const keys = Object.keys(data).sort((a, b) => b.localeCompare(a));
-            keys.forEach(k => {
-                const s = data[k];
+
+            let totalQty = 0;
+            let totalCostAll = 0;
+            let totalSaleAll = 0;
+            let totalProfitAll = 0;
+
+            const searchQ = document.getElementById('search').value.toLowerCase();
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const monthFilter = document.getElementById('monthFilter').value;
+
+            Object.keys(salesData || {}).reverse().forEach(k => {
+                const s = salesData[k];
+                if (!s) return;
+
+                if (monthFilter && !s.date.startsWith(monthFilter)) return;
+                if (startDate && s.date < startDate) return;
+                if (endDate && s.date > endDate) return;
+
                 const modelName = productsData[s.product_id]?.name || s.product_id;
-                const text = (modelName + ' ' + s.date).toLowerCase();
-                if (q && !text.includes(q)) return;
+                const productName = s.product_name || '-';
+                const qty = Number(s.qty) || 0;
+                const purchase = Number(s.purchase_price) || 0;
+                const sale = Number(s.sale_price) || 0;
+                const totalCost = Number(s.total_cost) || (purchase * qty);
+                const totalSale = Number(s.total_sale) || (sale * qty);
+                const profit = Number(s.profit) || (totalSale - totalCost);
+
+                const text = (modelName + ' ' + s.date + ' ' + productName).toLowerCase();
+                if (searchQ && !text.includes(searchQ)) return;
+
                 const tr = document.createElement('tr');
-                const total = (Number(s.price) || 0) * (Number(s.qty) || 0);
                 tr.innerHTML = `
                     <td>${s.date}</td>
                     <td>${modelName}</td>
-                    <td>${Number(s.price).toLocaleString()}</td>
-                    <td>${s.qty}</td>
-                    <td>${total.toLocaleString()}</td>
+                    <td>${productName}</td>
+                    <td>${purchase.toLocaleString()}</td>
+                    <td>${sale.toLocaleString()}</td>
+                    <td>${qty}</td>
+                    <td>${totalCost.toLocaleString()}</td>
+                    <td>${totalSale.toLocaleString()}</td>
+                    <td style="color:${profit >= 0 ? 'green' : 'red'}">
+                        ${profit.toLocaleString()}
+                    </td>
                     <td>${s.note || ''}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editSale('${k}')">แก้ไข</button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteSale('${k}')">ลบ</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteSale('${k}')">ลบ</button>
                     </td>
                 `;
                 salesBody.appendChild(tr);
+
+                totalQty += qty;
+                totalCostAll += totalCost;
+                totalSaleAll += totalSale;
+                totalProfitAll += profit;
             });
+
+            totalQtyCell.textContent = totalQty.toLocaleString();
+            totalCostCell.textContent = totalCostAll.toLocaleString();
+            totalSaleCell.textContent = totalSaleAll.toLocaleString();
+            totalProfitCell.textContent = totalProfitAll.toLocaleString();
         }
 
-        document.getElementById('search').addEventListener('input', () => { renderSales(salesData); });
+        document.getElementById('search').addEventListener('input', renderSales);
+        document.getElementById('startDate').addEventListener('change', renderSales);
+        document.getElementById('endDate').addEventListener('change', renderSales);
+        document.getElementById('monthFilter').addEventListener('change', renderSales);
 
         window.deleteSale = async function (id) {
-            if (confirm('ต้องการลบรายการขายนี้หรือไม่?')) {
-                await remove(ref(db, `sales/${id}`));
-            }
-        };
+            if (!confirm('ຕ້ອງການລົບບໍ?')) return;
+            await remove(ref(db, `sales/${id}`));
+        }
 
-        window.editSale = function (id) {
-            alert('ฟังก์ชันแก้ไขยังไม่ได้ถูกกำหนด');
-        };
+        document.getElementById('toggleDark').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // ===== Download Excel (ตามเดือนที่เลือก) =====
+        document.getElementById('downloadExcel').addEventListener('click', () => {
+            const monthFilter = document.getElementById('monthFilter').value;
+
+            const wb = XLSX.utils.book_new();
+            const data = [['วันที่', 'Model', 'ชื่อสินค้า', 'ราคา', 'จำนวน', 'รวม', 'หมายเหตุ']];
+
+            let totalExcel = 0;
+
+            Object.keys(salesData || {}).forEach(k => {
+                const s = salesData[k];
+                if (!s) return;
+                if (monthFilter && !s.date.startsWith(monthFilter)) return;
+
+                const modelName = productsData[s.product_id]?.name || s.product_id;
+                const productName = s.product_name || '-';
+                const price = Number(s.price) || 0;
+                const qty = Number(s.qty) || 0;
+                const total = price * qty;
+
+                totalExcel += total;
+
+                data.push([s.date, modelName, productName, price, qty, total, s.note || '']);
+            });
+
+            data.push(['', '', '', '', 'รวมทั้งหมด', totalExcel, '']);
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, 'Sales');
+
+            const fileName = monthFilter
+                ? `Fuji_Sales_${monthFilter}.xlsx`
+                : 'Fuji_Sales_All.xlsx';
+
+            XLSX.writeFile(wb, fileName);
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
