@@ -55,6 +55,7 @@
             appId: "",
             databaseURL: "https://fuji-mobile-shop-default-rtdb.asia-southeast1.firebasedatabase.app/"
         };
+
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const salesRef = ref(db, 'sales');
@@ -65,9 +66,10 @@
             const monthly = {};
 
             Object.values(data).forEach(s => {
-                const date = s.date;
-                const month = date.slice(0, 7);
-                const total = (Number(s.price) || 0) * (Number(s.qty) || 0);
+                const date = s.date; // วันที่
+                const month = date.slice(0, 7); // YYYY-MM
+                const total = Number(s.total_sale) || 0; // ใช้ total_sale
+
                 daily[date] = (daily[date] || 0) + total;
                 monthly[month] = (monthly[month] || 0) + total;
             });
@@ -92,9 +94,7 @@
                 },
                 options: {
                     responsive: true,
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
+                    scales: { y: { beginAtZero: true } }
                 }
             });
         }
