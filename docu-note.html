@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="lo">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເບັ່ງບັນທືກຊີວິດ WYSIWYG - Docu Note</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f0f0f0;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Navbar */
+        nav {
+            background: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        nav h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            background: #1976D2;
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background: #1565C0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #noteForm,
+        #filterForm {
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #noteForm input,
+        #filterForm input {
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #editor {
+            min-height: 120px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: #fff;
+            overflow: auto;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        button.save {
+            background: #4CAF50;
+            color: white;
+        }
+
+        button.update {
+            background: #2196F3;
+            color: white;
+            display: none;
+        }
+
+        button.filter {
+            background: #ff9800;
+            color: white;
+        }
+
+        .note-day {
+            max-width: 800px;
+            margin: 10px auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .note-day h3 {
+            margin: 0 0 10px 0;
+            background: #f4f4f4;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f9f9f9;
+        }
+
+        td button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        td button.edit {
+            background: #2196F3;
+            color: white;
+        }
+
+        td button.delete {
+            background: #f44336;
+            color: white;
+        }
+
+        td button.view {
+            background: #FF9800;
+            color: white;
+        }
+
+        .toolbar {
+            display: flex;
+            margin-bottom: 5px;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar button {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            max-height: 70vh;
+            overflow: auto;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <h2>Docu Note</h2>
+        <a href="note.html">ບັນທຶກລາຍຈ່າຍປະຈຳວັນ</a>
+    </nav>
+
+    <h1>ບົດບັນທຶກຊີວິດແລະແບ່ງບັນປະສົບການ</h1>
+
+    <div id="noteForm">
+        <input type="text" id="noteTitle" placeholder="ເຫົາຫົວຂໍ້">
+        <div class="toolbar">
+            <button type="button" onclick="execCmd('bold')"><b>B</b></button>
+            <button type="button" onclick="execCmd('italic')"><i>I</i></button>
+            <button type="button" onclick="execCmd('underline')"><u>U</u></button>
+            <button type="button" onclick="execCmd('foreColor','red')">ແດງ</button>
+            <button type="button" onclick="execCmd('foreColor','green')">ຂຽວ</button>
+            <button type="button" onclick="execCmd('insertOrderedList')">OL</button>
+            <button type="button" onclick="execCmd('insertUnorderedList')">UL</button>
+            <button type="button" onclick="execCmd('createLink',prompt('ປ້ອນ URL'))">Link</button>
+        </div>
+        <div id="editor" contenteditable="true" placeholder="ເພີ່ມລາຍລະອຽດ"></div>
+        <button class="save" onclick="saveNote()">ບັນທືກ</button>
+        <button class="update" onclick="updateNote()">ແກ້ໄຂ</button>
+    </div>
+
+    <div id="filterForm">
+        <input type="date" id="filterDate">
+        <button class="filter" onclick="filterNotes()">ຄົ້ນຫາຕາມວັນທີ</button>
+        <button class="filter" onclick="clearFilter()">ສະກ້າງການຄົ້ນຫາ</button>
+        <button class="filter" onclick="downloadExcel()">ດາວໂນ້ດ Excel</button>
+    </div>
+
+    <div id="notesContainer"></div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 id="modalTitle"></h2>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8b0h8yyTo5th6UMvI4_dKUB1ZnvCwZBw",
+            authDomain: "fuji-mobile-shop.firebaseapp.com",
+            databaseURL: "https://fuji-mobile-shop-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fuji-mobile-shop",
+            storageBucket: "fuji-mobile-shop.appspot.com",
+            messagingSenderId: "753053073037",
+            appId: "1:753053073037:web:7c9cb46e055b91a4cf2cc4",
+            measurementId: "G-BZH3DRHBFV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let editKey = null;
+        const noteTitle = document.getElementById('noteTitle');
+        const editor = document.getElementById('editor');
+        const saveBtn = document.querySelector('#noteForm .save');
+        const updateBtn = document.querySelector('#noteForm .update');
+
+        // WYSIWYG command
+        window.execCmd = (cmd, val = null) => { document.execCommand(cmd, false, val); }
+
+        // Modal functions
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        window.showModal = (title, content) => {
+            modalTitle.innerHTML = title;
+            modalContent.innerHTML = content;
+            modal.style.display = 'block';
+        }
+        window.closeModal = () => { modal.style.display = 'none'; }
+
+        // Load notes
+        function loadNotes() {
+            onValue(ref(db, 'notes'), snap => renderNotes(snap.val()));
+        }
+
+        // Render notes (แก้ไขแล้ว รองรับข้อความยาว)
+        function renderNotes(data, filterDay = null) {
+            const container = document.getElementById('notesContainer');
+            container.innerHTML = '';
+            if (!data) return;
+
+            const grouped = {};
+            Object.keys(data).forEach(key => {
+                const note = data[key];
+                const day = note.date.split(' ')[0];
+                if (!grouped[day]) grouped[day] = [];
+                grouped[day].push({ ...note, key });
+            });
+
+            Object.keys(grouped).sort((a, b) => b.localeCompare(a)).forEach(day => {
+                if (filterDay && day !== filterDay) return;
+
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'note-day';
+                dayDiv.innerHTML = `<h3>${day}</h3>`;
+
+                const table = document.createElement('table');
+                const thead = document.createElement('thead');
+                thead.innerHTML = `<tr><th>ເວລາ</th><th>ຫົວຂໍ້</th><th>ລາຍລະອຽດ</th><th>ຈັດການ</th></tr>`;
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+                grouped[day].forEach(note => {
+                    const tr = document.createElement('tr');
+
+                    tr.innerHTML = `
+                        <td>${note.date.split(' ')[1]}</td>
+                        <td>${note.title}</td>
+                        <td><button class="view" data-title="${note.title.replace(/"/g, '&quot;')}" data-content="${note.content.replace(/"/g, '&quot;')}">ເບິ່ງລາຍລະອຽດ</button></td>
+                        <td>
+                            <button class="edit" onclick="editNote('${note.key}')">ແກ້ໄຂ</button>
+                            <button class="delete" onclick="deleteNote('${note.key}')">ລຶບ</button>
+                        </td>`;
+
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                dayDiv.appendChild(table);
+                container.appendChild(dayDiv);
+            });
+
+            // Add click event for view buttons
+            document.querySelectorAll('.view').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const title = btn.dataset.title;
+                    const content = btn.dataset.content.replace(/\n/g, '<br>');
+                    showModal(title, content);
+                });
+            });
+        }
+
+        // Save note
+        window.saveNote = function () {
+            const title = noteTitle.value.trim();
+            const content = editor.innerHTML.trim();
+            if (!title || !content) { alert('ກະລຸນາໃສ່ຫົວຂໍ້ແລະລາຍລະອຽດ'); return; }
+            const dateStr = new Date().toISOString().slice(0, 10) + ' ' + new Date().toTimeString().slice(0, 8);
+            const newRef = push(ref(db, 'notes'));
+            set(newRef, { date: dateStr, title, content });
+            noteTitle.value = ''; editor.innerHTML = '';
+        }
+
+        // Edit note
+        window.editNote = function (key) {
+            onValue(ref(db, 'notes/' + key), snap => {
+                const note = snap.val();
+                noteTitle.value = note.title;
+                editor.innerHTML = note.content;
+                editKey = key;
+                saveBtn.style.display = 'none';
+                updateBtn.style.display = 'inline-block';
+            }, { onlyOnce: true });
+        }
+
+        // Update note
+        window.updateNote = function () {
+            const title = noteTitle.value.trim();
+            const content = editor.innerHTML.trim();
+            if (!title || !content) { alert('ກະລຸນາໃສ່ຫົວຂໍ້ແລະລາຍລະອຽດ'); return; }
+            const dateStr = new Date().toISOString().slice(0, 10) + ' ' + new Date().toTimeString().slice(0, 8);
+            update(ref(db, 'notes/' + editKey), { date: dateStr, title, content });
+            noteTitle.value = ''; editor.innerHTML = '';
+            saveBtn.style.display = 'inline-block';
+            updateBtn.style.display = 'none';
+            editKey = null;
+        }
+
+        // Delete note
+        window.deleteNote = function (key) { if (confirm('ທ່ານຕ້ອງການລຶບບັນທືກນີ້ບໍ?')) remove(ref(db, 'notes/' + key)); }
+
+        // Filter
+        window.filterNotes = function () {
+            const filterDate = document.getElementById('filterDate').value;
+            if (!filterDate) { alert('ກະລຸນາເລືອກວັນທີ'); return; }
+            onValue(ref(db, 'notes'), snap => renderNotes(snap.val(), filterDate), { onlyOnce: true });
+        }
+
+        // Clear filter
+        window.clearFilter = function () { document.getElementById('filterDate').value = ''; loadNotes(); }
+
+        // Download Excel
+        window.downloadExcel = function () {
+            onValue(ref(db, 'notes'), snap => {
+                const data = snap.val();
+                if (!data) { alert('ບໍ່ມີຂໍ້ມູນ'); return; }
+                let csv = "ວັນທີ,ເວລາ,ຫົວຂໍ້,ລາຍລະອຽດ\n";
+                Object.keys(data).sort().forEach(key => {
+                    const n = data[key];
+                    const [day, time] = n.date.split(' ');
+                    const contentText = n.content.replace(/<[^>]+>/g, '');
+                    csv += `${day},${time},${n.title},${contentText}\n`;
+                });
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'docu_note.csv'; a.click();
+                URL.revokeObjectURL(url);
+            }, { onlyOnce: true });
+        }
+
+        loadNotes();
+    </script>
+</body>
+
+</html>
