@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>ລະບົບບັນທຶກລາຍຈ່າຍ</title>
 
-    <!-- SheetJS ใช้ทำ Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
     <style>
@@ -15,7 +14,6 @@
             background: #f7f7f7;
         }
 
-        /* Navbar */
         .navbar {
             background: #333;
             padding: 10px;
@@ -63,8 +61,8 @@
             border-radius: 5px;
         }
 
-        /* Popup Edit box */
-        #editBox {
+        #editBox,
+        #deleteConfirmBox {
             position: fixed;
             top: 0;
             left: 0;
@@ -76,24 +74,26 @@
             align-items: center;
         }
 
-        #editContent {
+        #editContent,
+        #deleteContent {
             background: #fff;
             padding: 20px;
             width: 300px;
             border-radius: 8px;
+        }
+
+        #deleteContent button {
+            width: 45%;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- 🔹 Navbar -->
     <div class="navbar">
         <a href="index.html">🏠 ກັບໜ້າຫຼັກ</a>
-         <a href="docu-note.html">ບັນທຶກເລື່ອງລາວ</a>
+        <a href="docu-note.html">ບັນທຶກເລື່ອງລາວ</a>
     </div>
-   
-       
 
     <h2>💰 ລະບົບບັນທຶກລາຍຈ່າຍປະຈຳວັນ</h2>
 
@@ -115,6 +115,9 @@
 
     <div class="summary">
         <h3>📊 ສະຫຼຸບລາຍຈ່າຍເດືອນ</h3>
+
+        <p id="todayTotalText" style="color:#d9534f;font-weight:bold;"></p>
+
         <p id="totalText">รวมทั้งหมด: 0 ກີບ</p>
     </div>
 
@@ -136,7 +139,7 @@
         <tbody id="expenseTable"></tbody>
     </table>
 
-    <!-- Popup Edit -->
+    <!-- Popup แก้ไขรายการ -->
     <div id="editBox">
         <div id="editContent">
             <h3>✏ ແກ້ໄຂລາຍການ</h3>
@@ -155,7 +158,17 @@
         </div>
     </div>
 
-    <!-- Firebase -->
+    <!-- Popup ยืนยันลบ -->
+    <div id="deleteConfirmBox">
+        <div id="deleteContent">
+            <h3 style="color:red;">⚠ ຢືນຢັນການລົບ</h3>
+            <p>ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລົບລາຍການນີ້?</p>
+            <button onclick="confirmDelete()" style="background:#d9534f;color:white;">ລົບ</button>
+            <button onclick="cancelDelete()">ຍົກເລີກ</button>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, push, remove, update, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
@@ -176,9 +189,8 @@
         const monthSelect = document.getElementById("monthSelect");
         const currentYear = new Date().getFullYear();
 
-        let EDIT_Y = "";
-        let EDIT_M = "";
-        let EDIT_KEY = "";
+        let EDIT_Y = "", EDIT_M = "", EDIT_KEY = "";
+        let DELETE_Y = "", DELETE_M = "", DELETE_KEY = "";
 
         async function loadAvailableMonths() {
             const yearRef = ref(db, `expenses/${currentYear}`);
@@ -216,7 +228,6 @@
             const m = date.split("-")[1];
 
             const newRef = push(ref(db, `expenses/${y}/${m}`));
-
             set(newRef, { date, item, price }).then(() => {
                 alert("✔ ບັນທຶກສຳເລັດ");
                 loadAvailableMonths();
@@ -227,23 +238,32 @@
         window.loadMonth = function () {
             const m = monthSelect.value;
             const y = currentYear;
-            const tableBody = document.getElementById("expenseTable");
 
+            const tableBody = document.getElementById("expenseTable");
             tableBody.innerHTML = "";
+
             if (!m) return;
 
             const monthRef = ref(db, `expenses/${y}/${m}`);
 
             onValue(monthRef, (snapshot) => {
                 tableBody.innerHTML = "";
+
                 let index = 1;
                 let total = 0;
+                let todayTotal = 0;
+
+                const todayStr = new Date().toISOString().split("T")[0];
 
                 snapshot.forEach(child => {
                     const key = child.key;
                     const data = child.val();
 
                     total += Number(data.price);
+
+                    if (data.date === todayStr) {
+                        todayTotal += Number(data.price);
+                    }
 
                     tableBody.innerHTML += `
                 <tr>
@@ -254,17 +274,39 @@
 
                     <td><button onclick="openEdit('${y}','${m}','${key}','${data.date}','${data.item}','${data.price}')">✏</button></td>
 
-                    <td><button onclick="deleteItem('${y}','${m}','${key}')">🗑</button></td>
+                    <td><button onclick="askDelete('${y}','${m}','${key}')">🗑</button></td>
                 </tr>`;
                 });
 
-                totalText.textContent = "ລວມທັງໝົດ: " + total.toLocaleString() + " ກີບ";
+                todayTotalText.textContent =
+                    "ລວມວັນນີ້: " + todayTotal.toLocaleString() + " ກີບ";
+
+                totalText.textContent =
+                    "ລວມທັງໝົດ: " + total.toLocaleString() + " ກີບ";
             });
         };
 
-        window.deleteItem = function (y, m, key) {
-            remove(ref(db, `expenses/${y}/${m}/${key}`));
-            loadMonth();
+        /** 🔥 ฟังก์ชันเปิด Popup ลบ */
+        window.askDelete = function (y, m, key) {
+            DELETE_Y = y;
+            DELETE_M = m;
+            DELETE_KEY = key;
+
+            document.getElementById("deleteConfirmBox").style.display = "flex";
+        };
+
+        /** 🔥 กดลบจริง */
+        window.confirmDelete = function () {
+            remove(ref(db, `expenses/${DELETE_Y}/${DELETE_M}/${DELETE_KEY}`))
+                .then(() => {
+                    document.getElementById("deleteConfirmBox").style.display = "none";
+                    loadMonth();
+                });
+        };
+
+        /** ❌ ยกเลิก */
+        window.cancelDelete = function () {
+            document.getElementById("deleteConfirmBox").style.display = "none";
         };
 
         window.openEdit = function (y, m, key, date, item, price) {
@@ -304,7 +346,6 @@
             });
         };
 
-        /* ---------------------- Export Excel ---------------------- */
         window.exportExcel = async function () {
             const m = monthSelect.value;
             const y = currentYear;
@@ -331,7 +372,6 @@
 
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
-
             XLSX.utils.book_append_sheet(wb, ws, "Expenses");
 
             const filename = `expenses_${y}_${m}.xlsx`;
