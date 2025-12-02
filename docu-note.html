@@ -270,7 +270,6 @@
 
     <div id="notesContainer"></div>
 
-    <!-- Modal view -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">&times;</button>
@@ -281,7 +280,6 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="modal">
         <div class="modal-content">
             <h2>ຢືນຢັນການລຶບ</h2>
@@ -318,6 +316,7 @@
         const saveBtn = document.querySelector('#noteForm .save');
         const updateBtn = document.querySelector('#noteForm .update');
         const shareLinkContainer = document.getElementById('shareLinkContainer');
+        const filterDateInput = document.getElementById('filterDate');
 
         window.execCmd = (cmd, val = null) => { document.execCommand(cmd, false, val); }
 
@@ -352,11 +351,49 @@
         const deleteModal = document.getElementById('deleteModal');
         const confirmDeleteBtn = document.getElementById('confirmDelete');
         window.closeDeleteModal = () => { deleteModal.style.display = 'none'; deleteKey = null; }
+
         confirmDeleteBtn.addEventListener('click', () => {
-            if (deleteKey) remove(ref(db, 'notes/' + deleteKey));
+            if (deleteKey) {
+                remove(ref(db, 'notes/' + deleteKey))
+                    .then(() => alert('ບັນທຶກຖືກລຶບແລ້ວ!'))
+                    .catch(err => console.error('Error deleting note:', err));
+            }
             closeDeleteModal();
         });
 
+        // ** (1) SAVE NOTE FUNCTION **
+        window.saveNote = function () {
+            const title = noteTitle.value.trim();
+            const content = editor.innerHTML.trim();
+            if (!title || !content) {
+                alert('ກະລຸນາປ້ອນຫົວຂໍ້ແລະເນື້ອຫາ!');
+                return;
+            }
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-CA').replace(/\//g, '-'); // Format YYYY-MM-DD
+            const timeStr = now.toTimeString().split(' ')[0].substring(0, 5); // Format HH:MM
+
+            const newNote = {
+                title: title,
+                content: content,
+                date: `${dateStr} ${timeStr}`
+            };
+
+            const newNoteRef = push(ref(db, 'notes'));
+            set(newNoteRef, newNote)
+                .then(() => {
+                    alert('ບັນທຶກສຳເລັດ!');
+                    noteTitle.value = '';
+                    editor.innerHTML = '';
+                })
+                .catch((error) => {
+                    console.error("Error saving note: ", error);
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກ!');
+                });
+        }
+
+        // ** (2) LOAD NOTES FUNCTION **
         function loadNotes() {
             onValue(ref(db, 'notes'), snap => renderNotes(snap.val()));
         }
@@ -384,9 +421,12 @@
                 const tbody = document.createElement('tbody');
                 grouped[day].forEach(note => {
                     const tr = document.createElement('tr');
+                    // ໃຊ້ escape function ເພື່ອຮັບປະກັນວ່າ data-title/data-content ຖືກຕ້ອງ
+                    const escapedTitle = note.title.replace(/"/g, '&quot;');
+                    const escapedContent = note.content.replace(/"/g, '&quot;');
                     tr.innerHTML = `<td>${note.date.split(' ')[1]}</td>
-            <td>${note.title}</td>
-            <td><button class="view" data-title="${note.title.replace(/"/g, '&quot;')}" data-content="${note.content.replace(/"/g, '&quot;')}" data-id="${note.key}">ເບິ່ງລາຍລະອຽດ</button></td>
+            <td>${escapedTitle}</td>
+            <td><button class="view" data-title="${escapedTitle}" data-content="${escapedContent}" data-id="${note.key}">ເບິ່ງລາຍລະອຽດ</button></td>
             <td><button class="edit" onclick="editNote('${note.key}')">ແກ້ໄຂ</button>
             <button class="delete" onclick="promptDelete('${note.key}')">ລຶບ</button></td>`;
                     tbody.appendChild(tr);
@@ -397,6 +437,7 @@
             });
             document.querySelectorAll('.view').forEach(btn => {
                 btn.addEventListener('click', () => {
+                    // ດຶງຂໍ້ມູນທີ່ຖືກ escape ມາສະແດງ
                     const title = btn.dataset.title;
                     const content = btn.dataset.content;
                     const id = btn.dataset.id;
@@ -405,15 +446,144 @@
             });
         }
 
-        // Save, edit, update, delete, filter, download functions remain same...
+        // ** (3) EDIT NOTE FUNCTION **
+        window.editNote = function (key) {
+            editKey = key;
+            saveBtn.style.display = 'none';
+            updateBtn.style.display = 'block';
+
+            get(ref(db, 'notes/' + key)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const note = snapshot.val();
+                    noteTitle.value = note.title;
+                    editor.innerHTML = note.content;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    alert('ບໍ່ພົບຂໍ້ມູນທີ່ຈະແກ້ໄຂ.');
+                    resetForm();
+                }
+            }).catch(error => {
+                console.error("Error reading note for edit: ", error);
+                alert('ເກີດຂໍ້ຜິດພາດໃນການດຶງຂໍ້ມູນ.');
+                resetForm();
+            });
+        }
+
+        // ** (4) UPDATE NOTE FUNCTION **
+        window.updateNote = function () {
+            if (!editKey) return;
+
+            const title = noteTitle.value.trim();
+            const content = editor.innerHTML.trim();
+            if (!title || !content) {
+                alert('ກະລຸນາປ້ອນຫົວຂໍ້ແລະເນື້ອຫາ!');
+                return;
+            }
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-CA').replace(/\//g, '-');
+            const timeStr = now.toTimeString().split(' ')[0].substring(0, 5);
+
+            const updatedNote = {
+                title: title,
+                content: content,
+                // ອັບເດດເວລາບັນທຶກດ້ວຍ
+                date: `${dateStr} ${timeStr}`
+            };
+
+            update(ref(db, 'notes/' + editKey), updatedNote)
+                .then(() => {
+                    alert('ແກ້ໄຂບັນທຶກສຳເລັດ!');
+                    resetForm();
+                })
+                .catch((error) => {
+                    console.error("Error updating note: ", error);
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການແກ້ໄຂ!');
+                });
+        }
+
+        // ** (5) PROMPT DELETE FUNCTION **
+        window.promptDelete = function (key) {
+            deleteKey = key;
+            deleteModal.style.display = 'block';
+        }
+
+        function resetForm() {
+            editKey = null;
+            noteTitle.value = '';
+            editor.innerHTML = '';
+            saveBtn.style.display = 'block';
+            updateBtn.style.display = 'none';
+        }
+
+        // ** (6) FILTER NOTES FUNCTION **
+        window.filterNotes = function () {
+            const filterDay = filterDateInput.value; // Format YYYY-MM-DD
+            if (!filterDay) {
+                alert('ກະລຸນາເລືອກວັນທີເພື່ອຄົ້ນຫາ!');
+                return;
+            }
+
+            get(ref(db, 'notes')).then(snapshot => {
+                if (snapshot.exists()) {
+                    renderNotes(snapshot.val(), filterDay);
+                } else {
+                    document.getElementById('notesContainer').innerHTML = '<p style="text-align:center;">ບໍ່ພົບຂໍ້ມູນໃນວັນທີນີ້.</p>';
+                }
+            }).catch(err => {
+                console.error('Error fetching notes for filter:', err);
+            });
+        }
+
+        // ** (7) CLEAR FILTER FUNCTION **
+        window.clearFilter = function () {
+            filterDateInput.value = '';
+            loadNotes(); // ໂຫຼດບັນທຶກທັງໝົດຄືນ
+        }
+
+        // ** (8) DOWNLOAD EXCEL FUNCTION **
+        window.downloadExcel = function () {
+            get(ref(db, 'notes')).then(snapshot => {
+                const data = snapshot.val();
+                if (!data) {
+                    alert('ບໍ່ມີບັນທຶກໃຫ້ດາວໂຫຼດ!');
+                    return;
+                }
+
+                let csv = 'ເວລາ,ຫົວຂໍ້,ເນື້ອຫາ\n';
+                Object.keys(data).forEach(key => {
+                    const note = data[key];
+                    // ໃຊ້ replace() ເພື່ອປ້ອງກັນການຜິດພາດໃນ CSV
+                    const safeTitle = `"${note.title.replace(/"/g, '""')}"`;
+                    // ປ່ຽນ HTML ເປັນຂໍ້ຄວາມທຳມະດາເພື່ອຄວາມສະອາດ
+                    const contentText = note.content.replace(/<[^>]*>/g, '').replace(/"/g, '""').trim();
+                    const safeContent = `"${contentText}"`;
+
+                    csv += `${note.date},${safeTitle},${safeContent}\n`;
+                });
+
+                const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "docu_note_export.csv";
+                a.click();
+                URL.revokeObjectURL(url);
+
+            }).catch(err => {
+                console.error('Error fetching notes for export:', err);
+                alert('ເກີດຂໍ້ຜິດພາດໃນການດາວໂຫຼດ!');
+            });
+        }
+
 
         window.generateShareLink = function () {
             if (!currentNoteId) return;
             const shareUrl = `${window.location.origin}${window.location.pathname}?id=${currentNoteId}`;
-            shareLinkContainer.innerHTML = `<input type="text" value="${shareUrl}" readonly style="width:100%;text-align:center;">`;
+            shareLinkContainer.innerHTML = `<input type="text" value="${shareUrl}" readonly style="width:100%;text-align:center;" onclick="this.select();document.execCommand('copy');alert('ລິ້ງຖືກຄັດລອກແລ້ວ!')">`;
         }
 
-        // --- New: Load note from URL ---
+        // --- Load note from URL ---
         function loadNoteFromURL() {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
@@ -421,7 +591,9 @@
                 get(ref(db, 'notes/' + id)).then(snap => {
                     if (snap.exists()) {
                         const note = snap.val();
-                        showModal(note.title, note.content, id);
+                        // ໃຊ້ replace ຖ້າເນື້ອຫາບັນທຶກມີລາຍລະອຽດຫຼາຍ
+                        const contentToDisplay = note.content.replace(/<a/g, '<a target="_blank"');
+                        showModal(note.title, contentToDisplay, id);
                     }
                 });
             }
