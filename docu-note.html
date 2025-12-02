@@ -13,7 +13,6 @@
             margin: 0;
         }
 
-        /* Navbar */
         nav {
             background: #2196F3;
             color: white;
@@ -172,7 +171,6 @@
             font-size: 14px;
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -190,9 +188,8 @@
             margin: 10% auto;
             padding: 20px;
             border-radius: 8px;
-            max-width: 600px;
-            max-height: 70vh;
-            overflow: auto;
+            max-width: 400px;
+            text-align: center;
         }
 
         .modal-content h2 {
@@ -206,12 +203,25 @@
             background: none;
             border: none;
         }
+
+        .modal button {
+            margin: 10px;
+        }
+
+        .modal button.confirm {
+            background: #f44336;
+            color: white;
+        }
+
+        .modal button.cancel {
+            background: #9e9e9e;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- Navbar -->
     <nav>
         <h2>Docu Note</h2>
         <a href="note.html">ບັນທຶກລາຍຈ່າຍປະຈຳວັນ</a>
@@ -245,12 +255,22 @@
 
     <div id="notesContainer"></div>
 
-    <!-- Modal -->
+    <!-- View Modal -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">&times;</button>
             <h2 id="modalTitle"></h2>
             <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h2>ຢືນຢັນການລຶບ</h2>
+            <p>ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບບັນທືກນີ້?</p>
+            <button class="confirm" id="confirmDelete">ລຶບ</button>
+            <button class="cancel" onclick="closeDeleteModal()">ຍົກເລີກ</button>
         </div>
     </div>
 
@@ -273,6 +293,7 @@
         const db = getDatabase(app);
 
         let editKey = null;
+        let deleteKey = null;
         const noteTitle = document.getElementById('noteTitle');
         const editor = document.getElementById('editor');
         const saveBtn = document.querySelector('#noteForm .save');
@@ -292,12 +313,20 @@
         }
         window.closeModal = () => { modal.style.display = 'none'; }
 
+        // Delete modal
+        const deleteModal = document.getElementById('deleteModal');
+        const confirmDeleteBtn = document.getElementById('confirmDelete');
+        window.closeDeleteModal = () => { deleteModal.style.display = 'none'; deleteKey = null; }
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (deleteKey) remove(ref(db, 'notes/' + deleteKey));
+            closeDeleteModal();
+        });
+
         // Load notes
         function loadNotes() {
             onValue(ref(db, 'notes'), snap => renderNotes(snap.val()));
         }
 
-        // Render notes (แก้ไขแล้ว รองรับข้อความยาว)
         function renderNotes(data, filterDay = null) {
             const container = document.getElementById('notesContainer');
             container.innerHTML = '';
@@ -326,16 +355,14 @@
                 const tbody = document.createElement('tbody');
                 grouped[day].forEach(note => {
                     const tr = document.createElement('tr');
-
                     tr.innerHTML = `
                         <td>${note.date.split(' ')[1]}</td>
                         <td>${note.title}</td>
                         <td><button class="view" data-title="${note.title.replace(/"/g, '&quot;')}" data-content="${note.content.replace(/"/g, '&quot;')}">ເບິ່ງລາຍລະອຽດ</button></td>
                         <td>
                             <button class="edit" onclick="editNote('${note.key}')">ແກ້ໄຂ</button>
-                            <button class="delete" onclick="deleteNote('${note.key}')">ລຶບ</button>
+                            <button class="delete" onclick="promptDelete('${note.key}')">ລຶບ</button>
                         </td>`;
-
                     tbody.appendChild(tr);
                 });
                 table.appendChild(tbody);
@@ -343,7 +370,6 @@
                 container.appendChild(dayDiv);
             });
 
-            // Add click event for view buttons
             document.querySelectorAll('.view').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const title = btn.dataset.title;
@@ -353,7 +379,6 @@
             });
         }
 
-        // Save note
         window.saveNote = function () {
             const title = noteTitle.value.trim();
             const content = editor.innerHTML.trim();
@@ -364,7 +389,6 @@
             noteTitle.value = ''; editor.innerHTML = '';
         }
 
-        // Edit note
         window.editNote = function (key) {
             onValue(ref(db, 'notes/' + key), snap => {
                 const note = snap.val();
@@ -376,7 +400,6 @@
             }, { onlyOnce: true });
         }
 
-        // Update note
         window.updateNote = function () {
             const title = noteTitle.value.trim();
             const content = editor.innerHTML.trim();
@@ -389,20 +412,20 @@
             editKey = null;
         }
 
-        // Delete note
-        window.deleteNote = function (key) { if (confirm('ທ່ານຕ້ອງການລຶບບັນທືກນີ້ບໍ?')) remove(ref(db, 'notes/' + key)); }
+        // Prompt delete
+        window.promptDelete = function (key) {
+            deleteKey = key;
+            deleteModal.style.display = 'block';
+        }
 
-        // Filter
         window.filterNotes = function () {
             const filterDate = document.getElementById('filterDate').value;
             if (!filterDate) { alert('ກະລຸນາເລືອກວັນທີ'); return; }
             onValue(ref(db, 'notes'), snap => renderNotes(snap.val(), filterDate), { onlyOnce: true });
         }
 
-        // Clear filter
         window.clearFilter = function () { document.getElementById('filterDate').value = ''; loadNotes(); }
 
-        // Download Excel
         window.downloadExcel = function () {
             onValue(ref(db, 'notes'), snap => {
                 const data = snap.val();
