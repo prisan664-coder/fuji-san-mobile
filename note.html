@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="lo">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ລະບົບບັນທຶກລາຍຈ່າຍ</title>
+
+    <!-- SheetJS ใช้ทำ Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #f7f7f7;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #333;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 8px 12px;
+            display: inline-block;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        /* Popup Edit box */
+        #editBox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, .5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #editContent {
+            background: #fff;
+            padding: 20px;
+            width: 300px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 🔹 Navbar -->
+    <div class="navbar">
+        <a href="index.html">🏠 ກັບໜ້າຫຼັກ</a>
+    </div>
+
+    <h2>💰 ລະບົບບັນທຶກລາຍຈ່າຍປະຈຳວັນ</h2>
+
+    <label>ວັນທີ:</label>
+    <input type="date" id="dateInput"><br>
+
+    <label>ລາຍການ:</label>
+    <input type="text" id="itemInput" placeholder="ຊື້ຫຍັງ?"><br>
+
+    <label>ລາຄາ:</label>
+    <input type="number" id="priceInput" placeholder="0"><br>
+
+    <button onclick="saveExpense()">➕ ບັນທຶກລາຍການ</button>
+
+    <hr>
+
+    <label>ເລືອກເດືອນ:</label>
+    <select id="monthSelect" onchange="loadMonth()"></select>
+
+    <div class="summary">
+        <h3>📊 ສະຫຼຸບລາຍຈ່າຍເດືອນ</h3>
+        <p id="totalText">รวมทั้งหมด: 0 ກີບ</p>
+    </div>
+
+    <button onclick="exportExcel()" style="background:#1f7cff;color:white;border:none;border-radius:5px;">
+        📥 Export Excel
+    </button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ລຳດັບ</th>
+                <th>ວັນທີ</th>
+                <th>ລາຍການ</th>
+                <th>ລາຄາ</th>
+                <th>ແກ້ໄຂ</th>
+                <th>ລຶບ</th>
+            </tr>
+        </thead>
+        <tbody id="expenseTable"></tbody>
+    </table>
+
+    <!-- Popup Edit -->
+    <div id="editBox">
+        <div id="editContent">
+            <h3>✏ ແກ້ໄຂລາຍການ</h3>
+
+            <label>ວັນທີ:</label>
+            <input type="date" id="editDate"><br>
+
+            <label>ລາຍການ:</label>
+            <input type="text" id="editItem"><br>
+
+            <label>ລາຄາ:</label>
+            <input type="number" id="editPrice"><br>
+
+            <button onclick="saveEdit()">💾 ບັນທຶກ</button>
+            <button onclick="closeEdit()">❌ ປິດ</button>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, push, remove, update, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8b0h8yyTo5th6UMvI4_dKUB1ZnvCwZBw",
+            authDomain: "fuji-mobile-shop.firebaseapp.com",
+            databaseURL: "https://fuji-mobile-shop-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "fuji-mobile-shop",
+            storageBucket: "fuji-mobile-shop.appspot.com",
+            messagingSenderId: "753053073037",
+            appId: "1:753053073037:web:7c9cb46e055b91a4cf2cc4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const monthSelect = document.getElementById("monthSelect");
+        const currentYear = new Date().getFullYear();
+
+        let EDIT_Y = "";
+        let EDIT_M = "";
+        let EDIT_KEY = "";
+
+        async function loadAvailableMonths() {
+            const yearRef = ref(db, `expenses/${currentYear}`);
+            const snapshot = await get(yearRef);
+
+            monthSelect.innerHTML = "";
+
+            if (!snapshot.exists()) {
+                monthSelect.innerHTML = `<option value="">-- ບໍ່ມີຂໍ້ມູນ --</option>`;
+                return;
+            }
+
+            snapshot.forEach(child => {
+                const mm = child.key;
+                const opt = document.createElement("option");
+                opt.value = mm;
+                opt.textContent = `ເດືອນ ${mm} / ${currentYear}`;
+                monthSelect.appendChild(opt);
+            });
+
+            loadMonth();
+        }
+
+        window.saveExpense = function () {
+            const date = dateInput.value;
+            const item = itemInput.value;
+            const price = Number(priceInput.value);
+
+            if (!date || !item || !price) {
+                alert("ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບ");
+                return;
+            }
+
+            const y = date.split("-")[0];
+            const m = date.split("-")[1];
+
+            const newRef = push(ref(db, `expenses/${y}/${m}`));
+
+            set(newRef, { date, item, price }).then(() => {
+                alert("✔ ບັນທຶກສຳເລັດ");
+                loadAvailableMonths();
+                loadMonth();
+            });
+        };
+
+        window.loadMonth = function () {
+            const m = monthSelect.value;
+            const y = currentYear;
+            const tableBody = document.getElementById("expenseTable");
+
+            tableBody.innerHTML = "";
+            if (!m) return;
+
+            const monthRef = ref(db, `expenses/${y}/${m}`);
+
+            onValue(monthRef, (snapshot) => {
+                tableBody.innerHTML = "";
+                let index = 1;
+                let total = 0;
+
+                snapshot.forEach(child => {
+                    const key = child.key;
+                    const data = child.val();
+
+                    total += Number(data.price);
+
+                    tableBody.innerHTML += `
+                <tr>
+                    <td>${index++}</td>
+                    <td>${data.date}</td>
+                    <td>${data.item}</td>
+                    <td>${Number(data.price).toLocaleString()}</td>
+
+                    <td><button onclick="openEdit('${y}','${m}','${key}','${data.date}','${data.item}','${data.price}')">✏</button></td>
+
+                    <td><button onclick="deleteItem('${y}','${m}','${key}')">🗑</button></td>
+                </tr>`;
+                });
+
+                totalText.textContent = "ລວມທັງໝົດ: " + total.toLocaleString() + " ກີບ";
+            });
+        };
+
+        window.deleteItem = function (y, m, key) {
+            remove(ref(db, `expenses/${y}/${m}/${key}`));
+            loadMonth();
+        };
+
+        window.openEdit = function (y, m, key, date, item, price) {
+            EDIT_Y = y;
+            EDIT_M = m;
+            EDIT_KEY = key;
+
+            editDate.value = date;
+            editItem.value = item;
+            editPrice.value = price;
+
+            document.getElementById("editBox").style.display = "flex";
+        };
+
+        window.closeEdit = function () {
+            document.getElementById("editBox").style.display = "none";
+        };
+
+        window.saveEdit = function () {
+            const newDate = editDate.value;
+            const newItem = editItem.value;
+            const newPrice = Number(editPrice.value);
+
+            if (!newDate || !newItem || !newPrice) {
+                alert("ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບ");
+                return;
+            }
+
+            update(ref(db, `expenses/${EDIT_Y}/${EDIT_M}/${EDIT_KEY}`), {
+                date: newDate,
+                item: newItem,
+                price: newPrice
+            }).then(() => {
+                alert("✔ ແກ້ໄຂສຳເລັດ");
+                closeEdit();
+                loadMonth();
+            });
+        };
+
+        /* ---------------------- Export Excel ---------------------- */
+        window.exportExcel = async function () {
+            const m = monthSelect.value;
+            const y = currentYear;
+
+            if (!m) {
+                alert("⚠ ກະລຸນາເລືອກເດືອນ");
+                return;
+            }
+
+            const monthRef = ref(db, `expenses/${y}/${m}`);
+            const snapshot = await get(monthRef);
+
+            if (!snapshot.exists()) {
+                alert("⚠ ບໍ່ມີຂໍ້ມູນໃນເດືອນນີ້");
+                return;
+            }
+
+            let data = [["ວັນທີ", "ລາຍການ", "ລາຄາ"]];
+
+            snapshot.forEach(child => {
+                const d = child.val();
+                data.push([d.date, d.item, d.price]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+
+            XLSX.utils.book_append_sheet(wb, ws, "Expenses");
+
+            const filename = `expenses_${y}_${m}.xlsx`;
+            XLSX.writeFile(wb, filename);
+        };
+
+        loadAvailableMonths();
+    </script>
+
+</body>
+
+</html>
