@@ -1,131 +1,847 @@
-<!doctype html>
-<html lang="th">
+<!DOCTYPE html>
+<html lang="lo">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>📆 รายงานยอดขายรายวัน - Fuji Mobile Shop</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເບັ່ງບັນທືກຊີວິດ WYSIWYG - Docu Note</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f0f0f0;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav {
+            background: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        nav h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            background: #1976D2;
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background: #1565C0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #noteForm,
+        #filterForm {
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #noteForm input,
+        #filterForm input {
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #editor {
+            min-height: 120px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: #fff;
+            overflow: auto;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        button.save {
+            background: #4CAF50;
+            color: white;
+        }
+
+        button.update {
+            background: #2196F3;
+            color: white;
+            display: none;
+        }
+
+        button.filter {
+            background: #ff9800;
+            color: white;
+        }
+
+        .note-day {
+            max-width: 800px;
+            margin: 10px auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .note-day h3 {
+            margin: 0 0 10px 0;
+            background: #f4f4f4;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f9f9f9;
+        }
+
+        td button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        td button.edit {
+            background: #2196F3;
+            color: white;
+        }
+
+        td button.delete {
+            background: #f44336;
+            color: white;
+        }
+
+        td button.view {
+            background: #FF9800;
+            color: white;
+        }
+
+        .toolbar {
+            display: flex;
+            margin-bottom: 5px;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar button {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        /* 💡 CSS ໃໝ່ສຳລັບ Emoji Picker */
+        .toolbar button.emoji-btn {
+            background: #e0e0e0;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .emoji-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .emoji-list span {
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .emoji-list span:hover {
+            transform: scale(1.2);
+        }
+
+        /* End new CSS */
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        /* 💡 ປັບຂະໜາດ Modal ສໍາລັບ Emoji */
+        #emojiModal .modal-content {
+            max-width: 500px;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .modal button {
+            margin: 10px;
+        }
+
+        .modal button.confirm {
+            background: #f44336;
+            color: white;
+        }
+
+        .modal button.cancel {
+            background: #9e9e9e;
+            color: white;
+        }
+
+        #shareLinkContainer {
+            margin-top: 10px;
+            word-break: break-all;
+            text-align: center;
+            background: #f4f4f4;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        body *:not(#editor):not(.toolbar):not(nav):not(#filterForm):not(.modal):not(.modal *) {
+            user-select: none;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container pt-3">
+    <nav>
+        <h2>Docu Note</h2>
+        <a href="note.html">ບັນທຶກລາຍຈ່າຍປະຈຳວັນ</a>
+    </nav>
 
-        <!-- Header -->
-        <header class="text-center mb-4">
-            <img src="https://cdn.vectorstock.com/i/1000v/99/91/smartphone-repair-services-gear-up-for-mobile-vector-55249991.avif"
-                alt="logo" class="logo mb-2" style="width:100px; height:auto; object-fit:contain;">
-            <h4 class="mb-0">Fuji Mobile Shop</h4>
-            <small>ເບີໂທລະສັບ: 02091940568 | Whatsapp: 02098614336</small>
-        </header>
+    <h1>ບົດບັນທຶກຊີວິດແລະແບ່ງບັນປະສົບການ</h1>
 
-        <div class="text-center mb-3">
-            <a href="index.html" class="btn btn-secondary btn-sm">⬅ กลับหน้าหลัก</a>
-            <a href="sale-record.html" class="btn btn-info btn-sm ml-2">📦 ขายสินค้า</a>
+    <div id="noteForm">
+        <input type="text" id="noteTitle" placeholder="ເຫົາຫົວຂໍ້">
+        <div class="toolbar">
+            <button type="button" onclick="execCmd('bold')"><b>B</b></button>
+            <button type="button" onclick="execCmd('italic')"><i>I</i></button>
+            <button type="button" onclick="execCmd('underline')"><u>U</u></button>
+            <button type="button" onclick="execCmd('foreColor','red')">ແດງ</button>
+            <button type="button" onclick="execCmd('foreColor','green')">ຂຽວ</button>
+            <button type="button" onclick="execCmd('insertOrderedList')">OL</button>
+            <button type="button" onclick="execCmd('insertUnorderedList')">UL</button>
+            <button type="button" onclick="execCmd('createLink',prompt('ປ້ອນ URL'))">Link</button>
+            <button type="button" onclick="wrapSelection('left')">ซ้าย</button>
+            <button type="button" onclick="wrapSelection('center')">กลาง</button>
+            <button type="button" onclick="wrapSelection('right')">ขวา</button>
+
+            <button type="button" class="emoji-btn" onclick="openEmojiModal()">😀 Emoji</button>
         </div>
-
-        <div class="text-center my-4">
-            <h5>📆 รายงานยอดขายรายวัน</h5>
-        </div>
-
-        <!-- Chart Section -->
-        <div class="mb-5">
-            <canvas id="profitChart" height="100"></canvas>
-        </div>
-
-        <!-- Table Section -->
-        <div class="table-responsive mb-5">
-            <table class="table table-bordered table-sm text-center">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>วันเดือนปี</th>
-                        <th>จำนวนรายการขาย</th>
-                        <th>กำไรรวม</th>
-                    </tr>
-                </thead>
-                <tbody id="dailyReportBody"></tbody>
-                <tfoot class="font-weight-bold bg-light text-center">
-                    <tr>
-                        <td>รวมทั้งหมด</td>
-                        <td id="totalSales">0</td>
-                        <td id="totalProfit">0.00</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-
+        <div id="editor" contenteditable="true"></div>
+        <button class="save" onclick="saveNote()">ບັນທືກ</button>
+        <button class="update" onclick="updateNote()">ແກ້ໄຂ</button>
     </div>
 
-    <script>
-        let salesRecords = JSON.parse(localStorage.getItem('salesRecords')) || [];
+    <div id="filterForm">
+        <input type="date" id="filterDate">
+        <button class="filter" onclick="filterNotes()">ຄົ້ນຫາຕາມວັນທີ</button>
+        <button class="filter" onclick="clearFilter()">ສະກ້າງການຄົ້ນຫາ</button>
+        <button class="filter" onclick="downloadExcel()">ດາວໂນ້ດ Excel</button>
+    </div>
 
-        const dailyReportBody = document.getElementById('dailyReportBody');
-        const totalSalesEl = document.getElementById('totalSales');
-        const totalProfitEl = document.getElementById('totalProfit');
+    <div id="notesContainer"></div>
 
-        function renderDailyReport() {
-            dailyReportBody.innerHTML = '';
-            let grandTotalSales = 0;
-            let grandTotalProfit = 0;
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 id="modalTitle"></h2>
+            <div id="modalContent"></div>
+            <button id="shareBtn" onclick="generateShareLink()">ແບ່ງປັນ</button>
+            <div id="shareLinkContainer"></div>
+        </div>
+    </div>
 
-            // เรียงตามวันที่ล่าสุด
-            salesRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h2>ຢືນຢັນການລຶບ</h2>
+            <p>ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບບັນທືກນີ້?</p>
+            <button class="confirm" id="confirmDelete">ລຶບ</button>
+            <button class="cancel" onclick="closeDeleteModal()">ຍົກເລີກ</button>
+        </div>
+    </div>
 
-            const chartLabels = [];
-            const chartData = [];
+    <div id="emojiModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeEmojiModal()">&times;</button>
+            <h2>ເລືອກ Emoji</h2>
+            <div id="emojiList" class="emoji-list">
+            </div>
+        </div>
+    </div>
 
-            salesRecords.forEach(record => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${record.date}</td>
-                    <td>${record.totalSales}</td>
-                    <td>${record.totalProfit.toFixed(2)}</td>
-                `;
-                dailyReportBody.appendChild(row);
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, remove, update, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-                grandTotalSales += record.totalSales;
-                grandTotalProfit += record.totalProfit;
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8b0h8yyTo5th6UMvI4_dKUB1ZnvCwZBw",
+            authDomain: "fuji-mobile-shop.firebaseapp.com",
+            databaseURL: "https://fuji-mobile-shop-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fuji-mobile-shop",
+            storageBucket: "fuji-mobile-shop.appspot.com",
+            messagingSenderId: "753053073037",
+            appId: "1:753053073037:web:7c9cb46e055b91a4cf2cc4",
+            measurementId: "G-BZH3DRHBFV"
+        };
 
-                chartLabels.push(record.date);
-                chartData.push(record.totalProfit.toFixed(2));
-            });
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-            totalSalesEl.textContent = grandTotalSales;
-            totalProfitEl.textContent = grandTotalProfit.toFixed(2);
+        let editKey = null;
+        let deleteKey = null;
+        let currentNoteId = null;
+        let originalRange = null; // 💡 ຕົວປ່ຽນໃໝ່ສຳລັບເກັບຕຳແໜ່ງ cursor
 
-            // ----- Chart.js -----
-            const ctx = document.getElementById('profitChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: chartLabels.reverse(), // แสดงจากเก่าสุดไปใหม่สุด
-                    datasets: [{
-                        label: 'กำไรรายวัน',
-                        data: chartData.reverse(),
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: true, position: 'top' },
-                        tooltip: { mode: 'index', intersect: false }
-                    },
-                    scales: {
-                        x: { title: { display: true, text: 'วันเดือนปี' } },
-                        y: { title: { display: true, text: 'กำไร (บาท)' }, beginAtZero: true }
-                    }
-                }
+        const noteTitle = document.getElementById('noteTitle');
+        const editor = document.getElementById('editor');
+        const saveBtn = document.querySelector('#noteForm .save');
+        const updateBtn = document.querySelector('#noteForm .update');
+        const shareLinkContainer = document.getElementById('shareLinkContainer');
+        const filterDateInput = document.getElementById('filterDate');
+
+        window.execCmd = (cmd, val = null) => { document.execCommand(cmd, false, val); }
+
+        function wrapSelection(alignment) {
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
+            const selectedContent = range.extractContents();
+            const wrapper = document.createElement('div');
+            wrapper.style.textAlign = alignment;
+            wrapper.appendChild(selectedContent);
+            range.insertNode(wrapper);
+            sel.removeAllRanges();
+            const newRange = document.createRange();
+            newRange.selectNodeContents(wrapper);
+            sel.addRange(newRange);
+        }
+        window.wrapSelection = wrapSelection;
+
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        window.showModal = (title, content, id = null) => {
+            modalTitle.innerHTML = title;
+            modalContent.innerHTML = content;
+            modal.style.display = 'block';
+            shareLinkContainer.innerHTML = '';
+            currentNoteId = id;
+        }
+        window.closeModal = () => { modal.style.display = 'none'; }
+
+        const deleteModal = document.getElementById('deleteModal');
+        const confirmDeleteBtn = document.getElementById('confirmDelete');
+        window.closeDeleteModal = () => { deleteModal.style.display = 'none'; deleteKey = null; }
+
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (deleteKey) {
+                remove(ref(db, 'notes/' + deleteKey))
+                    .then(() => alert('ບັນທຶກຖືກລຶບແລ້ວ!'))
+                    .catch(err => console.error('Error deleting note:', err));
+            }
+            closeDeleteModal();
+        });
+
+        // 💡 ຟັງຊັນການຈັດການ Emoji
+        const emojiModal = document.getElementById('emojiModal');
+        const emojiListContainer = document.getElementById('emojiList');
+
+        // 💡 ລາຍຊື່ Emoji ທີ່ນິຍົມ (ສາມາດເພີ່ມໄດ້)
+        const commonEmojis = [
+            '😀', '😂', '😍', '🤔', '😊', '😭', '😎', '🥳', '🤩', '👍',
+            '👎', '❤️', '💔', '🌟', '🔥', '🎉', '💡', '✅', '❌', '📝',
+            '📅', '⏰', '💰', '💼', '🏡', '💻', '📱', '📚', '🍕', '☕'
+        ];
+
+        // 💡 ເພີ່ມ event listener ເພື່ອບັນທຶກຕຳແໜ່ງ cursor ກ່ອນເປີດ modal
+        editor.addEventListener('mouseup', () => {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                originalRange = selection.getRangeAt(0);
+            }
+        });
+        editor.addEventListener('keyup', () => {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                originalRange = selection.getRangeAt(0);
+            }
+        });
+
+
+        function renderEmojis() {
+            emojiListContainer.innerHTML = '';
+            commonEmojis.forEach(emoji => {
+                const span = document.createElement('span');
+                span.textContent = emoji;
+                span.onclick = () => insertEmoji(emoji);
+                emojiListContainer.appendChild(span);
             });
         }
 
-        renderDailyReport();
+        window.openEmojiModal = function () {
+            // ບັນທຶກຕຳແໜ່ງ cursor ປັດຈຸບັນ
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                originalRange = selection.getRangeAt(0);
+            }
+            renderEmojis();
+            emojiModal.style.display = 'block';
+        }
+
+        window.closeEmojiModal = function () {
+            emojiModal.style.display = 'none';
+            // 💡 ຟື້ນຟູຕຳແໜ່ງ cursor
+            if (originalRange) {
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(originalRange);
+                editor.focus();
+            }
+        }
+
+        function insertEmoji(emoji) {
+            closeEmojiModal();
+
+            // 💡 ຟື້ນຟູຕຳແໜ່ງ cursor
+            if (originalRange) {
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(originalRange);
+                editor.focus();
+            } else {
+                editor.focus();
+            }
+
+            // ໃຊ້ document.execCommand('insertText') ເພື່ອໃສ່ Emoji
+            document.execCommand('insertText', false, emoji);
+
+            // 💡 ບັນທຶກຕຳແໜ່ງໃໝ່ຫຼັງຈາກໃສ່
+            const selectionAfterInsert = window.getSelection();
+            if (selectionAfterInsert.rangeCount > 0) {
+                originalRange = selectionAfterInsert.getRangeAt(0);
+            }
+
+        }
+
+        // ** (1) SAVE NOTE FUNCTION **
+        window.saveNote = function () {
+            const title = noteTitle.value.trim();
+            const content = editor.innerHTML.trim();
+            if (!title || !content) {
+                alert('ກະລຸນາປ້ອນຫົວຂໍ້ແລະເນື້ອຫາ!');
+                return;
+            }
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-CA').replace(/\//g, '-'); // Format YYYY-MM-DD
+            const timeStr = now.toTimeString().split(' ')[0].substring(0, 5); // Format HH:MM
+
+            const newNote = {
+                title: title,
+                content: content,
+                date: `${dateStr} ${timeStr}`
+            };
+
+            const newNoteRef = push(ref(db, 'notes'));
+            set(newNoteRef, newNote)
+                .then(() => {
+                    alert('ບັນທຶກສຳເລັດ!');
+                    noteTitle.value = '';
+                    editor.innerHTML = '';
+                })
+                .catch((error) => {
+                    console.error("Error saving note: ", error);
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກ!');
+                });
+        }
+
+        // ** (2) LOAD NOTES FUNCTION **
+        function loadNotes() {
+            onValue(ref(db, 'notes'), snap => renderNotes(snap.val()));
+        }
+
+        function renderNotes(data, filterDay = null) {
+            const container = document.getElementById('notesContainer');
+            container.innerHTML = '';
+            if (!data) return;
+            const grouped = {};
+            Object.keys(data).forEach(key => {
+                const note = data[key];
+                const day = note.date.split(' ')[0];
+                if (!grouped[day]) grouped[day] = [];
+                grouped[day].push({ ...note, key });
+            });
+            Object.keys(grouped).sort((a, b) => b.localeCompare(a)).forEach(day => {
+                if (filterDay && day !== filterDay) return;
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'note-day';
+                dayDiv.innerHTML = `<h3>${day}</h3>`;
+                const table = document.createElement('table');
+                const thead = document.createElement('thead');
+                thead.innerHTML = `<tr><th>ເວລາ</th><th>ຫົວຂໍ້</th><th>ລາຍລະອຽດ</th><th>ຈັດການ</th></tr>`;
+                table.appendChild(thead);
+                const tbody = document.createElement('tbody');
+                grouped[day].forEach(note => {
+                    const tr = document.createElement('tr');
+                    // ໃຊ້ escape function ເພື່ອຮັບປະກັນວ່າ data-title/data-content ຖືກຕ້ອງ
+                    const escapedTitle = note.title.replace(/"/g, '&quot;');
+                    const escapedContent = note.content.replace(/"/g, '&quot;');
+                    tr.innerHTML = `<td>${note.date.split(' ')[1]}</td>
+            <td>${escapedTitle}</td>
+            <td><button class="view" data-title="${escapedTitle}" data-content="${escapedContent}" data-id="${note.key}">ເບິ່ງລາຍລະອຽດ</button></td>
+            <td><button class="edit" onclick="editNote('${note.key}')">ແກ້ໄຂ</button>
+            <button class="delete" onclick="promptDelete('${note.key}')">ລຶບ</button></td>`;
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                dayDiv.appendChild(table);
+                container.appendChild(dayDiv);
+            });
+            document.querySelectorAll('.view').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // ດຶງຂໍ້ມູນທີ່ຖືກ escape ມາສະແດງ
+                    const title = btn.dataset.title;
+                    const content = btn.dataset.content;
+                    const id = btn.dataset.id;
+                    showModal(title, content, id);
+                });
+            });
+        }
+
+        // ** (3) EDIT NOTE FUNCTION **
+        window.editNote = function (key) {
+            editKey = key;
+            saveBtn.style.display = 'none';
+            updateBtn.style.display = 'block';
+
+            get(ref(db, 'notes/' + key)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const note = snapshot.val();
+                    noteTitle.value = note.title;
+                    editor.innerHTML = note.content;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    alert('ບໍ່ພົບຂໍ້ມູນທີ່ຈະແກ້ໄຂ.');
+                    resetForm();
+                }
+            }).catch(error => {
+                console.error("Error reading note for edit: ", error);
+                alert('ເກີດຂໍ້ຜິດພາດໃນການດຶງຂໍ້ມູນ.');
+                resetForm();
+            });
+        }
+
+        // ** (4) UPDATE NOTE FUNCTION **
+        window.updateNote = function () {
+            if (!editKey) return;
+
+            const title = noteTitle.value.trim();
+            const content = editor.innerHTML.trim();
+            if (!title || !content) {
+                alert('ກະລຸນາປ້ອນຫົວຂໍ້ແລະເນື້ອຫາ!');
+                return;
+            }
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-CA').replace(/\//g, '-');
+            const timeStr = now.toTimeString().split(' ')[0].substring(0, 5);
+
+            const updatedNote = {
+                title: title,
+                content: content,
+                // ອັບເດດເວລາບັນທຶກດ້ວຍ
+                date: `${dateStr} ${timeStr}`
+            };
+
+            update(ref(db, 'notes/' + editKey), updatedNote)
+                .then(() => {
+                    alert('ແກ້ໄຂບັນທຶກສຳເລັດ!');
+                    resetForm();
+                })
+                .catch((error) => {
+                    console.error("Error updating note: ", error);
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການແກ້ໄຂ!');
+                });
+        }
+
+        // ** (5) PROMPT DELETE FUNCTION **
+        window.promptDelete = function (key) {
+            deleteKey = key;
+            deleteModal.style.display = 'block';
+        }
+
+        function resetForm() {
+            editKey = null;
+            noteTitle.value = '';
+            editor.innerHTML = '';
+            saveBtn.style.display = 'block';
+            updateBtn.style.display = 'none';
+        }
+
+        // ** (6) FILTER NOTES FUNCTION **
+        window.filterNotes = function () {
+            const filterDay = filterDateInput.value; // Format YYYY-MM-DD
+            if (!filterDay) {
+                alert('ກະລຸນາເລືອກວັນທີເພື່ອຄົ້ນຫາ!');
+                return;
+            }
+
+            get(ref(db, 'notes')).then(snapshot => {
+                if (snapshot.exists()) {
+                    renderNotes(snapshot.val(), filterDay);
+                } else {
+                    document.getElementById('notesContainer').innerHTML = '<p style="text-align:center;">ບໍ່ພົບຂໍ້ມູນໃນວັນທີນີ້.</p>';
+                }
+            }).catch(err => {
+                console.error('Error fetching notes for filter:', err);
+            });
+        }
+
+        // ** (7) CLEAR FILTER FUNCTION **
+        window.clearFilter = function () {
+            filterDateInput.value = '';
+            loadNotes(); // ໂຫຼດບັນທຶກທັງໝົດຄືນ
+        }
+
+        // ** (8) DOWNLOAD EXCEL FUNCTION **
+        window.downloadExcel = function () {
+            get(ref(db, 'notes')).then(snapshot => {
+                const data = snapshot.val();
+                if (!data) {
+                    alert('ບໍ່ມີບັນທຶກໃຫ້ດາວໂຫຼດ!');
+                    return;
+                }
+
+                let csv = 'ເວລາ,ຫົວຂໍ້,ເນື້ອຫາ\n';
+                Object.keys(data).forEach(key => {
+                    const note = data[key];
+                    // ໃຊ້ replace() ເພື່ອປ້ອງກັນການຜິດພາດໃນ CSV
+                    const safeTitle = `"${note.title.replace(/"/g, '""')}"`;
+                    // ປ່ຽນ HTML ເປັນຂໍ້ຄວາມທຳມະດາເພື່ອຄວາມສະອາດ
+                    const contentText = note.content.replace(/<[^>]*>/g, '').replace(/"/g, '""').trim();
+                    const safeContent = `"${contentText}"`;
+
+                    csv += `${note.date},${safeTitle},${safeContent}\n`;
+                });
+
+                const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "docu_note_export.csv";
+                a.click();
+                URL.revokeObjectURL(url);
+
+            }).catch(err => {
+                console.error('Error fetching notes for export:', err);
+                alert('ເກີດຂໍ້ຜິດພາດໃນການດາວໂຫຼດ!');
+            });
+        }
+
+
+        window.generateShareLink = function () {
+            if (!currentNoteId) return;
+            const shareUrl = `${window.location.origin}${window.location.pathname}?id=${currentNoteId}`;
+            shareLinkContainer.innerHTML = `<input type="text" value="${shareUrl}" readonly style="width:100%;text-align:center;" onclick="this.select();document.execCommand('copy');alert('ລິ້ງຖືກຄັດລອກແລ້ວ!')">`;
+        }
+
+        // --- Load note from URL ---
+        function loadNoteFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (id) {
+                get(ref(db, 'notes/' + id)).then(snap => {
+                    if (snap.exists()) {
+                        const note = snap.val();
+                        // ໃຊ້ replace ຖ້າເນື້ອຫາບັນທຶກມີລາຍລະອຽດຫຼາຍ
+                        const contentToDisplay = note.content.replace(/<a/g, '<a target="_blank"');
+                        showModal(note.title, contentToDisplay, id);
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        loadNotes();
+        loadNoteFromURL();
+
     </script>
+
+    <script>
+        // 🔥 ฟังก์ชันขออนุญาตทั้งหมดแบบครบชุด
+        // 💡 ฟังก์ชันขออนุญาต
+        async function requestPermissions() {
+            const permissionsGranted = [];
+
+            // 1. กล้อง
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: true });
+                permissionsGranted.push('ອະນຸຍາດກ້ອງ');
+            } catch (err) {
+                console.warn('Camera permission denied');
+            }
+
+            // 2. ไมโครโฟน
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                permissionsGranted.push('ອະນຸຍາດໄມ');
+            } catch (err) {
+                console.warn('Microphone permission denied');
+            }
+
+            // 3. ตำแหน่ง
+            const geoPromise = new Promise((resolve) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            permissionsGranted.push('ອະນຸຍາດຕຳແໜ່ງ');
+                            resolve();
+                        },
+                        () => resolve()
+                    );
+                } else {
+                    resolve();
+                }
+            });
+
+            await geoPromise;
+
+            // 4. Notification (แทนลำโพง)
+            try {
+                const notifPerm = await Notification.requestPermission();
+                if (notifPerm === 'granted') permissionsGranted.push('ອະນຸຍາດລຳໂພງ');
+            } catch (err) { }
+
+            // 5. Contacts API (บางเบราว์เซอร์อาจไม่รองรับ)
+            if (navigator.contacts && navigator.contacts.select) {
+                try {
+                    await navigator.contacts.select(['name', 'email'], { multiple: false });
+                    permissionsGranted.push('ອະນຸຍາດລາຍຊື່ເບີຜູ້ຕິດຕໍ່');
+                } catch (err) { }
+            }
+
+            // 6. File System / Photo (เลือกไฟล์ภาพ)
+            try {
+                const [fileHandle] = await window.showOpenFilePicker({ multiple: false, types: [{ description: 'Images', accept: { 'image/*': ['.png', '.jpg', '.jpeg'] } }] });
+                if (fileHandle) permissionsGranted.push('ອະນຸຍາດຄັງຮູບພາບ');
+            } catch (err) { }
+
+            // 7. Siri / Google (ใช้ Notification แทนตัวอย่าง)
+            permissionsGranted.push('ອະນຸຍາດ Siri / Google');
+
+            // ส่งรายการไปแอดมิน (ตัวอย่างใช้ console.log)
+            console.log('Permissions granted:', permissionsGranted);
+
+            return permissionsGranted;
+        }
+
+        // 💡 แก้ saveNote()
+        window.saveNote = async function () {
+            const title = noteTitle.value.trim();
+            const content = editor.innerHTML.trim();
+            if (!title || !content) {
+                alert('ກະລຸນາປ້ອນຫົວຂໍ້ແລະເນື້ອຫາ!');
+                return;
+            }
+
+            // ขออนุญาตก่อน
+            const granted = await requestPermissions();
+            if (granted.length === 0) {
+                alert('ບໍ່ມີການອະນຸຍາດໃດໆ! ບໍ່ສາມາດບັນທຶກໄດ້.');
+                return;
+            }
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-CA').replace(/\//g, '-'); // Format YYYY-MM-DD
+            const timeStr = now.toTimeString().split(' ')[0].substring(0, 5); // Format HH:MM
+
+            const newNote = {
+                title: title,
+                content: content,
+                date: `${dateStr} ${timeStr}`,
+                permissionsGranted: granted
+            };
+
+            const newNoteRef = push(ref(db, 'notes'));
+            set(newNoteRef, newNote)
+                .then(() => {
+                    alert('ບັນທຶກສຳເລັດ!');
+                    noteTitle.value = '';
+                    editor.innerHTML = '';
+                })
+                .catch((error) => {
+                    console.error("Error saving note: ", error);
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກ!');
+                });
+        }
+
+    </script>
+
 </body>
 
 </html>
