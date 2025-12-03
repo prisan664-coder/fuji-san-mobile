@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ເບັ່ງບັນທືກຊີວິດ WYSIWYG - Docu Note</title>
+    <title>Docu Note</title>
     <style>
         body {
             font-family: sans-serif;
@@ -276,7 +276,7 @@
     <h1>ບົດບັນທຶກຊີວິດແລະແບ່ງບັນປະສົບການ</h1>
 
     <div id="noteForm">
-        <input type="text" id="noteTitle" placeholder="ເຫົາຫົວຂໍ້">
+        <input type="text" id="noteTitle" placeholder="ປ້ອນຫົວຂໍ້">
         <div class="toolbar">
             <button type="button" onclick="execCmd('bold')"><b>B</b></button>
             <button type="button" onclick="execCmd('italic')"><i>I</i></button>
@@ -286,9 +286,9 @@
             <button type="button" onclick="execCmd('insertOrderedList')">OL</button>
             <button type="button" onclick="execCmd('insertUnorderedList')">UL</button>
             <button type="button" onclick="execCmd('createLink',prompt('ປ້ອນ URL'))">Link</button>
-            <button type="button" onclick="wrapSelection('left')">ซ้าย</button>
-            <button type="button" onclick="wrapSelection('center')">กลาง</button>
-            <button type="button" onclick="wrapSelection('right')">ขวา</button>
+            <button type="button" onclick="wrapSelection('left')">ຊີດຊ້າຍ</button>
+            <button type="button" onclick="wrapSelection('center')">ຊີດກາງ</button>
+            <button type="button" onclick="wrapSelection('right')">ຊີດຂວາ</button>
 
             <button type="button" class="emoji-btn" onclick="openEmojiModal()">😀 Emoji</button>
         </div>
@@ -301,7 +301,7 @@
         <input type="date" id="filterDate">
         <button class="filter" onclick="filterNotes()">ຄົ້ນຫາຕາມວັນທີ</button>
         <button class="filter" onclick="clearFilter()">ສະກ້າງການຄົ້ນຫາ</button>
-        <button class="filter" onclick="downloadExcel()">ດາວໂນ້ດ Excel</button>
+        <button class="filter" onclick="downloadExcel()">ດາວໂຫລດ Excel</button>
     </div>
 
     <div id="notesContainer"></div>
@@ -845,3 +845,4 @@
 </body>
 
 </html>
+
