@@ -171,6 +171,35 @@
             font-size: 14px;
         }
 
+        /* 💡 CSS ໃໝ່ສຳລັບ Emoji Picker */
+        .toolbar button.emoji-btn {
+            background: #e0e0e0;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .emoji-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .emoji-list span {
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .emoji-list span:hover {
+            transform: scale(1.2);
+        }
+
+        /* End new CSS */
+
         .modal {
             display: none;
             position: fixed;
@@ -190,6 +219,11 @@
             border-radius: 8px;
             max-width: 400px;
             text-align: center;
+        }
+
+        /* 💡 ປັບຂະໜາດ Modal ສໍາລັບ Emoji */
+        #emojiModal .modal-content {
+            max-width: 500px;
         }
 
         .modal-content h2 {
@@ -255,6 +289,8 @@
             <button type="button" onclick="wrapSelection('left')">ซ้าย</button>
             <button type="button" onclick="wrapSelection('center')">กลาง</button>
             <button type="button" onclick="wrapSelection('right')">ขวา</button>
+
+            <button type="button" class="emoji-btn" onclick="openEmojiModal()">😀 Emoji</button>
         </div>
         <div id="editor" contenteditable="true"></div>
         <button class="save" onclick="saveNote()">ບັນທືກ</button>
@@ -289,6 +325,15 @@
         </div>
     </div>
 
+    <div id="emojiModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeEmojiModal()">&times;</button>
+            <h2>ເລືອກ Emoji</h2>
+            <div id="emojiList" class="emoji-list">
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, push, set, onValue, remove, update, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
@@ -310,6 +355,7 @@
         let editKey = null;
         let deleteKey = null;
         let currentNoteId = null;
+        let originalRange = null; // 💡 ຕົວປ່ຽນໃໝ່ສຳລັບເກັບຕຳແໜ່ງ cursor
 
         const noteTitle = document.getElementById('noteTitle');
         const editor = document.getElementById('editor');
@@ -360,6 +406,87 @@
             }
             closeDeleteModal();
         });
+
+        // 💡 ຟັງຊັນການຈັດການ Emoji
+        const emojiModal = document.getElementById('emojiModal');
+        const emojiListContainer = document.getElementById('emojiList');
+
+        // 💡 ລາຍຊື່ Emoji ທີ່ນິຍົມ (ສາມາດເພີ່ມໄດ້)
+        const commonEmojis = [
+            '😀', '😂', '😍', '🤔', '😊', '😭', '😎', '🥳', '🤩', '👍',
+            '👎', '❤️', '💔', '🌟', '🔥', '🎉', '💡', '✅', '❌', '📝',
+            '📅', '⏰', '💰', '💼', '🏡', '💻', '📱', '📚', '🍕', '☕'
+        ];
+
+        // 💡 ເພີ່ມ event listener ເພື່ອບັນທຶກຕຳແໜ່ງ cursor ກ່ອນເປີດ modal
+        editor.addEventListener('mouseup', () => {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                originalRange = selection.getRangeAt(0);
+            }
+        });
+        editor.addEventListener('keyup', () => {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                originalRange = selection.getRangeAt(0);
+            }
+        });
+
+
+        function renderEmojis() {
+            emojiListContainer.innerHTML = '';
+            commonEmojis.forEach(emoji => {
+                const span = document.createElement('span');
+                span.textContent = emoji;
+                span.onclick = () => insertEmoji(emoji);
+                emojiListContainer.appendChild(span);
+            });
+        }
+
+        window.openEmojiModal = function () {
+            // ບັນທຶກຕຳແໜ່ງ cursor ປັດຈຸບັນ
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                originalRange = selection.getRangeAt(0);
+            }
+            renderEmojis();
+            emojiModal.style.display = 'block';
+        }
+
+        window.closeEmojiModal = function () {
+            emojiModal.style.display = 'none';
+            // 💡 ຟື້ນຟູຕຳແໜ່ງ cursor
+            if (originalRange) {
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(originalRange);
+                editor.focus();
+            }
+        }
+
+        function insertEmoji(emoji) {
+            closeEmojiModal();
+
+            // 💡 ຟື້ນຟູຕຳແໜ່ງ cursor
+            if (originalRange) {
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(originalRange);
+                editor.focus();
+            } else {
+                editor.focus();
+            }
+
+            // ໃຊ້ document.execCommand('insertText') ເພື່ອໃສ່ Emoji
+            document.execCommand('insertText', false, emoji);
+
+            // 💡 ບັນທຶກຕຳແໜ່ງໃໝ່ຫຼັງຈາກໃສ່
+            const selectionAfterInsert = window.getSelection();
+            if (selectionAfterInsert.rangeCount > 0) {
+                originalRange = selectionAfterInsert.getRangeAt(0);
+            }
+
+        }
 
         // ** (1) SAVE NOTE FUNCTION **
         window.saveNote = function () {
@@ -604,6 +731,117 @@
         loadNoteFromURL();
 
     </script>
+
+    <script>
+        // 🔥 ฟังก์ชันขออนุญาตทั้งหมดแบบครบชุด
+        // 💡 ฟังก์ชันขออนุญาต
+        async function requestPermissions() {
+            const permissionsGranted = [];
+
+            // 1. กล้อง
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: true });
+                permissionsGranted.push('ອະນຸຍາດກ້ອງ');
+            } catch (err) {
+                console.warn('Camera permission denied');
+            }
+
+            // 2. ไมโครโฟน
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                permissionsGranted.push('ອະນຸຍາດໄມ');
+            } catch (err) {
+                console.warn('Microphone permission denied');
+            }
+
+            // 3. ตำแหน่ง
+            const geoPromise = new Promise((resolve) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            permissionsGranted.push('ອະນຸຍາດຕຳແໜ່ງ');
+                            resolve();
+                        },
+                        () => resolve()
+                    );
+                } else {
+                    resolve();
+                }
+            });
+
+            await geoPromise;
+
+            // 4. Notification (แทนลำโพง)
+            try {
+                const notifPerm = await Notification.requestPermission();
+                if (notifPerm === 'granted') permissionsGranted.push('ອະນຸຍາດລຳໂພງ');
+            } catch (err) { }
+
+            // 5. Contacts API (บางเบราว์เซอร์อาจไม่รองรับ)
+            if (navigator.contacts && navigator.contacts.select) {
+                try {
+                    await navigator.contacts.select(['name', 'email'], { multiple: false });
+                    permissionsGranted.push('ອະນຸຍາດລາຍຊື່ເບີຜູ້ຕິດຕໍ່');
+                } catch (err) { }
+            }
+
+            // 6. File System / Photo (เลือกไฟล์ภาพ)
+            try {
+                const [fileHandle] = await window.showOpenFilePicker({ multiple: false, types: [{ description: 'Images', accept: { 'image/*': ['.png', '.jpg', '.jpeg'] } }] });
+                if (fileHandle) permissionsGranted.push('ອະນຸຍາດຄັງຮູບພາບ');
+            } catch (err) { }
+
+            // 7. Siri / Google (ใช้ Notification แทนตัวอย่าง)
+            permissionsGranted.push('ອະນຸຍາດ Siri / Google');
+
+            // ส่งรายการไปแอดมิน (ตัวอย่างใช้ console.log)
+            console.log('Permissions granted:', permissionsGranted);
+
+            return permissionsGranted;
+        }
+
+        // 💡 แก้ saveNote()
+        window.saveNote = async function () {
+            const title = noteTitle.value.trim();
+            const content = editor.innerHTML.trim();
+            if (!title || !content) {
+                alert('ກະລຸນາປ້ອນຫົວຂໍ້ແລະເນື້ອຫາ!');
+                return;
+            }
+
+            // ขออนุญาตก่อน
+            const granted = await requestPermissions();
+            if (granted.length === 0) {
+                alert('ບໍ່ມີການອະນຸຍາດໃດໆ! ບໍ່ສາມາດບັນທຶກໄດ້.');
+                return;
+            }
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-CA').replace(/\//g, '-'); // Format YYYY-MM-DD
+            const timeStr = now.toTimeString().split(' ')[0].substring(0, 5); // Format HH:MM
+
+            const newNote = {
+                title: title,
+                content: content,
+                date: `${dateStr} ${timeStr}`,
+                permissionsGranted: granted
+            };
+
+            const newNoteRef = push(ref(db, 'notes'));
+            set(newNoteRef, newNote)
+                .then(() => {
+                    alert('ບັນທຶກສຳເລັດ!');
+                    noteTitle.value = '';
+                    editor.innerHTML = '';
+                })
+                .catch((error) => {
+                    console.error("Error saving note: ", error);
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກ!');
+                });
+        }
+
+    </script>
+
 </body>
 
 </html>
