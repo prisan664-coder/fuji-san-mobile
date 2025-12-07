@@ -300,19 +300,27 @@
                 style="background:#d9534f;color:white;">ລົບ</button> <button onclick="cancelDelete()">ຍົກເລີກ</button>
         </div>
     </div>
-
     <div id="customAlertBox">
         <div id="customAlertContent">
             <p id="customAlertMessage">ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ</p>
             <button onclick="closeCustomAlert()">OK</button>
         </div>
     </div>
-
     <div id="appNotification" class="notification daily-reminder"></div>
-
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, push, remove, update, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import {
+            getDatabase,
+            ref,
+            set,
+            onValue,
+            push,
+            remove,
+            update,
+            get
+        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC8b0h8yyTo5th6UMvI4_dKUB1ZnvCwZBw",
@@ -334,16 +342,37 @@
             DELETE_M = "",
             DELETE_KEY = "";
 
-        // Custom Alert Functions 
+        // --- 🔥 NEW: Text-to-Speech Function ---
+        function speakText(text) {
+            // ตรวจสอบว่าเบราว์เซอร์รองรับหรือไม่
+            if ('speechSynthesis' in window) {
+                // ยกเลิกการพูดก่อนหน้า (ถ้ามี)
+                window.speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                // ตั้งค่าภาษาเป็นภาษาไทย (th-TH) เพื่อการออกเสียงภาษาไทยที่ชัดเจนที่สุด
+                utterance.lang = 'th-TH';
+
+                // ความเร็ว (Rate): 1.0 คือปกติ
+                utterance.rate = 1.0;
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.log("Speech Synthesis ไม่รองรับในเบราว์เซอร์นี้");
+            }
+        }
+
+        // Custom Alert Functions
         function showCustomAlert(message) {
             document.getElementById("customAlertMessage").textContent = message;
             document.getElementById("customAlertBox").style.display = "flex";
+            // 🔥 MODIFIED: ออกเสียง Alert เป็นภาษาไทย
+            speakText("กรุณากรอกข้อมูลให้ครบถ้วน");
         }
 
         window.closeCustomAlert = function () {
             document.getElementById("customAlertBox").style.display = "none";
         };
-
 
         // ฟังก์ชันสำหรับแสดง Notification (จำลอง)
         function showNotification(message, type) {
@@ -363,7 +392,11 @@
         // Morning Reminder
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById("dateInput").value = new Date().toISOString().split('T')[0];
-            showNotification("🔔 ວັນນີ້ຢ່າລືມບັນທຶກລາຍການປະຈຳວັນດ້ວຍນະ", "daily-reminder");
+            const reminderMsg = "🔔 ວັນນີ້ຢ່າລືມບັນທຶກລາຍການປະຈຳວັນດ້ວຍນະ";
+            showNotification(reminderMsg, "daily-reminder");
+
+            // 🔥 MODIFIED: ออกเสียงเตือนตอนเช้าเป็นภาษาไทย
+            speakText("วันนี้อย่าลืมบันทึกรายการประจำวันนะครับ");
         });
 
         async function loadAvailableMonths() {
@@ -421,9 +454,18 @@
             }
 
             // 3. Post-Save Total Notification
-            const totalText = todayTotal.toLocaleString("lo-LA");
-            const notificationMsg = `✔ ທ່ານໄດ້ບັນທຶກລາຍການສຳເລັດແລ້ວ\nວັນນີ້ທ່ານໃຊ້ຈ່າຍໄປທັງໝົດ ${totalText} ກີບ`;
+            // แปลงตัวเลขเป็นข้อความที่อ่านได้ (ใช้ lo-LA เพื่อคงรูปแบบการแสดงผลแบบลาวและหน่วยกีบ)
+            const totalTextFormatted = todayTotal.toLocaleString("lo-LA");
+
+            // 🔥 MODIFIED: สร้างข้อความสำหรับการออกเสียงเป็นภาษาไทยตามที่ผู้ใช้ร้องขอ
+            const speechMessage = `เพิ่มรายการสำเร็จแล้ว. วันนี้คุณใช้จ่ายไปทั้งหมด ${totalTextFormatted} กีบ`;
+
+            // แสดง Notification บนจอ (คงภาษาลาวตาม UI เดิม)
+            const notificationMsg = `✔ ທ່ານໄດ້ບັນທຶກລາຍການສຳເລັດແລ້ວ\nວັນນີ້ທ່ານໃຊ້ຈ່າຍໄປທັງໝົດ ${totalTextFormatted} ກີບ`;
             showNotification(notificationMsg, "save-complete");
+
+            // 🔥 MODIFIED: ออกเสียงสรุปรายการเป็นภาษาไทย
+            speakText(speechMessage);
 
             // 4. โหลดข้อมูลใหม่
             loadAvailableMonths();
@@ -433,7 +475,6 @@
             itemInput.value = "";
             priceInput.value = "";
         };
-
         window.loadMonth = function () {
             const m = monthSelect.value;
             const y = currentYear;
@@ -457,9 +498,7 @@
                     }
 
                     // ใช้ toLocaleString("lo-LA") สำหรับการแสดงผลตัวเลขเป็นลาว
-                    tableBody.innerHTML += `                <tr>                    <td>${index++}</td>                    <td>${data.date}</td>                    <td>${data.item}</td>                    <td>${Number(data.price).toLocaleString("lo-LA")}</td>
-                    <td><button onclick="openEdit('${y}','${m}','${key}','${data.date}','${data.item}','${data.price}')">✏</button></td>
-                    <td><button onclick="askDelete('${y}','${m}','${key}')">🗑</button></td>                </tr>`;
+                    tableBody.innerHTML += `                <tr>                    <td>${index++}</td>                    <td>${data.date}</td>                    <td>${data.item}</td>                    <td>${Number(data.price).toLocaleString("lo-LA")}</td>                    <td><button onclick="openEdit('${y}','${m}','${key}','${data.date}','${data.item}','${data.price}')">✏</button></td>                    <td><button onclick="askDelete('${y}','${m}','${key}')">🗑</button></td>                </tr>`;
                 });
 
                 todayTotalText.textContent = "ລວມວັນນີ້: " + todayTotal.toLocaleString("lo-LA") + " ກີບ";
@@ -472,12 +511,17 @@
             DELETE_M = m;
             DELETE_KEY = key;
             document.getElementById("deleteConfirmBox").style.display = "flex";
+            // 🔥 MODIFIED: ออกเสียงยืนยันการลบเป็นภาษาไทยตามที่ผู้ใช้ร้องขอ
+            const thaiConfirmation = "ท่านต้องการยืนยันที่จะลบรายการนี้ไหม ถ้ายืนยันกดลบ ถ้ายกเลิกกดปุ่มยกเลิก";
+            speakText(thaiConfirmation);
         };
         /** 🔥 กดลบจริง */
         window.confirmDelete = function () {
             remove(ref(db, `expenses/${DELETE_Y}/${DELETE_M}/${DELETE_KEY}`)).then(() => {
                 document.getElementById("deleteConfirmBox").style.display = "none";
                 loadMonth();
+                // 🔥 MODIFIED: ออกเสียงหลังลบสำเร็จเป็นภาษาไทย
+                speakText("รายการถูกลบสำเร็จแล้ว");
             });
         };
         /** ❌ ยกเลิก */
@@ -511,7 +555,8 @@
                 item: newItem,
                 price: newPrice
             }).then(() => {
-                alert("✔ ແກ້ໄຂສຳເລັດ");
+                // 🔥 MODIFIED: ออกเสียงหลังแก้ไขสำเร็จเป็นภาษาไทย
+                speakText("แก้ไขรายการสำเร็จแล้ว");
                 closeEdit();
                 loadMonth();
             });
@@ -520,13 +565,15 @@
             const m = monthSelect.value;
             const y = currentYear;
             if (!m) {
-                alert("⚠ ກະລຸນາເລືອກເດືອນ");
+                // 🔥 MODIFIED: ออกเสียงเป็นภาษาไทย
+                speakText("กรุณาเลือกเดือน");
                 return;
             }
             const monthRef = ref(db, `expenses/${y}/${m}`);
             const snapshot = await get(monthRef);
             if (!snapshot.exists()) {
-                alert("⚠ ບໍ່ມີຂໍ້ມູນໃນເດືອນນີ້");
+                // 🔥 MODIFIED: ออกเสียงเป็นภาษาไทย
+                speakText("ไม่มีข้อมูลในเดือนนี้");
                 return;
             }
             let data = [
@@ -541,8 +588,10 @@
             XLSX.utils.book_append_sheet(wb, ws, "Expenses");
             const filename = `expenses_${y}_${m}.xlsx`;
             XLSX.writeFile(wb, filename);
-        };
 
+            // 🔥 MODIFIED: ออกเสียงหลัง Export เป็นภาษาไทย
+            speakText("Export Excel สำเร็จแล้ว");
+        };
 
         loadAvailableMonths();
     </script>
