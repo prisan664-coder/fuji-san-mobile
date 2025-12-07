@@ -22,7 +22,7 @@
         .navbar a {
             color: white;
             text-decoration: none;
-            font-size: 18px;
+            font-size: 19px;
             padding: 8px 12px;
             display: inline-block;
         }
@@ -33,23 +33,101 @@
             margin: 5px;
         }
 
+        /* 🔥 MODIFIED: ปรับปรุงสไตล์ตารางให้สวยงามตามภาพ */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
             background: white;
-        }
-
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            /* **ลบเส้นขอบหลักของตาราง (border: none;)** */
+            border: none;
         }
 
         th {
             background: #4CAF50;
+            /* สีเขียว */
             color: white;
+            font-weight: 500;
+            text-transform: none;
+            padding: 10px 8px;
+            /* ใส่ padding สำหรับ header */
+            border: 1px solid #4CAF50;
+            /* ให้ header มีเส้นแบ่งสีเขียว */
+        }
+
+        td {
+            border-top: 1px solid #e0e0e0;
+            /* คงเหลือเส้นแบ่งแนวนอนด้านบน (Top Border) */
+            border-left: none;
+            border-right: none;
+            /* **ลบเส้นแบ่งแนวตั้ง** */
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        /* 🔥 NEW/MODIFIED: ปรับความกว้างและจัดตำแหน่งคอลัมน์ให้ตรงตามภาพ */
+        #expenseTable td:nth-child(1) {
+            /* ลำดับ (ລຳດັບ) */
+            width: 5%;
+            min-width: 40px;
+            font-weight: normal;
+            color: #333;
+            text-align: center;
+        }
+
+        #expenseTable td:nth-child(2) {
+            /* ວັນທີ (วันที่) */
+            width: 15%;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        #expenseTable td:nth-child(3) {
+            /* ລາຍການ (รายการ) */
+            text-align: left;
+            padding-left: 10px;
+            width: 40%;
+            min-width: 150px;
+        }
+
+        #expenseTable td:nth-child(4) {
+            /* ລາຄາ (ราคา) - เพิ่มสีพื้นหลังอ่อนๆ และเน้นข้อความชิดขวา*/
+            text-align: right;
+            padding-right: 15px;
+            width: 15%;
+            min-width: 90px;
+            font-weight: bold;
+            color: #d9534f;
+            background-color: #ffeaea;
+            /* สีชมพูอ่อนมากเพื่อไฮไลต์ราคา */
+        }
+
+        /* คอลัมน์ แก้ไข/ลบ */
+        #expenseTable td:nth-child(5),
+        #expenseTable td:nth-child(6) {
+            width: 10%;
+            min-width: 50px;
+        }
+
+        /* 🔥 NEW: ปรับสไตล์ปุ่มแก้ไขและลบให้เป็นสี่เหลี่ยมเล็กๆ เหมือนในภาพ */
+        #expenseTable button {
+            background-color: white;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 5px 8px;
+            /* ปรับขนาดให้เล็กลง */
+            border-radius: 2px;
+            /* ขอบมนเล็กน้อย */
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            line-height: 1;
+            /* จัดตำแหน่งข้อความตรงกลาง */
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+            font-size: 14px;
         }
 
         .summary {
@@ -110,6 +188,70 @@
             background-color: #5cb85c;
             /* สีเขียวสำหรับแจ้งเตือนหลังบันทึก */
         }
+
+        /* Custom Alert Modal Style (คงเดิม) */
+        #customAlertBox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, .6);
+            display: none;
+            /* ซ่อนไว้ตั้งแต่แรก */
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            /* ให้แสดงทับทุกอย่าง */
+            backdrop-filter: blur(2px);
+            /* เพิ่มความสวยงาม */
+        }
+
+        #customAlertContent {
+            background: #fff;
+            padding: 30px;
+            width: 300px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: fadeIn 0.3s ease-out;
+            /* เพิ่ม Animation */
+        }
+
+        #customAlertContent p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        #customAlertContent button {
+            background: #28a745;
+            /* สีเขียวเหมือนปุ่ม OK ในภาพ */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #customAlertContent button:hover {
+            background: #1e7e34;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 
@@ -159,13 +301,49 @@
         </div>
     </div>
 
+    <div id="customAlertBox">
+        <div id="customAlertContent">
+            <p id="customAlertMessage">ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ</p>
+            <button onclick="closeCustomAlert()">OK</button>
+        </div>
+    </div>
+
     <div id="appNotification" class="notification daily-reminder"></div>
 
-    <script type="module">        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"; import { getDatabase, ref, set, onValue, push, remove, update, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-        const firebaseConfig = { apiKey: "AIzaSyC8b0h8yyTo5th6UMvI4_dKUB1ZnvCwZBw", authDomain: "fuji-mobile-shop.firebaseapp.com", databaseURL: "https://fuji-mobile-shop-default-rtdb.asia-southeast1.firebasedatabase.app/", projectId: "fuji-mobile-shop", storageBucket: "fuji-mobile-shop.appspot.com", messagingSenderId: "753053073037", appId: "1:753053073037:web:7c9cb46e055b91a4cf2cc4" };
-        const app = initializeApp(firebaseConfig); const db = getDatabase(app);
-        const monthSelect = document.getElementById("monthSelect"); const currentYear = new Date().getFullYear();
-        let EDIT_Y = "", EDIT_M = "", EDIT_KEY = ""; let DELETE_Y = "", DELETE_M = "", DELETE_KEY = "";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, push, remove, update, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8b0h8yyTo5th6UMvI4_dKUB1ZnvCwZBw",
+            authDomain: "fuji-mobile-shop.firebaseapp.com",
+            databaseURL: "https://fuji-mobile-shop-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "fuji-mobile-shop",
+            storageBucket: "fuji-mobile-shop.appspot.com",
+            messagingSenderId: "753053073037",
+            appId: "1:753053073037:web:7c9cb46e055b91a4cf2cc4"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const monthSelect = document.getElementById("monthSelect");
+        const currentYear = new Date().getFullYear();
+        let EDIT_Y = "",
+            EDIT_M = "",
+            EDIT_KEY = "";
+        let DELETE_Y = "",
+            DELETE_M = "",
+            DELETE_KEY = "";
+
+        // Custom Alert Functions 
+        function showCustomAlert(message) {
+            document.getElementById("customAlertMessage").textContent = message;
+            document.getElementById("customAlertBox").style.display = "flex";
+        }
+
+        window.closeCustomAlert = function () {
+            document.getElementById("customAlertBox").style.display = "none";
+        };
+
 
         // ฟังก์ชันสำหรับแสดง Notification (จำลอง)
         function showNotification(message, type) {
@@ -182,35 +360,56 @@
             }, 5000);
         }
 
-        // 🔥 NEW: CODE FOR NOTIFICATION 1: Morning Reminder
-        // เรียกใช้เมื่อ DOM โหลดเสร็จ (จำลองการแจ้งเตือนตอนเช้า)
+        // Morning Reminder
         document.addEventListener('DOMContentLoaded', () => {
-            // ตั้งค่าวันที่ปัจจุบันเป็นค่าเริ่มต้น
             document.getElementById("dateInput").value = new Date().toISOString().split('T')[0];
             showNotification("🔔 ວັນນີ້ຢ່າລືມບັນທຶກລາຍການປະຈຳວັນດ້ວຍນະ", "daily-reminder");
         });
 
         async function loadAvailableMonths() {
-            const yearRef = ref(db, `expenses/${currentYear}`); const snapshot = await get(yearRef);
+            const yearRef = ref(db, `expenses/${currentYear}`);
+            const snapshot = await get(yearRef);
             monthSelect.innerHTML = "";
-            if (!snapshot.exists()) { monthSelect.innerHTML = `<option value="">-- ບໍ່ມີຂໍ້ມູນ --</option>`; return; }
-            snapshot.forEach(child => { const mm = child.key; const opt = document.createElement("option"); opt.value = mm; opt.textContent = `ເດືອນ ${mm} / ${currentYear}`; monthSelect.appendChild(opt); });
+            if (!snapshot.exists()) {
+                monthSelect.innerHTML = `<option value="">-- ບໍ່ມີຂໍ້ມູນ --</option>`;
+                return;
+            }
+            snapshot.forEach(child => {
+                const mm = child.key;
+                const opt = document.createElement("option");
+                opt.value = mm;
+                opt.textContent = `ເດືອນ ${mm} / ${currentYear}`;
+                monthSelect.appendChild(opt);
+            });
             loadMonth();
         }
 
-        window.saveExpense = async function () { // เปลี่ยนเป็น async เพื่อรอการดึงข้อมูล
-            const date = dateInput.value; const item = itemInput.value; const price = Number(priceInput.value);
-            if (!date || !item || !price) { alert("ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບ"); return; }
-            const y = date.split("-")[0]; const m = date.split("-")[1];
+        window.saveExpense = async function () {
+            const date = dateInput.value;
+            const item = itemInput.value;
+            const price = Number(priceInput.value);
+
+            // แทนที่ alert ด้วย Custom Alert
+            if (!date || !item || !price) {
+                showCustomAlert("ກະ​ລຸ​ນາ​ກອກ​ຂໍ້​ມູນ​ໃຫ້​ຄົບ");
+                return;
+            }
+            const y = date.split("-")[0];
+            const m = date.split("-")[1];
 
             // 1. บันทึกข้อมูล
-            const newRef = push(ref(db, `expenses/${y}/${m}`)); await set(newRef, { date, item, price }); // ใช้ await 
+            const newRef = push(ref(db, `expenses/${y}/${m}`));
+            await set(newRef, {
+                date,
+                item,
+                price
+            });
 
             // 2. ดึงข้อมูลรวมของวันนี้อีกครั้งหลังบันทึก
             const todayRef = ref(db, `expenses/${y}/${m}`);
             const snapshot = await get(todayRef);
             let todayTotal = 0;
-            const todayStr = dateInput.value; // ใช้วันที่จาก Input เพื่อความแม่นยำ
+            const todayStr = dateInput.value;
 
             if (snapshot.exists()) {
                 snapshot.forEach(child => {
@@ -221,13 +420,12 @@
                 });
             }
 
-            // 3. 🔥 NEW: CODE FOR NOTIFICATION 2: Post-Save Total
-            const totalText = todayTotal.toLocaleString("lo-LA"); // จัดรูปแบบตัวเลขให้เป็นภาษาลาว
+            // 3. Post-Save Total Notification
+            const totalText = todayTotal.toLocaleString("lo-LA");
             const notificationMsg = `✔ ທ່ານໄດ້ບັນທຶກລາຍການສຳເລັດແລ້ວ\nວັນນີ້ທ່ານໃຊ້ຈ່າຍໄປທັງໝົດ ${totalText} ກີບ`;
             showNotification(notificationMsg, "save-complete");
 
             // 4. โหลดข้อมูลใหม่
-            // alert("✔ ບັນທຶກສຳເລັດ"); // ลบ alert เดิมออก
             loadAvailableMonths();
             loadMonth();
 
@@ -237,62 +435,117 @@
         };
 
         window.loadMonth = function () {
-            const m = monthSelect.value; const y = currentYear;
-            const tableBody = document.getElementById("expenseTable"); tableBody.innerHTML = "";
+            const m = monthSelect.value;
+            const y = currentYear;
+            const tableBody = document.getElementById("expenseTable");
+            tableBody.innerHTML = "";
             if (!m) return;
             const monthRef = ref(db, `expenses/${y}/${m}`);
             onValue(monthRef, (snapshot) => {
                 tableBody.innerHTML = "";
-                let index = 1; let total = 0; let todayTotal = 0;
-                const todayStr = document.getElementById("dateInput").value; // ใช้วันที่จาก Input
+                let index = 1;
+                let total = 0;
+                let todayTotal = 0;
+                const todayStr = document.getElementById("dateInput").value;
 
                 snapshot.forEach(child => {
-                    const key = child.key; const data = child.val();
+                    const key = child.key;
+                    const data = child.val();
                     total += Number(data.price);
-                    if (data.date === todayStr) { todayTotal += Number(data.price); }
+                    if (data.date === todayStr) {
+                        todayTotal += Number(data.price);
+                    }
 
                     // ใช้ toLocaleString("lo-LA") สำหรับการแสดงผลตัวเลขเป็นลาว
-                    tableBody.innerHTML += `                <tr>                    <td>${index++}</td>                    <td>${data.date}</td>                    <td>${data.item}</td>                    <td>${Number(data.price).toLocaleString("lo-LA")}</td>
-                    <td><button onclick="openEdit('${y}','${m}','${key}','${data.date}','${data.item}','${data.price}')">✏</button></td>
-                    <td><button onclick="askDelete('${y}','${m}','${key}')">🗑</button></td>                </tr>`;
+                    tableBody.innerHTML += `                <tr>                    <td>${index++}</td>                    <td>${data.date}</td>                    <td>${data.item}</td>                    <td>${Number(data.price).toLocaleString("lo-LA")}</td>
+                    <td><button onclick="openEdit('${y}','${m}','${key}','${data.date}','${data.item}','${data.price}')">✏</button></td>
+                    <td><button onclick="askDelete('${y}','${m}','${key}')">🗑</button></td>                </tr>`;
                 });
 
                 todayTotalText.textContent = "ລວມວັນນີ້: " + todayTotal.toLocaleString("lo-LA") + " ກີບ";
                 totalText.textContent = "ລວມທັງໝົດ: " + total.toLocaleString("lo-LA") + " ກີບ";
             });
         };
-        /** 🔥 ฟังก์ชันเปิด Popup ลบ */        window.askDelete = function (y, m, key) {
-            DELETE_Y = y; DELETE_M = m; DELETE_KEY = key;
+        /** 🔥 ฟังก์ชันเปิด Popup ลบ */
+        window.askDelete = function (y, m, key) {
+            DELETE_Y = y;
+            DELETE_M = m;
+            DELETE_KEY = key;
             document.getElementById("deleteConfirmBox").style.display = "flex";
         };
-        /** 🔥 กดลบจริง */        window.confirmDelete = function () { remove(ref(db, `expenses/${DELETE_Y}/${DELETE_M}/${DELETE_KEY}`)).then(() => { document.getElementById("deleteConfirmBox").style.display = "none"; loadMonth(); }); };
-        /** ❌ ยกเลิก */        window.cancelDelete = function () { document.getElementById("deleteConfirmBox").style.display = "none"; };
+        /** 🔥 กดลบจริง */
+        window.confirmDelete = function () {
+            remove(ref(db, `expenses/${DELETE_Y}/${DELETE_M}/${DELETE_KEY}`)).then(() => {
+                document.getElementById("deleteConfirmBox").style.display = "none";
+                loadMonth();
+            });
+        };
+        /** ❌ ยกเลิก */
+        window.cancelDelete = function () {
+            document.getElementById("deleteConfirmBox").style.display = "none";
+        };
         window.openEdit = function (y, m, key, date, item, price) {
-            EDIT_Y = y; EDIT_M = m; EDIT_KEY = key;
-            editDate.value = date; editItem.value = item; editPrice.value = price;
+            EDIT_Y = y;
+            EDIT_M = m;
+            EDIT_KEY = key;
+            editDate.value = date;
+            editItem.value = item;
+            editPrice.value = price;
             document.getElementById("editBox").style.display = "flex";
         };
-        window.closeEdit = function () { document.getElementById("editBox").style.display = "none"; };
+        window.closeEdit = function () {
+            document.getElementById("editBox").style.display = "none";
+        };
         window.saveEdit = function () {
-            const newDate = editDate.value; const newItem = editItem.value; const newPrice = Number(editPrice.value);
-            if (!newDate || !newItem || !newPrice) { alert("ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບ"); return; }
-            update(ref(db, `expenses/${EDIT_Y}/${EDIT_M}/${EDIT_KEY}`), { date: newDate, item: newItem, price: newPrice }).then(() => { alert("✔ ແກ້ໄຂສຳເລັດ"); closeEdit(); loadMonth(); });
+            const newDate = editDate.value;
+            const newItem = editItem.value;
+            const newPrice = Number(editPrice.value);
+
+            // แทนที่ alert ด้วย Custom Alert
+            if (!newDate || !newItem || !newPrice) {
+                showCustomAlert("ກະ​ລຸ​ນາ​ກອກ​ຂໍ້​ມູນ​ໃຫ້​ຄົບ");
+                return;
+            }
+            update(ref(db, `expenses/${EDIT_Y}/${EDIT_M}/${EDIT_KEY}`), {
+                date: newDate,
+                item: newItem,
+                price: newPrice
+            }).then(() => {
+                alert("✔ ແກ້ໄຂສຳເລັດ");
+                closeEdit();
+                loadMonth();
+            });
         };
         window.exportExcel = async function () {
-            const m = monthSelect.value; const y = currentYear;
-            if (!m) { alert("⚠ ກະລຸນາເລືອກເດືອນ"); return; }
-            const monthRef = ref(db, `expenses/${y}/${m}`); const snapshot = await get(monthRef);
-            if (!snapshot.exists()) { alert("⚠ ບໍ່ມີຂໍ້ມູນໃນເດືອນນີ້"); return; }
-            let data = [["ວັນທີ", "ລາຍການ", "ລາຄາ"]];
-            snapshot.forEach(child => { const d = child.val(); data.push([d.date, d.item, d.price]); });
-            const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Expenses");
-            const filename = `expenses_${y}_${m}.xlsx`; XLSX.writeFile(wb, filename);
+            const m = monthSelect.value;
+            const y = currentYear;
+            if (!m) {
+                alert("⚠ ກະລຸນາເລືອກເດືອນ");
+                return;
+            }
+            const monthRef = ref(db, `expenses/${y}/${m}`);
+            const snapshot = await get(monthRef);
+            if (!snapshot.exists()) {
+                alert("⚠ ບໍ່ມີຂໍ້ມູນໃນເດືອນນີ້");
+                return;
+            }
+            let data = [
+                ["ວັນທີ", "ລາຍການ", "ລາຄາ"]
+            ];
+            snapshot.forEach(child => {
+                const d = child.val();
+                data.push([d.date, d.item, d.price]);
+            });
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Expenses");
+            const filename = `expenses_${y}_${m}.xlsx`;
+            XLSX.writeFile(wb, filename);
         };
 
-        // เพิ่ม toLocaleString("lo-LA") ใน loadAvailableMonths และ loadMonth เพื่อแสดงตัวเลขให้ถูกต้องตามภาษาลาว
-        // ... (โค้ดส่วนอื่น ๆ เหมือนเดิม)
 
-        loadAvailableMonths();    </script>
+        loadAvailableMonths();
+    </script>
 </body>
 
 </html>
