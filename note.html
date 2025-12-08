@@ -307,21 +307,12 @@
         </div>
     </div>
     <div id="appNotification" class="notification daily-reminder"></div>
-    <script type="module">
-        import {
-            initializeApp
-        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import {
-            getDatabase,
-            ref,
-            set,
-            onValue,
-            push,
-            remove,
-            update,
-            get
-        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+        // ใช้ Global variable 'firebase' แทนการ import
         const firebaseConfig = {
             apiKey: "AIzaSyC8b0h8yyTo5th6UMvI4_dKUB1ZnvCwZBw",
             authDomain: "fuji-mobile-shop.firebaseapp.com",
@@ -331,8 +322,11 @@
             messagingSenderId: "753053073037",
             appId: "1:753053073037:web:7c9cb46e055b91a4cf2cc4"
         };
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+
+        // ใช้ firebase.initializeApp() และ firebase.database()
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const monthSelect = document.getElementById("monthSelect");
         const currentYear = new Date().getFullYear();
         let EDIT_Y = "",
@@ -344,18 +338,11 @@
 
         // --- 🔥 NEW: Text-to-Speech Function ---
         function speakText(text) {
-            // ตรวจสอบว่าเบราว์เซอร์รองรับหรือไม่
             if ('speechSynthesis' in window) {
-                // ยกเลิกการพูดก่อนหน้า (ถ้ามี)
                 window.speechSynthesis.cancel();
-
                 const utterance = new SpeechSynthesisUtterance(text);
-                // ตั้งค่าภาษาเป็นภาษาไทย (th-TH) เพื่อการออกเสียงภาษาไทยที่ชัดเจนที่สุด
                 utterance.lang = 'th-TH';
-
-                // ความเร็ว (Rate): 1.0 คือปกติ
                 utterance.rate = 1.0;
-
                 window.speechSynthesis.speak(utterance);
             } else {
                 console.log("Speech Synthesis ไม่รองรับในเบราว์เซอร์นี้");
@@ -378,14 +365,13 @@
         function showNotification(message, type) {
             const notifBox = document.getElementById("appNotification");
             notifBox.textContent = message;
-            notifBox.className = `notification ${type}`; // กำหนดสีตามประเภท
+            notifBox.className = `notification ${type}`;
             notifBox.style.display = "block";
             notifBox.style.opacity = 1;
 
-            // ซ่อน Notification หลังจาก 5 วินาที
             setTimeout(() => {
                 notifBox.style.opacity = 0;
-                setTimeout(() => notifBox.style.display = "none", 500); // ซ่อนหลังจาก transition เสร็จ
+                setTimeout(() => notifBox.style.display = "none", 500);
             }, 5000);
         }
 
@@ -400,8 +386,10 @@
         });
 
         async function loadAvailableMonths() {
-            const yearRef = ref(db, `expenses/${currentYear}`);
-            const snapshot = await get(yearRef);
+            // 🔥 MODIFIED: ใช้ db.ref().once() แทน ref(db, ...)/get()
+            const yearRef = db.ref(`expenses/${currentYear}`);
+            const snapshot = await yearRef.once('value');
+
             monthSelect.innerHTML = "";
             if (!snapshot.exists()) {
                 monthSelect.innerHTML = `<option value="">-- ບໍ່ມີຂໍ້ມູນ --</option>`;
@@ -422,7 +410,6 @@
             const item = itemInput.value;
             const price = Number(priceInput.value);
 
-            // แทนที่ alert ด้วย Custom Alert
             if (!date || !item || !price) {
                 showCustomAlert("ກະ​ລຸ​ນາ​ກອກ​ຂໍ້​ມູນ​ໃຫ້​ຄົບ");
                 return;
@@ -431,16 +418,17 @@
             const m = date.split("-")[1];
 
             // 1. บันทึกข้อมูล
-            const newRef = push(ref(db, `expenses/${y}/${m}`));
-            await set(newRef, {
+            // 🔥 MODIFIED: ใช้ db.ref().push().set() แทน push(ref(db, ...))/set()
+            const monthRef = db.ref(`expenses/${y}/${m}`);
+            await monthRef.push().set({
                 date,
                 item,
                 price
             });
 
             // 2. ดึงข้อมูลรวมของวันนี้อีกครั้งหลังบันทึก
-            const todayRef = ref(db, `expenses/${y}/${m}`);
-            const snapshot = await get(todayRef);
+            // 🔥 MODIFIED: ใช้ monthRef.once() แทน get(todayRef)
+            const snapshot = await monthRef.once('value');
             let todayTotal = 0;
             const todayStr = dateInput.value;
 
@@ -454,17 +442,13 @@
             }
 
             // 3. Post-Save Total Notification
-            // แปลงตัวเลขเป็นข้อความที่อ่านได้ (ใช้ lo-LA เพื่อคงรูปแบบการแสดงผลแบบลาวและหน่วยกีบ)
             const totalTextFormatted = todayTotal.toLocaleString("lo-LA");
 
-            // 🔥 MODIFIED: สร้างข้อความสำหรับการออกเสียงเป็นภาษาไทยตามที่ผู้ใช้ร้องขอ
             const speechMessage = `เพิ่มรายการสำเร็จแล้ว. วันนี้คุณใช้จ่ายไปทั้งหมด ${totalTextFormatted} กีบ`;
 
-            // แสดง Notification บนจอ (คงภาษาลาวตาม UI เดิม)
             const notificationMsg = `✔ ທ່ານໄດ້ບັນທຶກລາຍການສຳເລັດແລ້ວ\nວັນນີ້ທ່ານໃຊ້ຈ່າຍໄປທັງໝົດ ${totalTextFormatted} ກີບ`;
             showNotification(notificationMsg, "save-complete");
 
-            // 🔥 MODIFIED: ออกเสียงสรุปรายการเป็นภาษาไทย
             speakText(speechMessage);
 
             // 4. โหลดข้อมูลใหม่
@@ -475,14 +459,17 @@
             itemInput.value = "";
             priceInput.value = "";
         };
+
         window.loadMonth = function () {
             const m = monthSelect.value;
             const y = currentYear;
             const tableBody = document.getElementById("expenseTable");
             tableBody.innerHTML = "";
             if (!m) return;
-            const monthRef = ref(db, `expenses/${y}/${m}`);
-            onValue(monthRef, (snapshot) => {
+
+            // 🔥 MODIFIED: ใช้ db.ref().on('value', ...) แทน onValue(...)
+            const monthRef = db.ref(`expenses/${y}/${m}`);
+            monthRef.on('value', (snapshot) => {
                 tableBody.innerHTML = "";
                 let index = 1;
                 let total = 0;
@@ -498,36 +485,39 @@
                     }
 
                     // ใช้ toLocaleString("lo-LA") สำหรับการแสดงผลตัวเลขเป็นลาว
-                    tableBody.innerHTML += `                <tr>                    <td>${index++}</td>                    <td>${data.date}</td>                    <td>${data.item}</td>                    <td>${Number(data.price).toLocaleString("lo-LA")}</td>                    <td><button onclick="openEdit('${y}','${m}','${key}','${data.date}','${data.item}','${data.price}')">✏</button></td>                    <td><button onclick="askDelete('${y}','${m}','${key}')">🗑</button></td>                </tr>`;
+                    tableBody.innerHTML += `<tr> <td>${index++}</td> <td>${data.date}</td> <td>${data.item}</td> <td>${Number(data.price).toLocaleString("lo-LA")}</td> <td><button onclick="openEdit('${y}','${m}','${key}','${data.date}','${data.item}','${data.price}')">✏</button></td> <td><button onclick="askDelete('${y}','${m}','${key}')">🗑</button></td> </tr>`;
                 });
 
                 todayTotalText.textContent = "ລວມວັນນີ້: " + todayTotal.toLocaleString("lo-LA") + " ກີບ";
                 totalText.textContent = "ລວມທັງໝົດ: " + total.toLocaleString("lo-LA") + " ກີບ";
             });
         };
+
         /** 🔥 ฟังก์ชันเปิด Popup ลบ */
         window.askDelete = function (y, m, key) {
             DELETE_Y = y;
             DELETE_M = m;
             DELETE_KEY = key;
             document.getElementById("deleteConfirmBox").style.display = "flex";
-            // 🔥 MODIFIED: ออกเสียงยืนยันการลบเป็นภาษาไทยตามที่ผู้ใช้ร้องขอ
             const thaiConfirmation = "ท่านต้องการยืนยันที่จะลบรายการนี้ไหม ถ้ายืนยันกดลบ ถ้ายกเลิกกดปุ่มยกเลิก";
             speakText(thaiConfirmation);
         };
+
         /** 🔥 กดลบจริง */
         window.confirmDelete = function () {
-            remove(ref(db, `expenses/${DELETE_Y}/${DELETE_M}/${DELETE_KEY}`)).then(() => {
+            // 🔥 MODIFIED: ใช้ db.ref().child().remove() แทน remove(ref(db, ...))
+            db.ref(`expenses/${DELETE_Y}/${DELETE_M}/${DELETE_KEY}`).remove().then(() => {
                 document.getElementById("deleteConfirmBox").style.display = "none";
                 loadMonth();
-                // 🔥 MODIFIED: ออกเสียงหลังลบสำเร็จเป็นภาษาไทย
                 speakText("รายการถูกลบสำเร็จแล้ว");
             });
         };
+
         /** ❌ ยกเลิก */
         window.cancelDelete = function () {
             document.getElementById("deleteConfirmBox").style.display = "none";
         };
+
         window.openEdit = function (y, m, key, date, item, price) {
             EDIT_Y = y;
             EDIT_M = m;
@@ -537,42 +527,45 @@
             editPrice.value = price;
             document.getElementById("editBox").style.display = "flex";
         };
+
         window.closeEdit = function () {
             document.getElementById("editBox").style.display = "none";
         };
+
         window.saveEdit = function () {
             const newDate = editDate.value;
             const newItem = editItem.value;
             const newPrice = Number(editPrice.value);
 
-            // แทนที่ alert ด้วย Custom Alert
             if (!newDate || !newItem || !newPrice) {
                 showCustomAlert("ກະ​ລຸ​ນາ​ກອກ​ຂໍ້​ມູນ​ໃຫ້​ຄົບ");
                 return;
             }
-            update(ref(db, `expenses/${EDIT_Y}/${EDIT_M}/${EDIT_KEY}`), {
+            // 🔥 MODIFIED: ใช้ db.ref().child().update() แทน update(ref(db, ...))
+            db.ref(`expenses/${EDIT_Y}/${EDIT_M}/${EDIT_KEY}`).update({
                 date: newDate,
                 item: newItem,
                 price: newPrice
             }).then(() => {
-                // 🔥 MODIFIED: ออกเสียงหลังแก้ไขสำเร็จเป็นภาษาไทย
                 speakText("แก้ไขรายการสำเร็จแล้ว");
                 closeEdit();
                 loadMonth();
             });
         };
+
         window.exportExcel = async function () {
             const m = monthSelect.value;
             const y = currentYear;
             if (!m) {
-                // 🔥 MODIFIED: ออกเสียงเป็นภาษาไทย
                 speakText("กรุณาเลือกเดือน");
                 return;
             }
-            const monthRef = ref(db, `expenses/${y}/${m}`);
-            const snapshot = await get(monthRef);
+
+            // 🔥 MODIFIED: ใช้ db.ref().once() แทน get(monthRef)
+            const monthRef = db.ref(`expenses/${y}/${m}`);
+            const snapshot = await monthRef.once('value');
+
             if (!snapshot.exists()) {
-                // 🔥 MODIFIED: ออกเสียงเป็นภาษาไทย
                 speakText("ไม่มีข้อมูลในเดือนนี้");
                 return;
             }
@@ -589,7 +582,6 @@
             const filename = `expenses_${y}_${m}.xlsx`;
             XLSX.writeFile(wb, filename);
 
-            // 🔥 MODIFIED: ออกเสียงหลัง Export เป็นภาษาไทย
             speakText("Export Excel สำเร็จแล้ว");
         };
 
