@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@100..900&display=swap" rel="stylesheet">
+
     <style>
         /* 1. 🎨 การใช้สี (Color Scheme) และ Typography */
         body {
@@ -47,7 +48,7 @@
             flex-wrap: wrap;
         }
 
-        /* 🟢 NEW: Container สำหรับ Header และ Hit Counter */
+        /* 🟢 Container สำหรับ Header และ Hit Counter */
         .title-container {
             display: flex;
             align-items: center;
@@ -62,7 +63,7 @@
             padding-right: 15px;
         }
 
-        /* 🟢 NEW: Hit Counter Style (ไม่ต้องใหญ่) */
+        /* 🟢 Hit Counter Style (ไม่ต้องใหญ่) */
         #hitCounter {
             font-size: 1.0em;
             font-weight: 600;
@@ -369,7 +370,8 @@
             background: #fff;
             padding: 20px;
             width: 90%;
-            max-width: 900px;
+            max-width: 1100px;
+            /* เพิ่มความกว้าง */
             max-height: 90vh;
             border-radius: 8px;
             overflow-y: auto;
@@ -406,7 +408,8 @@
 
         /* Date/Time */
         #visitLogTable th:nth-child(3) {
-            width: 25%;
+            width: 35%;
+            /* เพิ่มพื้นที่ให้ Device/Model */
         }
 
         /* Device */
@@ -416,12 +419,12 @@
 
         /* IP */
         #visitLogTable th:nth-child(5) {
-            width: 25%;
+            width: 20%;
         }
 
         /* Location */
         #visitLogTable th:nth-child(6) {
-            width: 15%;
+            width: 10%;
         }
 
         /* Action */
@@ -665,7 +668,7 @@
                     <tr>
                         <th>ລ/ດ</th>
                         <th>ວັນທີ/ເວລາ</th>
-                        <th>ອຸປະກອນ (Device)</th>
+                        <th>ອຸປະກອນ (Device/Model)</th>
                         <th>IP Address</th>
                         <th>ທີ່ຕັ້ງ (Location)</th>
                         <th>ລຶບ</th>
@@ -713,7 +716,7 @@
             *ກົດແບ່ງປັນເພື່ອແນະນຳລະບົບບັນທຶກລາຍຈ່າຍນີ້ໃຫ້ໝູ່ຂອງທ່ານ</p>
     </div>
     <div class="footer">
-        Update version 5.6 (with Visitor Log)
+        Update version 5.7 (with Advanced Device Log)
     </div>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -739,27 +742,130 @@
         let DELETE_Y = "", DELETE_M = "", DELETE_KEY = "";
         const liveClockElement = document.getElementById("liveClock");
 
-        // 🟢 NEW: Global Variable สำหรับ Visitor Log
+        // 🟢 Global Variable สำหรับ Visitor Log
         let DELETE_VISIT_KEY = null;
 
         // ---------------------------------------------------------------------
-        // 🟢 NEW: VISITOR LOG FUNCTIONS 
+        // 🟢 NEW: ADVANCED DEVICE DETECTION FUNCTIONS
         // ---------------------------------------------------------------------
 
-        function getDeviceType() {
+        function getDeviceDetails() {
             const ua = navigator.userAgent;
+            let deviceType = "Desktop/PC";
+            let brand = "Unknown";
+            let model = "Desktop";
+
+            // 1. Determine Device Type (Mobile/Tablet/Desktop)
             if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
-                return "Tablet";
+                deviceType = "Tablet";
+            } else if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-L|Opera Mini/i.test(ua)) {
+                deviceType = "Mobile";
             }
-            if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-L|Opera Mini/i.test(ua)) {
-                return "Mobile";
+
+            // ถ้าเป็น Desktop ไม่ต้องหา Brand/Model ต่อ
+            if (deviceType === "Desktop/PC") {
+                brand = "Desktop";
+                model = "PC/Browser";
+                return { deviceType, brand, model };
             }
-            return "Desktop";
+
+            // 2. Advanced Brand/Model Detection for Mobile/Tablet
+
+            // Apple (iPhone/iPad/iPod)
+            if (/iPhone|iPod|iPad/i.test(ua)) {
+                brand = "Apple";
+
+                // Simplified Model Extraction for Apple
+                if (/iPhone/i.test(ua)) {
+                    model = "iPhone";
+                } else if (/iPad/i.test(ua)) {
+                    model = "iPad";
+                } else {
+                    model = "iOS Device";
+                }
+
+                // Add specific version (e.g., iPhone OS 17)
+                const osMatch = ua.match(/OS ([\d_]+)/i);
+                if (osMatch) model += ` (iOS ${osMatch[1].replace(/_/g, '.')})`;
+
+            }
+
+            // Android based devices (Samsung, Vivo, Oppo, Xiaomi/Redmi, Realme, Infinix, Itel, etc.)
+            else if (/Android/i.test(ua)) {
+                brand = "Android";
+
+                // Get Brand/Model from common patterns
+                const modelMatch = ua.match(/(SAMSUNG|SM-|Galaxy|Pixel|HUAWEI|VIVO|OPPO|Redmi|Mi|Realme|Infinix|TECNO|iTel|ASUS|Motorola)[\s-]?([^;\)]+)/i);
+
+                if (modelMatch && modelMatch.length > 2) {
+                    // Try to clean up model name
+                    model = modelMatch[0].replace(/;|\)/g, '').trim();
+
+                    // Specific Brand Handling (if needed)
+                    if (/Samsung|SM-|Galaxy/i.test(modelMatch[1])) brand = "Samsung";
+                    else if (/VIVO/i.test(modelMatch[1])) brand = "Vivo";
+                    else if (/OPPO/i.test(modelMatch[1])) brand = "Oppo";
+                    else if (/Realme/i.test(modelMatch[1])) brand = "Realme";
+                    else if (/Infinix/i.test(modelMatch[1])) brand = "Infinix";
+                    else if (/iTel/i.test(modelMatch[1])) brand = "iTel";
+                    else if (/Redmi|Mi/i.test(modelMatch[1])) brand = "Xiaomi/Mi";
+                    else {
+                        // Fallback to searching the whole UA
+                        const genericModelMatch = ua.match(/Android[^;]+; ([^)]+)/i);
+                        if (genericModelMatch && genericModelMatch.length > 1) {
+                            model = genericModelMatch[1].trim();
+                        } else {
+                            model = "Generic Android";
+                        }
+                    }
+                } else {
+                    // Fallback to getting device build code (often contains brand/model)
+                    const genericModelMatch = ua.match(/Android[^;]+; ([^)]+)/i);
+                    if (genericModelMatch && genericModelMatch.length > 1) {
+                        model = genericModelMatch[1].trim();
+                    } else {
+                        model = "Generic Android";
+                    }
+                }
+
+                // Add specific model name to the brand
+                brand = brand + (brand !== "Android" ? ` (${model.substring(0, 15)})` : "");
+
+            }
+            // Other devices
+            else if (/Windows Phone/i.test(ua)) {
+                brand = "Microsoft";
+                model = "Windows Phone";
+            }
+
+            // 3. Final Model string for display
+            let finalModel = `${brand}`;
+            if (model !== "Desktop" && model !== "Generic Android") {
+                finalModel += ` (${model.replace(/Build|Linux|Android|SM-/i, '').trim().substring(0, 25)})`;
+            } else if (brand === "Android") {
+                finalModel += ` (Model: ${model.substring(0, 25)})`;
+            }
+
+            return { deviceType, brand, model: finalModel };
+        }
+
+        function getIconForDevice(deviceType) {
+            switch (deviceType) {
+                case 'Mobile':
+                    return 'bi-phone-fill';
+                case 'Tablet':
+                    return 'bi-tablet-fill';
+                default:
+                    return 'bi-laptop-fill';
+            }
         }
 
         async function recordVisit() {
             try {
-                // 1. Get IP and Geolocation
+                // 1. Get Device Details
+                const deviceDetails = getDeviceDetails();
+
+                // 2. Get IP and Geolocation
                 const ipResponse = await fetch('http://ip-api.com/json/?fields=status,message,country,city,query');
                 const ipData = await ipResponse.json();
 
@@ -772,21 +878,22 @@
                     hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
                 });
 
-                // 2. Prepare Data
+                // 3. Prepare Data
                 const visitData = {
                     timestamp: firebase.database.ServerValue.TIMESTAMP,
                     dateTime: dateTimeStr,
-                    device: getDeviceType(),
+                    deviceType: deviceDetails.deviceType, // Mobile, Tablet, Desktop
+                    deviceModel: deviceDetails.model, // iPhone (iOS 17.0), Samsung (SM-G998B)
                     ip: ip,
                     location: location,
-                    userAgent: navigator.userAgent.substring(0, 100) // บันทึก user agent บางส่วน
+                    userAgent: navigator.userAgent.substring(0, 150) // บันทึก user agent บางส่วน
                 };
 
-                // 3. Save to Firebase
+                // 4. Save to Firebase
                 const visitsRef = db.ref('visits');
                 await visitsRef.push(visitData);
 
-                // 4. Update count on page
+                // 5. Update count on page
                 updateVisitCount();
 
             } catch (error) {
@@ -829,10 +936,13 @@
                 visits.reverse();
 
                 visits.forEach(data => {
+                    const deviceIcon = getIconForDevice(data.deviceType || 'Desktop/PC');
+                    const deviceDetail = data.deviceModel || data.deviceType || 'Unknown Device';
+
                     tableBody.innerHTML += `<tr>
                         <td>${index++}</td>
                         <td>${data.dateTime}</td>
-                        <td><i class="bi bi-${data.device === 'Mobile' ? 'phone-fill' : data.device === 'Tablet' ? 'tablet-fill' : 'laptop-fill'}"></i> ${data.device}</td>
+                        <td style="text-align: left;"><i class="bi ${deviceIcon}"></i> ${deviceDetail}</td>
                         <td>${data.ip}</td>
                         <td><i class="bi bi-geo-alt-fill"></i> ${data.location}</td>
                         <td>
@@ -883,7 +993,7 @@
         }
 
         // ---------------------------------------------------------------------
-        // 🟢 END: VISITOR LOG FUNCTIONS 
+        // 🟢 END: ADVANCED DEVICE DETECTION FUNCTIONS
         // ---------------------------------------------------------------------
 
 
@@ -947,7 +1057,7 @@
             updateLiveClock();
             setInterval(updateLiveClock, 1000); // อัปเดตทุก 1 วินาที
 
-            // 🟢 NEW: บันทึกการเข้าชมและอัปเดตตัวเลข
+            // 🟢 บันทึกการเข้าชมและอัปเดตตัวเลข
             recordVisit();
 
             // ตั้งวันที่เริ่มต้น
