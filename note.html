@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@100..900&display=swap" rel="stylesheet">
 
     <style>
-        /* 1. 🎨 การใช้สี (Color Scheme) และ Typography */
+        /* 1. 🎨 ການໃຊ້ສີ (Color Scheme) ແລະ Typography */
         body {
             font-family: 'Noto Sans Lao', sans-serif;
             padding: 20px;
@@ -48,7 +48,7 @@
             flex-wrap: wrap;
         }
 
-        /* 🟢 Container สำหรับ Header และ Hit Counter */
+        /* 🟢 Container ສຳລັບ Header, Hit Counter ແລະ Camera Button */
         .title-container {
             display: flex;
             align-items: center;
@@ -82,10 +82,10 @@
             background-color: #d4f7db;
         }
 
-        /* 🎯 ปรับขนาดนาฬิกาให้ใหญ่เป็นพิเศษเพื่อการมองเห็นบนมือถือ */
+        /* 🎯 ປັບຂະໜາດນາฬິກາໃຫ້ໃຫຍ່ເປັນພິເສດເພື່ອການມອງເຫັນເທິງມືຖື */
         #liveClock {
             font-size: 2.0em;
-            /* **ขนาดใหญ่พิเศษ** */
+            /* **ຂະໜາດໃຫຍ່ພິເສດ** */
             font-weight: bold;
             color: #dc3545;
             background-color: #ffeaea;
@@ -145,7 +145,7 @@
             transition: background-color 0.3s;
         }
 
-        /* 3. 🖼️ การจัดวางองค์ประกอบ (Cards) */
+        /* 3. 🖼️ ການຈັດວາງອົງປະກອບ (Cards) */
         .summary-container {
             display: flex;
             gap: 20px;
@@ -196,7 +196,7 @@
             color: #007bff;
         }
 
-        /* 4. 📊 การปรับปรุงตาราง (Table Redesign) */
+        /* 4. 📊 ການປັບປຸງຕາຕະລາງ (Table Redesign) */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -229,7 +229,7 @@
             background-color: #f8f9fa;
         }
 
-        /* ปรับความกว้างและจัดตำแหน่งคอลัมน์ (Expense Table) */
+        /* ປັບຄວາມກວ້າງແລະຈັດຕຳແໜ່ງຄໍລຳ (Expense Table) */
         #expenseTable td:nth-child(1) {
             /* ລຳດັບ */
             width: 5%;
@@ -267,7 +267,7 @@
             background-color: #ffeaea;
         }
 
-        /* 5. 💡 ไอคอนและปุ่ม (Icons and Buttons) */
+        /* 5. 💡 ໄອຄອນແລະປຸ່ມ (Icons and Buttons) */
         #expenseTable button,
         #visitLogTable button {
             background-color: #f1f1f1;
@@ -308,7 +308,7 @@
             background: #1e7e34 !important;
         }
 
-        /* ส่วนกรอง (Filter) */
+        /* ສ່ວນກອງ (Filter) */
         .filter-section {
             display: flex;
             align-items: center;
@@ -343,8 +343,9 @@
         /* Popups */
         #editBox,
         #deleteConfirmBox,
-        #visitLogBox {
-            /* 🟢 NEW: Visit Log Modal */
+        #visitLogBox,
+        #cameraModal {
+            /* 🟢 NEW: Camera Modal Included */
             position: fixed;
             top: 0;
             left: 0;
@@ -371,7 +372,7 @@
             padding: 20px;
             width: 90%;
             max-width: 1100px;
-            /* เพิ่มความกว้าง */
+            /* ເພີ່ມຄວາມກວ້າງ */
             max-height: 90vh;
             border-radius: 8px;
             overflow-y: auto;
@@ -409,7 +410,7 @@
         /* Date/Time */
         #visitLogTable th:nth-child(3) {
             width: 35%;
-            /* เพิ่มพื้นที่ให้ Device/Model */
+            /* ເພີ່ມພື້ນທີ່ໃຫ້ Device/Model */
         }
 
         /* Device */
@@ -438,6 +439,55 @@
 
         /* End Visit Log Style */
 
+        /* ------------------------------------ */
+        /* 📸 NEW: CAMERA MODAL STYLES */
+        /* ------------------------------------ */
+        #cameraContent {
+            background: #fff;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            /* ทำให้เล็กเหมือน "สแกนหน้า" */
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        #videoElement {
+            width: 100%;
+            max-width: 360px;
+            /* ควบคุมขนาดวิดีโอ */
+            height: auto;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transform: scaleX(-1);
+            /* กลับภาพให้เหมือนเซลฟี่ */
+            display: none;
+        }
+
+        #cameraCanvas {
+            display: none;
+            /* ซ่อน Canvas ไว้ แต่ต้องมีเพื่อจับภาพ */
+        }
+
+        .camera-btn {
+            background: #dc3545;
+            color: white;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+        }
+
+        .camera-btn:hover {
+            background: #c82333;
+        }
+
+        /* ------------------------------------ */
+        /* END CAMERA MODAL STYLES */
+        /* ------------------------------------ */
 
         #editContent button,
         #deleteContent button {
@@ -568,6 +618,10 @@
     <div class="header-container">
         <div class="title-container">
             <h2>💰 ລະບົບບັນທຶກລາຍຈ່າຍປະຈຳວັນ</h2>
+            <button onclick="openCamera()"
+                style="background:#00bcd4;color:white; font-weight: bold; padding: 5px 10px;">
+                <i class="bi bi-camera-fill"></i> ຖ່າຍຮູບຜູ້ໃຊ້
+            </button>
             <span id="hitCounter" onclick="openVisitLog()">
                 <i class="bi bi-eye-fill"></i> ເຂົ້າຊົມທັງໝົດ: <span id="visitCount">0</span>
             </span>
@@ -679,6 +733,21 @@
             </table>
         </div>
     </div>
+
+    <div id="cameraModal">
+        <div id="cameraContent">
+            <h3 style="color:#007bff;"><i class="bi bi-camera-video-fill"></i> ຖ່າຍຮູບຜູ້ໃຊ້ງານ</h3>
+            <video id="videoElement" autoplay playsinline></video>
+            <canvas id="cameraCanvas" width="360" height="270"></canvas>
+            <button id="snapButton" onclick="takePhoto()" class="camera-btn">
+                <i class="bi bi-camera"></i> ຖ່າຍຮູບ
+            </button>
+            <button onclick="closeCamera()" style="background:#6c757d; color:white;">
+                <i class="bi bi-x-lg"></i> ປິດ
+            </button>
+            <p style="font-size: 12px; color: red; margin-top: 10px;">*ກະລຸນາກົດປິດເມື່ອຖ່າຍຮູບສຳເລັດແລ້ວ.</p>
+        </div>
+    </div>
     <div id="customAlertBox">
         <div id="customAlertContent">
             <p id="customAlertMessage">ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ</p>
@@ -722,7 +791,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
-        // 🚨 ตรวจสอบค่านี้ให้ตรงกับ Firebase Project ของคุณก่อนนำไปใช้จริง!
+        // 🚨 ປ່ຽນຄ່າ Firebase ທີ່ນີ້ກ່ອນໃຊ້ງານຈິງ
         const firebaseConfig = {
             apiKey: "AIzaSyC8b0h8yyTo5th6UMrI4_dKUB1ZnvCwZBw",
             authDomain: "fuji-mobile-shop.firebaseapp.com",
@@ -737,18 +806,351 @@
         const db = firebase.database();
 
         const monthSelect = document.getElementById("monthSelect");
-        const currentYear = new Date().getFullYear();
+        const expenseTableBody = document.getElementById("expenseTable");
+        const visitLogTableBody = document.getElementById("visitLogTable");
+        const liveClockElement = document.getElementById("liveClock");
+        const hitCounterElement = document.getElementById("visitCount");
+        const todayTotalTextElement = document.getElementById("todayTotalText");
+        const totalTextElement = document.getElementById("totalText");
+
+        let currentYear = new Date().getFullYear().toString();
+        let currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
+        let currentMonthName = "";
+
         let EDIT_Y = "", EDIT_M = "", EDIT_KEY = "";
         let DELETE_Y = "", DELETE_M = "", DELETE_KEY = "";
-        const liveClockElement = document.getElementById("liveClock");
-
-        // 🟢 Global Variable สำหรับ Visitor Log
         let DELETE_VISIT_KEY = null;
 
+        // 📸 Global Variables สำหรับ Camera
+        const videoElement = document.getElementById('videoElement');
+        const cameraModal = document.getElementById('cameraModal');
+        const cameraCanvas = document.getElementById('cameraCanvas');
+        let currentStream = null;
+
         // ---------------------------------------------------------------------
-        // 🟢 NEW: ADVANCED DEVICE DETECTION FUNCTIONS
+        // ⚙️ UTILITY FUNCTIONS
         // ---------------------------------------------------------------------
 
+        function formatNumber(num) {
+            return parseFloat(num).toLocaleString('lo-LA', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+        }
+
+        function getLaoMonthName(monthNumber) {
+            const laoMonths = ["ມັງກອນ", "ກຸມພາ", "ມີນາ", "ເມສາ", "ພຶດສະພາ", "ມິຖຸນາ", "ກໍລະກົດ", "ສິງຫາ", "ກັນຍາ", "ຕຸລາ", "ພະຈິກ", "ທັນວາ"];
+            return laoMonths[parseInt(monthNumber, 10) - 1] || "";
+        }
+
+        function showCustomAlert(message) {
+            document.getElementById('customAlertMessage').innerText = message;
+            document.getElementById('customAlertBox').style.display = 'flex';
+        }
+
+        window.closeCustomAlert = function () {
+            document.getElementById('customAlertBox').style.display = 'none';
+        }
+
+        function showNotification(message, type) {
+            const notif = document.getElementById('appNotification');
+            notif.innerText = message;
+            notif.className = `notification ${type}`;
+            notif.style.display = 'block';
+            notif.style.opacity = 1;
+            setTimeout(() => {
+                notif.style.opacity = 0;
+                setTimeout(() => {
+                    notif.style.display = 'none';
+                }, 500);
+            }, 3000);
+        }
+
+        function updateLiveClock() {
+            const now = new Date();
+            const dateStr = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            liveClockElement.innerHTML = `<i class="bi bi-clock-fill"></i> ${dateStr} ${timeStr}`;
+        }
+
+        // ---------------------------------------------------------------------
+        // 📅 INITIALIZATION AND MONTH/YEAR HANDLING
+        // ---------------------------------------------------------------------
+
+        function populateMonthSelect() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const currentMonthIndex = now.getMonth();
+
+            // Clear previous options
+            monthSelect.innerHTML = '';
+
+            // Generate options for the current year (can be expanded to previous years if needed)
+            for (let i = 0; i < 12; i++) {
+                const monthNum = (i + 1).toString().padStart(2, '0');
+                const monthName = getLaoMonthName(monthNum);
+                const option = document.createElement('option');
+                option.value = monthNum;
+                option.textContent = `${monthName} ${year}`;
+                if (i === currentMonthIndex) {
+                    option.selected = true;
+                    currentMonth = monthNum;
+                    currentMonthName = monthName;
+                }
+                monthSelect.appendChild(option);
+            }
+        }
+
+        window.loadMonth = function () {
+            currentMonth = monthSelect.value;
+            currentMonthName = getLaoMonthName(currentMonth);
+            loadExpenses();
+        }
+
+        // ---------------------------------------------------------------------
+        // 💰 EXPENSE LOGIC
+        // ---------------------------------------------------------------------
+
+        window.saveExpense = function () {
+            const dateInput = document.getElementById('dateInput').value;
+            const itemInput = document.getElementById('itemInput').value.trim();
+            const priceInput = document.getElementById('priceInput').value.trim();
+
+            if (!dateInput || !itemInput || !priceInput || isNaN(parseFloat(priceInput))) {
+                showCustomAlert("ກະລຸນາກອກຂໍ້ມູນ ວັນທີ, ລາຍການ, ແລະ ລາຄາ ໃຫ້ຄົບຖ້ວນ");
+                return;
+            }
+
+            const price = parseFloat(priceInput);
+            const date = new Date(dateInput);
+            const year = date.getFullYear().toString();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const time = new Date().toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            const newExpenseRef = db.ref(`expenses/${year}/${month}`).push();
+            newExpenseRef.set({
+                date: dateInput,
+                time: time,
+                item: itemInput,
+                price: price
+            }).then(() => {
+                showNotification("✅ ບັນທຶກລາຍຈ່າຍສຳເລັດແລ້ວ!", "save-complete");
+                document.getElementById('itemInput').value = '';
+                document.getElementById('priceInput').value = '';
+                // Reload expenses if the new expense is for the currently selected month
+                if (year === currentYear && month === currentMonth) {
+                    loadExpenses();
+                } else {
+                    // Force the select box to the month we just saved, then load
+                    document.getElementById('monthSelect').value = month;
+                    currentMonth = month;
+                    currentMonthName = getLaoMonthName(month);
+                    loadExpenses();
+                }
+            }).catch(error => {
+                showCustomAlert(`❌ ບັນທຶກບໍ່ສຳເລັດ: ${error.message}`);
+                console.error("Firebase save error:", error);
+            });
+        }
+
+        window.loadExpenses = function () {
+            currentYear = new Date().getFullYear().toString();
+            expenseTableBody.innerHTML = '<tr><td colspan="7">ກຳລັງໂຫຼດຂໍ້ມູນ...</td></tr>';
+
+            const expenseRef = db.ref(`expenses/${currentYear}/${currentMonth}`);
+
+            expenseRef.once('value', (snapshot) => {
+                expenseTableBody.innerHTML = ''; // Clear loading message
+
+                if (!snapshot.exists()) {
+                    expenseTableBody.innerHTML = '<tr><td colspan="7">❌ ບໍ່ພົບລາຍການລາຍຈ່າຍໃນເດືອນນີ້.</td></tr>';
+                    todayTotalTextElement.innerText = '0 ກີບ';
+                    totalTextElement.innerText = '0 ກີບ';
+                    return;
+                }
+
+                let totalExpense = 0;
+                let todayExpense = 0;
+                let rowCount = 0;
+                const todayDate = new Date().toISOString().substring(0, 10); // YYYY-MM-DD
+                const expensesArray = [];
+
+                snapshot.forEach((childSnapshot) => {
+                    const expense = childSnapshot.val();
+                    expense.key = childSnapshot.key;
+                    expensesArray.push(expense);
+                });
+
+                // Sort by date and time (newest first)
+                expensesArray.sort((a, b) => {
+                    // Combine date and time for comparison (use a fallback if time is missing)
+                    const dateTimeA = `${a.date} ${a.time || '00:00:00'}`;
+                    const dateTimeB = `${b.date} ${b.time || '00:00:00'}`;
+                    if (dateTimeA < dateTimeB) return 1; // 1 means a comes after b (descending)
+                    if (dateTimeA > dateTimeB) return -1; // -1 means a comes before b (descending)
+                    return 0;
+                });
+
+                expensesArray.forEach((expense) => {
+                    const price = expense.price || 0;
+                    totalExpense += price;
+
+                    if (expense.date === todayDate) {
+                        todayExpense += price;
+                    }
+
+                    rowCount++;
+
+                    // 🌟 ການແກ້ໄຂ: ປ່ຽນ undefined ເປັນ -
+                    const timeDisplay = expense.time || '-';
+
+                    const row = expenseTableBody.insertRow();
+
+                    row.innerHTML = `
+                        <td>${rowCount}</td>
+                        <td>${expense.date}</td>
+                        <td>${timeDisplay}</td>
+                        <td>${expense.item}</td>
+                        <td style="text-align: right; font-weight: bold;">${formatNumber(price)} ກີບ</td>
+                        <td>
+                            <button onclick="openEdit('${currentYear}', '${currentMonth}', '${expense.key}', '${expense.date}', '${expense.item}', ${price})"><i class="bi bi-pencil-square"></i></button>
+                        </td>
+                        <td>
+                            <button onclick="openDeleteConfirm('${currentYear}', '${currentMonth}', '${expense.key}')"><i class="bi bi-trash-fill"></i></button>
+                        </td>
+                    `;
+                });
+
+                if (rowCount === 0) {
+                    expenseTableBody.innerHTML = '<tr><td colspan="7">❌ ບໍ່ພົບລາຍການລາຍຈ່າຍໃນເດືອນນີ້.</td></tr>';
+                }
+
+                // Update Summary Cards
+                todayTotalTextElement.innerText = `${formatNumber(todayExpense)} ກີບ`;
+                totalTextElement.innerText = `${formatNumber(totalExpense)} ກີບ`;
+
+            }).catch(error => {
+                expenseTableBody.innerHTML = `<tr><td colspan="7" style="color:red;">⚠️ ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດຂໍ້ມູນ: ${error.message}</td></tr>`;
+                console.error("Firebase load error:", error);
+            });
+        }
+
+        window.openEdit = function (year, month, key, date, item, price) {
+            EDIT_Y = year;
+            EDIT_M = month;
+            EDIT_KEY = key;
+            document.getElementById('editDate').value = date;
+            document.getElementById('editItem').value = item;
+            document.getElementById('editPrice').value = price;
+            document.getElementById('editBox').style.display = 'flex';
+        }
+
+        window.closeEdit = function () {
+            document.getElementById('editBox').style.display = 'none';
+        }
+
+        window.saveEdit = function () {
+            const newDate = document.getElementById('editDate').value;
+            const newItem = document.getElementById('editItem').value.trim();
+            const newPrice = document.getElementById('editPrice').value.trim();
+
+            if (!newDate || !newItem || !newPrice || isNaN(parseFloat(newPrice))) {
+                showCustomAlert("ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ");
+                return;
+            }
+
+            // Re-calculate the new year/month in case the date was changed
+            const newDateObj = new Date(newDate);
+            const newYear = newDateObj.getFullYear().toString();
+            const newMonth = (newDateObj.getMonth() + 1).toString().padStart(2, '0');
+            const newTime = new Date().toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            const updates = {
+                date: newDate,
+                time: newTime,
+                item: newItem,
+                price: parseFloat(newPrice)
+            };
+
+            // Handle cross-month move (if month/year changed, this is more complex: delete old, create new)
+            if (EDIT_Y !== newYear || EDIT_M !== newMonth) {
+                // 1. Delete from old location
+                db.ref(`expenses/${EDIT_Y}/${EDIT_M}/${EDIT_KEY}`).remove();
+
+                // 2. Add to new location (pushes a new key)
+                db.ref(`expenses/${newYear}/${newMonth}`).push(updates).then(() => {
+                    showNotification("✅ ຍ້າຍແລະແກ້ໄຂລາຍການສຳເລັດແລ້ວ!", "save-complete");
+                    document.getElementById('editBox').style.display = 'none';
+
+                    // Force the select box to the new month/year, then reload
+                    document.getElementById('monthSelect').value = newMonth;
+                    currentMonth = newMonth;
+                    currentYear = newYear;
+                    loadExpenses();
+                }).catch(error => {
+                    showCustomAlert(`❌ ບັນທຶກບໍ່ສຳເລັດ: ${error.message}`);
+                    console.error("Firebase update error:", error);
+                });
+
+            } else {
+                // Simple update (still in the same month/year)
+                db.ref(`expenses/${EDIT_Y}/${EDIT_M}/${EDIT_KEY}`).update(updates).then(() => {
+                    showNotification("✅ ແກ້ໄຂລາຍການສຳເລັດແລ້ວ!", "save-complete");
+                    document.getElementById('editBox').style.display = 'none';
+                    loadExpenses();
+                }).catch(error => {
+                    showCustomAlert(`❌ ບັນທຶກບໍ່ສຳເລັດ: ${error.message}`);
+                    console.error("Firebase update error:", error);
+                });
+            }
+        }
+
+        window.openDeleteConfirm = function (year, month, key) {
+            DELETE_Y = year;
+            DELETE_M = month;
+            DELETE_KEY = key;
+            document.getElementById('deleteConfirmBox').style.display = 'flex';
+        }
+
+        window.cancelDelete = function () {
+            document.getElementById('deleteConfirmBox').style.display = 'none';
+        }
+
+        window.confirmDelete = function () {
+            db.ref(`expenses/${DELETE_Y}/${DELETE_M}/${DELETE_KEY}`).remove().then(() => {
+                showNotification("✅ ລຶບລາຍການສຳເລັດແລ້ວ!", "save-complete");
+                document.getElementById('deleteConfirmBox').style.display = 'none';
+                loadExpenses();
+            }).catch(error => {
+                showCustomAlert(`❌ ລຶບບໍ່ສຳເລັດ: ${error.message}`);
+                console.error("Firebase delete error:", error);
+            });
+        }
+
+        // ---------------------------------------------------------------------
+        // 👁️ VISITOR LOGIC
+        // ---------------------------------------------------------------------
+
+        function getIPAddressAndLocation(callback) {
+            let ip = "Unknown";
+            let location = "Unknown";
+
+            // Try to get IP and Location from a free API
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(data => {
+                    ip = data.ip || "Unknown";
+                    location = `${data.city || 'Unknown'}, ${data.region_code || ''}, ${data.country_name || 'Unknown'}`;
+                })
+                .catch(error => {
+                    console.warn("Could not fetch IP/Location:", error);
+                })
+                .finally(() => {
+                    callback({ ip, location });
+                });
+        }
+
+        // 🟢 NEW: ADVANCED DEVICE DETECTION FUNCTIONS
         function getDeviceDetails() {
             const ua = navigator.userAgent;
             let deviceType = "Desktop/PC";
@@ -820,7 +1222,7 @@
                     }
                 } else {
                     // Fallback to getting device build code (often contains brand/model)
-                    const genericModelMatch = ua.match(/Android[^;]+; ([^)]+)/i);
+                    const genericModelMatch = ua.match(/Android[^;]+; ([^)]+)/ / i);
                     if (genericModelMatch && genericModelMatch.length > 1) {
                         model = genericModelMatch[1].trim();
                     } else {
@@ -829,531 +1231,342 @@
                 }
 
                 // Add specific model name to the brand
-                brand = brand + (brand !== "Android" ? ` (${model.substring(0, 15)})` : "");
-
-            }
-            // Other devices
-            else if (/Windows Phone/i.test(ua)) {
-                brand = "Microsoft";
-                model = "Windows Phone";
+                brand = brand.charAt(0).toUpperCase() + brand.slice(1);
             }
 
-            // 3. Final Model string for display
-            let finalModel = `${brand}`;
-            if (model !== "Desktop" && model !== "Generic Android") {
-                finalModel += ` (${model.replace(/Build|Linux|Android|SM-/i, '').trim().substring(0, 25)})`;
-            } else if (brand === "Android") {
-                finalModel += ` (Model: ${model.substring(0, 25)})`;
-            }
+            // Clean up model string (remove parentheses, extra spaces)
+            model = model.replace(/\([^)]*\)/g, '').trim();
 
-            return { deviceType, brand, model: finalModel };
+            return { deviceType, brand, model };
         }
 
-        function getIconForDevice(deviceType) {
-            switch (deviceType) {
-                case 'Mobile':
-                    return 'bi-phone-fill';
-                case 'Tablet':
-                    return 'bi-tablet-fill';
-                default:
-                    return 'bi-laptop-fill';
-            }
-        }
-
-        async function recordVisit() {
-            try {
-                // 1. Get Device Details
-                const deviceDetails = getDeviceDetails();
-
-                // 2. Get IP and Geolocation
-                const ipResponse = await fetch('http://ip-api.com/json/?fields=status,message,country,city,query');
-                const ipData = await ipResponse.json();
-
-                let ip = ipData.query || 'Unknown IP';
-                let location = `${ipData.city || 'Unknown City'}, ${ipData.country || 'Unknown Country'}`;
-
+        function saveVisitLog() {
+            getIPAddressAndLocation(details => {
                 const now = new Date();
-                const dateTimeStr = now.toLocaleString('en-US', {
-                    year: 'numeric', month: '2-digit', day: '2-digit',
-                    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-                });
+                const dateTime = now.toLocaleString('lo-LA');
+                const { deviceType, brand, model } = getDeviceDetails();
+                const fullDevice = `${deviceType} (${brand} - ${model})`;
 
-                // 3. Prepare Data
-                const visitData = {
+                const logData = {
                     timestamp: firebase.database.ServerValue.TIMESTAMP,
-                    dateTime: dateTimeStr,
-                    deviceType: deviceDetails.deviceType, // Mobile, Tablet, Desktop
-                    deviceModel: deviceDetails.model, // iPhone (iOS 17.0), Samsung (SM-G998B)
-                    ip: ip,
-                    location: location,
-                    userAgent: navigator.userAgent.substring(0, 150) // บันทึก user agent บางส่วน
+                    dateTime: dateTime,
+                    device: fullDevice,
+                    ip: details.ip,
+                    location: details.location
                 };
 
-                // 4. Save to Firebase
-                const visitsRef = db.ref('visits');
-                await visitsRef.push(visitData);
+                // Check if a visit has already been logged in the last 1 minute from this IP
+                // This is a simple throttling mechanism. 
+                const oneMinuteAgo = now.getTime() - (60 * 1000);
+                db.ref('visitLogs').orderByChild('ip').equalTo(details.ip).limitToLast(1).once('value', (snapshot) => {
+                    let shouldLog = true;
+                    snapshot.forEach(child => {
+                        const log = child.val();
+                        if (log.timestamp > oneMinuteAgo) {
+                            shouldLog = false;
+                        }
+                    });
 
-                // 5. Update count on page
-                updateVisitCount();
+                    if (shouldLog) {
+                        db.ref('visitLogs').push(logData).then(() => {
+                            // Success: Logged the visit
+                        }).catch(error => {
+                            console.error("Firebase Visit Log error:", error);
+                        });
+                    }
+                });
 
-            } catch (error) {
-                console.error("Error recording visit:", error);
-            }
-        }
-
-        // อัปเดตจำนวนการเข้าชมรวม
-        function updateVisitCount() {
-            db.ref('visits').once('value', (snapshot) => {
-                const count = snapshot.numChildren();
-                document.getElementById("visitCount").textContent = count;
+                // Update hit count immediately on load
+                db.ref('visitLogs').once('value', (snapshot) => {
+                    const count = snapshot.exists() ? snapshot.numChildren() : 0;
+                    hitCounterElement.innerText = formatNumber(count);
+                });
             });
         }
 
-        // เปิด Modal แสดง Log
-        window.openVisitLog = function () {
-            document.getElementById("visitLogBox").style.display = "flex";
-            loadVisitLog();
-        }
+        function loadVisitLogs() {
+            visitLogTableBody.innerHTML = '<tr><td colspan="6">ກຳລັງໂຫຼດບັນທຶກ...</td></tr>';
 
-        // ปิด Modal แสดง Log
-        window.closeVisitLog = function () {
-            document.getElementById("visitLogBox").style.display = "none";
-        }
+            db.ref('visitLogs').orderByChild('timestamp').once('value', (snapshot) => {
+                visitLogTableBody.innerHTML = '';
 
-        // โหลดข้อมูล Log เข้าตาราง
-        window.loadVisitLog = function () {
-            const tableBody = document.getElementById("visitLogTable");
-            tableBody.innerHTML = "";
+                if (!snapshot.exists()) {
+                    visitLogTableBody.innerHTML = '<tr><td colspan="6">❌ ບໍ່ພົບລາຍການເຂົ້າຊົມ.</td></tr>';
+                    hitCounterElement.innerText = '0';
+                    return;
+                }
 
-            db.ref('visits').orderByChild('timestamp').once('value', (snapshot) => {
-                let index = 1;
+                let rowCount = 0;
+                const logsArray = [];
 
-                // Reverse order to show newest first
-                let visits = [];
-                snapshot.forEach(child => {
-                    visits.push({ key: child.key, ...child.val() });
+                snapshot.forEach((childSnapshot) => {
+                    const log = childSnapshot.val();
+                    log.key = childSnapshot.key;
+                    logsArray.push(log);
                 });
-                visits.reverse();
 
-                visits.forEach(data => {
-                    const deviceIcon = getIconForDevice(data.deviceType || 'Desktop/PC');
-                    const deviceDetail = data.deviceModel || data.deviceType || 'Unknown Device';
+                // Reverse the array to show newest first
+                logsArray.reverse();
 
-                    tableBody.innerHTML += `<tr>
-                        <td>${index++}</td>
-                        <td>${data.dateTime}</td>
-                        <td style="text-align: left;"><i class="bi ${deviceIcon}"></i> ${deviceDetail}</td>
-                        <td>${data.ip}</td>
-                        <td><i class="bi bi-geo-alt-fill"></i> ${data.location}</td>
+                logsArray.forEach((log) => {
+                    rowCount++;
+                    const row = visitLogTableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${rowCount}</td>
+                        <td>${log.dateTime || 'Unknown'}</td>
+                        <td style="text-align: left; max-width: 250px; overflow-wrap: break-word;">${log.device || 'Unknown'}</td>
+                        <td>${log.ip || 'Unknown'}</td>
+                        <td>${log.location || 'Unknown'}</td>
                         <td>
-                            <button onclick="askDeleteVisit('${data.key}')" style="background:#dc3545; color:white; width: 30px; height: 30px; padding: 0;">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                            <button onclick="deleteVisitLog('${log.key}')"><i class="bi bi-trash-fill"></i></button>
                         </td>
-                    </tr>`;
+                    `;
                 });
+
+                // Update hit counter
+                hitCounterElement.innerText = formatNumber(logsArray.length);
+
+            }).catch(error => {
+                visitLogTableBody.innerHTML = `<tr><td colspan="6" style="color:red;">⚠️ ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດບັນທຶກ: ${error.message}</td></tr>`;
+                console.error("Firebase load visit log error:", error);
             });
         }
 
-        // ยืนยันการลบ Log รายการเดียว
-        window.askDeleteVisit = function (key) {
+        window.openVisitLog = function () {
+            loadVisitLogs();
+            document.getElementById('visitLogBox').style.display = 'flex';
+        }
+
+        window.closeVisitLog = function () {
+            document.getElementById('visitLogBox').style.display = 'none';
+        }
+
+        window.deleteVisitLog = function (key) {
             DELETE_VISIT_KEY = key;
-            if (confirm("ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບການເຂົ້າຊົມລາຍການນີ້?")) {
-                deleteVisit();
-            }
-        }
-
-        // ลบ Log รายการเดียว
-        function deleteVisit() {
-            if (DELETE_VISIT_KEY) {
-                db.ref(`visits/${DELETE_VISIT_KEY}`).remove().then(() => {
-                    updateVisitCount();
-                    loadVisitLog();
-                    showNotification("✔ ລຶບລາຍການເຂົ້າຊົມສຳເລັດແລ້ວ", "save-complete");
-                    DELETE_VISIT_KEY = null;
+            // Use the general delete confirm box with a modified message if needed, 
+            // or for simplicity, directly execute the delete action.
+            if (confirm("ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລົບລາຍການເຂົ້າຊົມນີ້?")) {
+                db.ref(`visitLogs/${DELETE_VISIT_KEY}`).remove().then(() => {
+                    showNotification("✅ ລຶບລາຍການເຂົ້າຊົມສຳເລັດແລ້ວ!", "save-complete");
+                    loadVisitLogs(); // Reload the log table
                 }).catch(error => {
-                    console.error("Error deleting visit:", error);
-                    showCustomAlert("❌ ບໍ່ສາມາດລຶບລາຍການເຂົ້າຊົມໄດ້.");
+                    showCustomAlert(`❌ ລຶບບໍ່ສຳເລັດ: ${error.message}`);
                 });
             }
         }
 
-        // ลบ Log ทั้งหมด
         window.clearAllVisits = function () {
-            if (confirm("⚠️ ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບລາຍການເຂົ້າຊົມທັງໝົດ? ຂໍ້ມູນຈະຫາຍໄປຢ່າງຖາວອນ.")) {
-                db.ref('visits').remove().then(() => {
-                    updateVisitCount();
-                    loadVisitLog();
-                    showNotification("✔ ລຶບລາຍການເຂົ້າຊົມທັງໝົດສຳເລັດແລ້ວ", "save-complete");
+            if (confirm("⚠️ ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບລາຍການເຂົ້າຊົມທັງໝົດ? ຂໍ້ມູນຈະຫາຍໄປຢ່າງຖາວອນ!")) {
+                db.ref('visitLogs').remove().then(() => {
+                    showNotification("✅ ລຶບລາຍການເຂົ້າຊົມທັງໝົດສຳເລັດແລ້ວ!", "save-complete");
+                    loadVisitLogs(); // Reload the log table (will show "No entries")
                 }).catch(error => {
-                    console.error("Error clearing all visits:", error);
-                    showCustomAlert("❌ ບໍ່ສາມາດລຶບລາຍການເຂົ້າຊົມທັງໝົດໄດ້.");
+                    showCustomAlert(`❌ ລຶບບໍ່ສຳເລັດ: ${error.message}`);
                 });
             }
         }
 
         // ---------------------------------------------------------------------
-        // 🟢 END: ADVANCED DEVICE DETECTION FUNCTIONS
+        // 📸 CAMERA FUNCTIONS
         // ---------------------------------------------------------------------
 
+        window.openCamera = async function () {
+            // 1. ຕວດສອບວ່າໂປຣແກຣມທ່ອງເວັບຮອງຮັບຫຼືບໍ່
+            if (!('mediaDevices' in navigator) || !('getUserMedia' in navigator.mediaDevices)) {
+                showCustomAlert("❌ ໂປຣແກຣມທ່ອງເວັບຂອງທ່ານບໍ່ຮອງຮັບການໃຊ້ງານກ້ອງ.");
+                return;
+            }
 
-        // 🟢 Live Clock Function: แสดงเวลาและวันที่แบบเรียลไทม์
-        function updateLiveClock() {
+            // 2. ປິດກ້ອງເກົ່າຖ້າມີ
+            closeCamera();
+
+            try {
+                // 3. ຂໍສິດການເຂົ້າເຖິງກ້ອງ (ໃຊ້ facingMode: 'user' ສຳລັບກ້ອງໜ້າ)
+                const constraints = {
+                    video: {
+                        width: { ideal: 360 }, // ກຳນົດຄວາມກວ້າງທີ່ຕ້ອງການ
+                        height: { ideal: 270 }, // ກຳນົດຄວາມສູງທີ່ຕ້ອງການ
+                        facingMode: 'user' // 'user' ສຳລັບກ້ອງໜ້າ (Selfie)
+                    }
+                };
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+                // 4. ສະແດງ Modal ແລະ Stream ວິດີໂອ
+                videoElement.srcObject = currentStream;
+                videoElement.style.display = 'block';
+                cameraModal.style.display = 'flex';
+                videoElement.play();
+
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+                // ⚠️ ນີ້ຄືຂໍ້ຄວາມເຕືອນເມື່ອມີຂໍ້ຜິດພາດ
+                showCustomAlert("⚠️ ບໍ່ສາມາດເຂົ້າເຖິງກ້ອງໄດ້. ກະລຸນາອະນຸຍາດ ຫຼື ຕວດສອບວ່າກ້ອງຖືກໃຊ້ງານໂດຍແອັບອື່ນຢູ່.");
+            }
+        }
+
+        window.takePhoto = function () {
+            if (!currentStream) {
+                showCustomAlert("❌ ບໍ່ມີການເຊື່ອມຕໍ່ກ້ອງ.");
+                return;
+            }
+
+            // 1. ກະກຽມ Canvas Context
+            const context = cameraCanvas.getContext('2d');
+            const width = videoElement.videoWidth;
+            const height = videoElement.videoHeight;
+            cameraCanvas.width = width;
+            cameraCanvas.height = height;
+
+            // 2. ວາດພາບຈາກ Video ລົງ Canvas
+            context.clearRect(0, 0, width, height); // ລ້າງ Canvas ກ່ອນ
+            context.translate(width, 0); // ເລີ່ມຕົ້ນການກັບພາບ
+            context.scale(-1, 1); // ກັບພາບຕາມແນວນອນ (ຄືກະຈົກ/ເຊວຟີ)
+            context.drawImage(videoElement, 0, 0, width, height);
+            context.setTransform(1, 0, 0, 1, 0, 0); // ຣີເຊັດການແປງ
+
+            // 3. ແປງພາບໃນ Canvas ເປັນ Data URL
+            const imageURL = cameraCanvas.toDataURL('image/png'); // ໄດ້ເປັນ PNG base64 string
+
+            // 4. ສ້າງ Link ສຳລັບດາວໂຫຼດ
+            const a = document.createElement('a');
+            a.href = imageURL;
+            // ຕັ້ງຊື່ໄຟລ໌: snapshot-YYYYMMDD-HHmmss.png
             const now = new Date();
-            // รูปแบบเวลา: HH:mm:ss
-            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            const filename = `snapshot-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}.png`;
+            a.download = filename;
 
-            // รูปแบบวันที่: MM/DD/YYYY (อ้างอิงจากตัวอย่างที่คุณให้มา)
-            const dateStr = now.toLocaleDateString('en-US', {
-                month: '2-digit',
-                day: '2-digit',
-                year: 'numeric'
-            });
+            // 5. ຄລິກ Link ເພື່ອສັ່ງດາວໂຫຼດ (ບັນທຶກລົງໃນເຄື່ອງ)
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
 
-            // แสดงผลในรูปแบบ HH:mm:ss | MM/DD/YYYY
-            liveClockElement.innerHTML = `<i class="bi bi-clock-fill"></i> ${timeStr} | ${dateStr}`;
+            showNotification("✅ ຖ່າຍຮູບແລະບັນທຶກສຳເລັດແລ້ວ!", "save-complete");
+            // closeCamera(); // ປິດກ້ອງຫຼັງຖ່າຍສຳເລັດ (ທາງເລືອກ)
         }
 
-
-        // Text-to-Speech Function (TTS)
-        function speakText(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'th-TH'; // ใช้ภาษาไทยในการออกเสียง
-                utterance.rate = 1.0;
-                window.speechSynthesis.speak(utterance);
+        window.closeCamera = function () {
+            if (currentStream) {
+                // ປິດ Track ຂອງກ້ອງທັງໝົດ
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
             }
+            videoElement.style.display = 'none';
+            videoElement.srcObject = null;
+            cameraModal.style.display = 'none';
         }
 
-        // Custom Alert Functions
-        function showCustomAlert(message) {
-            document.getElementById("customAlertMessage").textContent = message;
-            document.getElementById("customAlertBox").style.display = "flex";
-            speakText("ท่านยังไม่ได้ป้อนข้อมูลค่ะ รบกวนใส่ข้อมูลให้ครบก่อนนะคะ");
-        }
+        // ---------------------------------------------------------------------
+        // 📤 EXPORT & SHARE LOGIC
+        // ---------------------------------------------------------------------
 
-        window.closeCustomAlert = function () {
-            document.getElementById("customAlertBox").style.display = "none";
-        };
-
-        // Notification Functions
-        function showNotification(message, type) {
-            const notifBox = document.getElementById("appNotification");
-            notifBox.textContent = message;
-            notifBox.className = `notification ${type}`;
-            notifBox.style.display = "block";
-            notifBox.style.opacity = 1;
-
-            setTimeout(() => {
-                notifBox.style.opacity = 0;
-                setTimeout(() => notifBox.style.display = "none", 500);
-            }, 5000);
-        }
-
-        // Initial Load and Setup
-        document.addEventListener('DOMContentLoaded', () => {
-            // เริ่ม Live Clock ทันทีและตั้งเวลาอัปเดต
-            updateLiveClock();
-            setInterval(updateLiveClock, 1000); // อัปเดตทุก 1 วินาที
-
-            // 🟢 บันทึกการเข้าชมและอัปเดตตัวเลข
-            recordVisit();
-
-            // ตั้งวันที่เริ่มต้น
-            document.getElementById("dateInput").value = new Date().toISOString().split('T')[0];
-            const reminderMsg = "🔔 ວັນນີ້ຢ່າລືມບັນທຶກລາຍການປະຈຳວັນດ້ວຍນະ";
-            showNotification(reminderMsg, "daily-reminder");
-            speakText("วันนี้อย่าลืมบันทึกรายการประจำวันนะครับ");
-        });
-
-        // Load Available Months
-        window.loadAvailableMonths = async function (monthToSelect = null) {
-            const yearRef = db.ref(`expenses/${currentYear}`);
-            const snapshot = await yearRef.once('value');
-
-            monthSelect.innerHTML = "";
-            let months = [];
-
-            if (!snapshot.exists()) {
-                monthSelect.innerHTML = `<option value="">-- ບໍ່ມີຂໍ້ມູນ --</option>`;
-                document.getElementById("todayTotalText").textContent = "0 ກີບ";
-                document.getElementById("totalText").textContent = "0 ກີບ";
-                loadMonth();
+        window.exportExcel = function () {
+            // Recreate table data structure from the currently displayed table
+            const table = document.getElementById('expenseTable');
+            if (table.rows.length === 0 || table.rows[0].cells.length < 7) {
+                showCustomAlert("❌ ບໍ່ມີລາຍການລາຍຈ່າຍທີ່ຈະສົ່ງອອກ.");
                 return;
             }
 
-            snapshot.forEach(child => {
-                months.push(child.key);
-            });
-
-            months.sort(); // เรียงเดือน
-
-            months.forEach(mm => {
-                const opt = document.createElement("option");
-                opt.value = mm;
-                opt.textContent = `ເດືອນ ${mm} / ${currentYear}`;
-                monthSelect.appendChild(opt);
-            });
-
-            let monthToSet = '';
-            if (monthToSelect && months.includes(monthToSelect)) {
-                monthToSet = monthToSelect;
-            } else if (months.length > 0) {
-                monthToSet = months[months.length - 1];
-            }
-
-            if (monthToSet) {
-                monthSelect.value = monthToSet;
-            }
-
-            loadMonth();
-        }
-
-        // Save Expense
-        window.saveExpense = async function () {
-            const date = dateInput.value;
-            const item = itemInput.value;
-            const price = Number(priceInput.value);
-
-            // 🟢 ดึงเวลาปัจจุบัน (HH:mm:ss)
-            const now = new Date();
-            const currentTime = now.toTimeString().split(' ')[0];
-
-            if (!date || !item || !price) {
-                showCustomAlert("ກະ​ລຸ​ນາ​ກອກ​ຂໍ້​ມູນ​ໃຫ້​ຄົບ");
-                return;
-            }
-            const y = date.split("-")[0];
-            const m = date.split("-")[1];
-
-            if (y !== currentYear.toString()) {
-                showCustomAlert("📢 ຂໍອະໄພ, ລະບົບຍັງຮອງຮັບສະເພາະປີປັດຈຸບັນນີ້ເທົ່ານັ້ນ! ກະລຸນາເລືອກວັນທີພາຍໃນປີນີ້.");
-                return;
-            }
-
-            const monthRef = db.ref(`expenses/${y}/${m}`);
-            await monthRef.push().set({
-                date,
-                time: currentTime, // บันทึกเวลาที่แน่นอน
-                item,
-                price
-            });
-
-            // Re-calculate Today's Total for Notification
-            const snapshot = await monthRef.once('value');
-            let todayTotal = 0;
-            const todayStr = dateInput.value;
-            if (snapshot.exists()) {
-                snapshot.forEach(child => {
-                    const data = child.val();
-                    if (data.date === todayStr) {
-                        todayTotal += Number(data.price);
-                    }
-                });
-            }
-
-            const totalTextFormatted = todayTotal.toLocaleString("lo-LA");
-            const speechMessage = `เพิ่มรายการสำเร็จแล้ว. วันนี้คุณใช้จ่ายไปทั้งหมด ${totalTextFormatted} กีบ`;
-            const notificationMsg = `✔ ທ່ານໄດ້ບັນທຶກລາຍການສຳເລັດແລ້ວ\nວັນນີ້ທ່ານໃຊ້ຈ່າຍໄປທັງໝົດ ${totalTextFormatted} ກີບ`;
-            showNotification(notificationMsg, "save-complete");
-            speakText(speechMessage);
-
-            loadAvailableMonths(m);
-
-            itemInput.value = "";
-            priceInput.value = "";
-        };
-
-        // Load Month Data
-        window.loadMonth = function () {
-            const m = monthSelect.value;
-            const y = currentYear;
-            const tableBody = document.getElementById("expenseTable");
-            tableBody.innerHTML = "";
-            if (!m) {
-                document.getElementById("todayTotalText").textContent = "0 ກີບ";
-                document.getElementById("totalText").textContent = "0 ກີບ";
-                return;
-            }
-
-            const monthRef = db.ref(`expenses/${y}/${m}`);
-            monthRef.off();
-            monthRef.on('value', (snapshot) => {
-                tableBody.innerHTML = "";
-                let index = 1;
-                let total = 0;
-                let todayTotal = 0;
-                const todayStr = document.getElementById("dateInput").value;
-
-                // 🟢 โหลดข้อมูลมาเรียงตามวันที่และเวลา
-                let expenses = [];
-                snapshot.forEach(child => {
-                    expenses.push({ key: child.key, ...child.val() });
-                });
-
-                // เรียงตามวันที่ (date) แล้วเรียงตามเวลา (time)
-                expenses.sort((a, b) => {
-                    if (a.date !== b.date) {
-                        return a.date.localeCompare(b.date);
-                    }
-                    // เรียงตามเวลา (ถ้ามี)
-                    return (a.time || '00:00:00').localeCompare(b.time || '00:00:00');
-                });
-
-
-                expenses.forEach(data => {
-                    total += Number(data.price);
-
-                    if (data.date === todayStr) {
-                        todayTotal += Number(data.price);
-                    }
-
-                    // ดึงค่าเวลา (data.time) มาแสดง
-                    const displayTime = data.time ? data.time.substring(0, 5) : '-'; // ตัดเหลือ HH:mm
-
-                    tableBody.innerHTML += `<tr> 
-                        <td>${index++}</td> 
-                        <td>${data.date}</td> 
-                        <td>${displayTime}</td> 
-                        <td>${data.item}</td> 
-                        <td>${Number(data.price).toLocaleString("lo-LA")}</td> 
-                        <td><button onclick="openEdit('${y}','${m}','${data.key}','${data.date}','${data.item}','${data.price}','${data.time || ''}')"><i class="bi bi-pencil"></i></button></td> 
-                        <td><button onclick="askDelete('${y}','${m}','${data.key}')"><i class="bi bi-trash"></i></button></td> 
-                    </tr>`;
-                });
-
-                // อัปเดต Summary Cards
-                todayTotalText.textContent = todayTotal.toLocaleString("lo-LA") + " ກີບ";
-                totalText.textContent = total.toLocaleString("lo-LA") + " ກີບ";
-            });
-        };
-
-        // Delete Functions
-        window.askDelete = function (y, m, key) {
-            DELETE_Y = y;
-            DELETE_M = m;
-            DELETE_KEY = key;
-            document.getElementById("deleteConfirmBox").style.display = "flex";
-            const deleteConfirmation = "ถ้าท่านต้องการลบรายการให้กดลบ และไม่ต้องการลบให้กดยกเลิก เมื่อลบรายการแล้วข้อมูลจะหายไปในฐานข้อมูลค่ะ";
-            speakText(deleteConfirmation);
-        };
-
-        window.confirmDelete = function () {
-            db.ref(`expenses/${DELETE_Y}/${DELETE_M}/${DELETE_KEY}`).remove().then(() => {
-                document.getElementById("deleteConfirmBox").style.display = "none";
-                loadMonth();
-                speakText("รายการถูกลบสำเร็จแล้ว");
-            });
-        };
-
-        window.cancelDelete = function () {
-            document.getElementById("deleteConfirmBox").style.display = "none";
-        };
-
-        // Edit Functions
-        window.openEdit = function (y, m, key, date, item, price, time) {
-            EDIT_Y = y;
-            EDIT_M = m;
-            EDIT_KEY = key;
-            editDate.value = date;
-            editItem.value = item;
-            editPrice.value = price;
-            // ไม่ต้องแสดงเวลาในช่องแก้ไข
-            document.getElementById("editBox").style.display = "flex";
-            speakText("ตอนนี้ท่านกำลังเข้าสู่การแก้ไขรายการค่ะ");
-        };
-
-        window.closeEdit = function () {
-            document.getElementById("editBox").style.display = "none";
-        };
-
-        window.saveEdit = async function () {
-            const newDate = editDate.value;
-            const newItem = editItem.value;
-            const newPrice = Number(editPrice.value);
-
-            if (!newDate || !newItem || !newPrice) {
-                showCustomAlert("ກະ​ລຸ​ນາ​ກອກ​ຂໍ້​ມູນ​ໃຫ້​ຄົບ");
-                return;
-            }
-
-            // ดึงข้อมูลเดิมเพื่อเอาค่า Time เก่า (หรือใช้เวลาใหม่ ถ้าไม่มี)
-            let existingTime = '';
-            const oldDataSnapshot = await db.ref(`expenses/${EDIT_Y}/${EDIT_M}/${EDIT_KEY}`).once('value');
-            if (oldDataSnapshot.exists()) {
-                existingTime = oldDataSnapshot.val().time || new Date().toTimeString().split(' ')[0];
-            } else {
-                existingTime = new Date().toTimeString().split(' ')[0];
-            }
-
-            db.ref(`expenses/${EDIT_Y}/${EDIT_M}/${EDIT_KEY}`).update({
-                date: newDate,
-                item: newItem,
-                price: newPrice,
-                time: existingTime
-            }).then(() => {
-                speakText("แก้ไขรายการสำเร็จแล้ว");
-                closeEdit();
-                loadMonth();
-            });
-        };
-
-        // Export to Excel
-        window.exportExcel = async function () {
-            const m = monthSelect.value;
-            const y = currentYear;
-            if (!m) {
-                speakText("กรุณาเลือกเดือน");
-                return;
-            }
-
-            const monthRef = db.ref(`expenses/${y}/${m}`);
-            const snapshot = await monthRef.once('value');
-
-            if (!snapshot.exists()) {
-                speakText("ไม่มีข้อมูลในเดือนนี้");
-                return;
-            }
-            // 🟢 เพิ่มคอลัมน์เวลาใน Excel
-            let data = [
-                ["ວັນທີ", "ເວລາ", "ລາຍການ", "ລາຄາ"]
+            const data = [
+                ["ລ/ດ", "ວັນທີ", "ເວລາ", "ລາຍການ", "ລາຄາ (ກີບ)"] // Header row
             ];
-            snapshot.forEach(child => {
-                const d = child.val();
-                const timeStr = d.time ? d.time.substring(0, 8) : '-'; // ใช้เวลาเต็ม
-                data.push([d.date, timeStr, d.item, d.price]);
-            });
+
+            let total = 0;
+
+            for (let i = 0; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                // Extract text from the first 5 columns (skip Edit/Delete)
+                const rowData = [
+                    row.cells[0].innerText.trim(),
+                    row.cells[1].innerText.trim(),
+                    row.cells[2].innerText.trim(),
+                    row.cells[3].innerText.trim(),
+                    row.cells[4].innerText.replace(' ກີບ', '').replace(/,/g, '').trim() // Clean price
+                ];
+
+                // Add to total for summary row (only if it's a data row, not the "No entries" row)
+                const priceValue = parseFloat(rowData[4]);
+                if (!isNaN(priceValue)) {
+                    total += priceValue;
+                    data.push(rowData);
+                }
+            }
+
+            // Add summary rows
+            data.push([]); // Empty row
+            data.push(["", "", "", "ລວມທັງໝົດ", formatNumber(total)]);
+
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, `ລາຍຈ່າຍ ເດືອນ ${m} ປີ ${y}`);
-            const filename = `expenses_${y}_${m}.xlsx`;
+            XLSX.utils.book_append_sheet(wb, ws, "ລາຍຈ່າຍປະຈໍາເດືອນ");
+
+            const monthName = getLaoMonthName(currentMonth);
+            const filename = `ລາຍຈ່າຍ_${monthName}_${currentYear}.xlsx`;
             XLSX.writeFile(wb, filename);
 
-            speakText("Export Excel สำเร็จแล้ว");
-        };
+            showNotification("✅ ສົ່ງອອກ Excel ສຳເລັດແລ້ວ!", "save-complete");
+        }
 
-        // Share Function
-        function sharePage(platform) {
+
+        window.sharePage = function (platform) {
             const url = encodeURIComponent(window.location.href);
             const title = encodeURIComponent("💰 ລະບົບບັນທຶກລາຍຈ່າຍປະຈຳວັນ (Expense Tracker)");
-            const text = encodeURIComponent("มาใช้ระบบบันทึกรายจ่ายง่ายๆ นี้กันเถอะ!");
+            let shareUrl = "";
 
-            let shareUrl = '';
             switch (platform) {
-                case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`; break;
-                case 'twitter': shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`; break;
-                case 'line': shareUrl = `https://social-plugins.line.me/lineit/share?url=${url}&text=${text}`; break;
-                case 'whatsapp': shareUrl = `https://wa.me/?text=${text}%20${url}`; break;
-                case 'linkedin': shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}&summary=${text}`; break;
-                default: return;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    break;
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${title}&url=${url}`;
+                    break;
+                case 'line':
+                    shareUrl = `https://social-plugins.line.me/lineit/share?url=${url}&text=${title}`;
+                    break;
+                case 'whatsapp':
+                    shareUrl = `https://wa.me/?text=${title}%20${url}`;
+                    break;
+                case 'linkedin':
+                    shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}`;
+                    break;
+                default:
+                    return;
             }
 
-            window.open(shareUrl, 'shareWindow', 'width=600,height=450,scrollbars=yes,resizable=yes');
+            window.open(shareUrl, '_blank', 'width=600,height=400');
         }
-        window.sharePage = sharePage;
 
-        loadAvailableMonths();
+
+        // ---------------------------------------------------------------------
+        // 🚀 MAIN INITIALIZATION
+        // ---------------------------------------------------------------------
+
+        function initialize() {
+            // 1. Set default date
+            document.getElementById('dateInput').valueAsDate = new Date();
+
+            // 2. Populate Month Filter
+            populateMonthSelect();
+
+            // 3. Load Expenses (for the current month)
+            loadExpenses();
+
+            // 4. Save Visit Log (for hit counter)
+            saveVisitLog();
+
+            // 5. Start Live Clock
+            updateLiveClock();
+            setInterval(updateLiveClock, 1000);
+
+            // 6. Handle initial hit count display (will be updated by saveVisitLog)
+            db.ref('visitLogs').once('value', (snapshot) => {
+                const count = snapshot.exists() ? snapshot.numChildren() : 0;
+                hitCounterElement.innerText = formatNumber(count);
+            });
+        }
+
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', initialize);
     </script>
 </body>
 
