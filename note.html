@@ -47,11 +47,38 @@
             flex-wrap: wrap;
         }
 
+        /* 🟢 NEW: Container สำหรับ Header และ Hit Counter */
+        .title-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
         h2 {
             color: #007bff;
             font-weight: 700;
             margin: 0;
             padding-right: 15px;
+        }
+
+        /* 🟢 NEW: Hit Counter Style (ไม่ต้องใหญ่) */
+        #hitCounter {
+            font-size: 1.0em;
+            font-weight: 600;
+            color: #28a745;
+            background-color: #e6ffed;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.2s;
+        }
+
+        #hitCounter:hover {
+            background-color: #d4f7db;
         }
 
         /* 🎯 ปรับขนาดนาฬิกาให้ใหญ่เป็นพิเศษเพื่อการมองเห็นบนมือถือ */
@@ -76,15 +103,20 @@
         @media (max-width: 600px) {
             #liveClock {
                 font-size: 1.5em;
-                /* ลดขนาดลงเล็กน้อยบนจอเล็กมาก */
                 padding: 5px 10px;
                 margin-top: 10px;
             }
 
-            /* จัดหัวข้อและนาฬิกาให้อยู่คนละบรรทัดบนมือถือ */
             .header-container {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            .title-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+                margin-bottom: 10px;
             }
         }
 
@@ -191,11 +223,12 @@
         }
 
         /* Zebra Stripes */
-        #expenseTable tr:nth-child(even) {
+        #expenseTable tr:nth-child(even),
+        #visitLogTable tr:nth-child(even) {
             background-color: #f8f9fa;
         }
 
-        /* ปรับความกว้างและจัดตำแหน่งคอลัมน์ */
+        /* ปรับความกว้างและจัดตำแหน่งคอลัมน์ (Expense Table) */
         #expenseTable td:nth-child(1) {
             /* ລຳດັບ */
             width: 5%;
@@ -234,7 +267,8 @@
         }
 
         /* 5. 💡 ไอคอนและปุ่ม (Icons and Buttons) */
-        #expenseTable button {
+        #expenseTable button,
+        #visitLogTable button {
             background-color: #f1f1f1;
             color: #495057;
             border: 1px solid #ccc;
@@ -249,7 +283,8 @@
             transition: background-color 0.2s, color 0.2s;
         }
 
-        #expenseTable button:hover {
+        #expenseTable button:hover,
+        #visitLogTable button:hover {
             background-color: #e2e6ea;
             color: #000;
         }
@@ -306,16 +341,19 @@
 
         /* Popups */
         #editBox,
-        #deleteConfirmBox {
+        #deleteConfirmBox,
+        #visitLogBox {
+            /* 🟢 NEW: Visit Log Modal */
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, .5);
+            background: rgba(0, 0, 0, .7);
             display: none;
             justify-content: center;
             align-items: center;
+            z-index: 1500;
         }
 
         #editContent,
@@ -325,6 +363,78 @@
             width: 300px;
             border-radius: 8px;
         }
+
+        /* 🟢 NEW: Visit Log Content Style */
+        #visitLogContent {
+            background: #fff;
+            padding: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            border-radius: 8px;
+            overflow-y: auto;
+        }
+
+        #visitLogContent h3 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        #visitLogContent button.close-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 12px;
+        }
+
+        #visitLogContent table {
+            font-size: 14px;
+        }
+
+        #visitLogTable th:nth-child(1) {
+            width: 5%;
+        }
+
+        /* ID */
+        #visitLogTable th:nth-child(2) {
+            width: 15%;
+        }
+
+        /* Date/Time */
+        #visitLogTable th:nth-child(3) {
+            width: 25%;
+        }
+
+        /* Device */
+        #visitLogTable th:nth-child(4) {
+            width: 15%;
+        }
+
+        /* IP */
+        #visitLogTable th:nth-child(5) {
+            width: 25%;
+        }
+
+        /* Location */
+        #visitLogTable th:nth-child(6) {
+            width: 15%;
+        }
+
+        /* Action */
+
+        #visitLogContent .control-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        /* End Visit Log Style */
+
 
         #editContent button,
         #deleteContent button {
@@ -453,7 +563,12 @@
     </div>
 
     <div class="header-container">
-        <h2>💰 ລະບົບບັນທຶກລາຍຈ່າຍປະຈຳວັນ</h2>
+        <div class="title-container">
+            <h2>💰 ລະບົບບັນທຶກລາຍຈ່າຍປະຈຳວັນ</h2>
+            <span id="hitCounter" onclick="openVisitLog()">
+                <i class="bi bi-eye-fill"></i> ເຂົ້າຊົມທັງໝົດ: <span id="visitCount">0</span>
+            </span>
+        </div>
         <span id="liveClock"><i class="bi bi-clock-fill"></i> Loading...</span>
     </div>
     <div
@@ -532,6 +647,35 @@
         </div>
     </div>
 
+    <div id="visitLogBox">
+        <div id="visitLogContent">
+            <h3>
+                <i class="bi bi-person-lines-fill"></i> ບັນທຶກການເຂົ້າຊົມ (Visitor Log)
+                <button onclick="closeVisitLog()" class="close-btn"><i class="bi bi-x-lg"></i> ປິດ</button>
+            </h3>
+
+            <div class="control-buttons">
+                <button onclick="clearAllVisits()" style="background:#dc3545; color:white;">
+                    <i class="bi bi-trash-fill"></i> ລຶບລາຍການທັງໝົດ
+                </button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ລ/ດ</th>
+                        <th>ວັນທີ/ເວລາ</th>
+                        <th>ອຸປະກອນ (Device)</th>
+                        <th>IP Address</th>
+                        <th>ທີ່ຕັ້ງ (Location)</th>
+                        <th>ລຶບ</th>
+                    </tr>
+                </thead>
+                <tbody id="visitLogTable">
+                </tbody>
+            </table>
+        </div>
+    </div>
     <div id="customAlertBox">
         <div id="customAlertContent">
             <p id="customAlertMessage">ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ</p>
@@ -569,7 +713,7 @@
             *ກົດແບ່ງປັນເພື່ອແນະນຳລະບົບບັນທຶກລາຍຈ່າຍນີ້ໃຫ້ໝູ່ຂອງທ່ານ</p>
     </div>
     <div class="footer">
-        Update version 5.5
+        Update version 5.6 (with Visitor Log)
     </div>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -594,6 +738,154 @@
         let EDIT_Y = "", EDIT_M = "", EDIT_KEY = "";
         let DELETE_Y = "", DELETE_M = "", DELETE_KEY = "";
         const liveClockElement = document.getElementById("liveClock");
+
+        // 🟢 NEW: Global Variable สำหรับ Visitor Log
+        let DELETE_VISIT_KEY = null;
+
+        // ---------------------------------------------------------------------
+        // 🟢 NEW: VISITOR LOG FUNCTIONS 
+        // ---------------------------------------------------------------------
+
+        function getDeviceType() {
+            const ua = navigator.userAgent;
+            if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+                return "Tablet";
+            }
+            if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-L|Opera Mini/i.test(ua)) {
+                return "Mobile";
+            }
+            return "Desktop";
+        }
+
+        async function recordVisit() {
+            try {
+                // 1. Get IP and Geolocation
+                const ipResponse = await fetch('http://ip-api.com/json/?fields=status,message,country,city,query');
+                const ipData = await ipResponse.json();
+
+                let ip = ipData.query || 'Unknown IP';
+                let location = `${ipData.city || 'Unknown City'}, ${ipData.country || 'Unknown Country'}`;
+
+                const now = new Date();
+                const dateTimeStr = now.toLocaleString('en-US', {
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+                });
+
+                // 2. Prepare Data
+                const visitData = {
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    dateTime: dateTimeStr,
+                    device: getDeviceType(),
+                    ip: ip,
+                    location: location,
+                    userAgent: navigator.userAgent.substring(0, 100) // บันทึก user agent บางส่วน
+                };
+
+                // 3. Save to Firebase
+                const visitsRef = db.ref('visits');
+                await visitsRef.push(visitData);
+
+                // 4. Update count on page
+                updateVisitCount();
+
+            } catch (error) {
+                console.error("Error recording visit:", error);
+            }
+        }
+
+        // อัปเดตจำนวนการเข้าชมรวม
+        function updateVisitCount() {
+            db.ref('visits').once('value', (snapshot) => {
+                const count = snapshot.numChildren();
+                document.getElementById("visitCount").textContent = count;
+            });
+        }
+
+        // เปิด Modal แสดง Log
+        window.openVisitLog = function () {
+            document.getElementById("visitLogBox").style.display = "flex";
+            loadVisitLog();
+        }
+
+        // ปิด Modal แสดง Log
+        window.closeVisitLog = function () {
+            document.getElementById("visitLogBox").style.display = "none";
+        }
+
+        // โหลดข้อมูล Log เข้าตาราง
+        window.loadVisitLog = function () {
+            const tableBody = document.getElementById("visitLogTable");
+            tableBody.innerHTML = "";
+
+            db.ref('visits').orderByChild('timestamp').once('value', (snapshot) => {
+                let index = 1;
+
+                // Reverse order to show newest first
+                let visits = [];
+                snapshot.forEach(child => {
+                    visits.push({ key: child.key, ...child.val() });
+                });
+                visits.reverse();
+
+                visits.forEach(data => {
+                    tableBody.innerHTML += `<tr>
+                        <td>${index++}</td>
+                        <td>${data.dateTime}</td>
+                        <td><i class="bi bi-${data.device === 'Mobile' ? 'phone-fill' : data.device === 'Tablet' ? 'tablet-fill' : 'laptop-fill'}"></i> ${data.device}</td>
+                        <td>${data.ip}</td>
+                        <td><i class="bi bi-geo-alt-fill"></i> ${data.location}</td>
+                        <td>
+                            <button onclick="askDeleteVisit('${data.key}')" style="background:#dc3545; color:white; width: 30px; height: 30px; padding: 0;">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+            });
+        }
+
+        // ยืนยันการลบ Log รายการเดียว
+        window.askDeleteVisit = function (key) {
+            DELETE_VISIT_KEY = key;
+            if (confirm("ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບການເຂົ້າຊົມລາຍການນີ້?")) {
+                deleteVisit();
+            }
+        }
+
+        // ลบ Log รายการเดียว
+        function deleteVisit() {
+            if (DELETE_VISIT_KEY) {
+                db.ref(`visits/${DELETE_VISIT_KEY}`).remove().then(() => {
+                    updateVisitCount();
+                    loadVisitLog();
+                    showNotification("✔ ລຶບລາຍການເຂົ້າຊົມສຳເລັດແລ້ວ", "save-complete");
+                    DELETE_VISIT_KEY = null;
+                }).catch(error => {
+                    console.error("Error deleting visit:", error);
+                    showCustomAlert("❌ ບໍ່ສາມາດລຶບລາຍການເຂົ້າຊົມໄດ້.");
+                });
+            }
+        }
+
+        // ลบ Log ทั้งหมด
+        window.clearAllVisits = function () {
+            if (confirm("⚠️ ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບລາຍການເຂົ້າຊົມທັງໝົດ? ຂໍ້ມູນຈະຫາຍໄປຢ່າງຖາວອນ.")) {
+                db.ref('visits').remove().then(() => {
+                    updateVisitCount();
+                    loadVisitLog();
+                    showNotification("✔ ລຶບລາຍການເຂົ້າຊົມທັງໝົດສຳເລັດແລ້ວ", "save-complete");
+                }).catch(error => {
+                    console.error("Error clearing all visits:", error);
+                    showCustomAlert("❌ ບໍ່ສາມາດລຶບລາຍການເຂົ້າຊົມທັງໝົດໄດ້.");
+                });
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // 🟢 END: VISITOR LOG FUNCTIONS 
+        // ---------------------------------------------------------------------
+
 
         // 🟢 Live Clock Function: แสดงเวลาและวันที่แบบเรียลไทม์
         function updateLiveClock() {
@@ -654,6 +946,9 @@
             // เริ่ม Live Clock ทันทีและตั้งเวลาอัปเดต
             updateLiveClock();
             setInterval(updateLiveClock, 1000); // อัปเดตทุก 1 วินาที
+
+            // 🟢 NEW: บันทึกการเข้าชมและอัปเดตตัวเลข
+            recordVisit();
 
             // ตั้งวันที่เริ่มต้น
             document.getElementById("dateInput").value = new Date().toISOString().split('T')[0];
