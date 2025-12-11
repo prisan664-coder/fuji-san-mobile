@@ -4,140 +4,307 @@
 <head>
     <meta charset="UTF-8">
     <title>ລະບົບບັນທຶກລາຍຈ່າຍ</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@100..900&display=swap" rel="stylesheet">
     <style>
+        /* 1. 🎨 การใช้สี (Color Scheme) และ Typography */
         body {
-            font-family: sans-serif;
+            font-family: 'Noto Sans Lao', sans-serif;
             padding: 20px;
-            background: #f7f7f7;
+            background: #f4f7f9;
+            color: #333;
         }
 
         .navbar {
-            background: #333;
+            background: #007bff;
             padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .navbar a {
             color: white;
             text-decoration: none;
-            font-size: 19px;
-            padding: 8px 12px;
+            font-size: 17px;
+            padding: 8px 15px;
             display: inline-block;
+            transition: background 0.3s;
+            border-radius: 4px;
         }
 
-        input,
-        button {
+        .navbar a:hover {
+            background: #0056b3;
+        }
+
+        /* 🟢 FIXED: จัดรูปแบบ Header และ Live Clock */
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        h2 {
+            color: #007bff;
+            font-weight: 700;
+            margin: 0;
+            padding-right: 15px;
+        }
+
+        /* 🎯 ปรับขนาดนาฬิกาให้ใหญ่เป็นพิเศษเพื่อการมองเห็นบนมือถือ */
+        #liveClock {
+            font-size: 2.0em;
+            /* **ขนาดใหญ่พิเศษ** */
+            font-weight: bold;
+            color: #dc3545;
+            background-color: #ffeaea;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            min-width: 250px;
+            justify-content: center;
+        }
+
+        /* 🟢 Media Query สำหรับโทรศัพท์ (Mobile Optimization) */
+        @media (max-width: 600px) {
+            #liveClock {
+                font-size: 1.5em;
+                /* ลดขนาดลงเล็กน้อยบนจอเล็กมาก */
+                padding: 5px 10px;
+                margin-top: 10px;
+            }
+
+            /* จัดหัวข้อและนาฬิกาให้อยู่คนละบรรทัดบนมือถือ */
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* End Live Clock Style Fix */
+
+
+        /* Input/Button - ปรับปรุงเล็กน้อย */
+        input[type="date"],
+        input[type="text"],
+        input[type="number"],
+        select {
             padding: 10px;
-            margin: 5px;
+            margin: 5px 0;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            transition: border-color 0.3s;
         }
 
-        /* 🔥 MODIFIED: ปรับปรุงสไตล์ตารางให้สวยงามตามภาพ */
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        /* 3. 🖼️ การจัดวางองค์ประกอบ (Cards) */
+        .summary-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .summary-card {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        #totalTextCard {
+            background: #e6f3ff;
+            border-left: 5px solid #007bff;
+        }
+
+        #todayTotalTextCard {
+            background: #ffebe6;
+            border-left: 5px solid #dc3545;
+        }
+
+        .summary-card h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #6c757d;
+        }
+
+        .summary-card p {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 5px 0 0 0;
+        }
+
+        #todayTotalText {
+            color: #dc3545;
+        }
+
+        #totalText {
+            color: #007bff;
+        }
+
+        /* 4. 📊 การปรับปรุงตาราง (Table Redesign) */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
             background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
             overflow: hidden;
-            /* **ลบเส้นขอบหลักของตาราง (border: none;)** */
-            border: none;
+            border: 1px solid #dee2e6;
         }
 
         th {
-            background: #4CAF50;
-            /* สีเขียว */
+            background: #343a40;
             color: white;
-            font-weight: 500;
-            text-transform: none;
-            padding: 10px 8px;
-            /* ใส่ padding สำหรับ header */
-            border: 1px solid #4CAF50;
-            /* ให้ header มีเส้นแบ่งสีเขียว */
+            font-weight: 600;
+            padding: 12px 10px;
+            border: none;
+            text-align: center;
         }
 
         td {
-            border-top: 1px solid #e0e0e0;
-            /* คงเหลือเส้นแบ่งแนวนอนด้านบน (Top Border) */
-            border-left: none;
-            border-right: none;
-            /* **ลบเส้นแบ่งแนวตั้ง** */
             padding: 10px 8px;
             text-align: center;
+            border-bottom: 1px solid #f8f9fa;
         }
 
-        /* 🔥 NEW/MODIFIED: ปรับความกว้างและจัดตำแหน่งคอลัมน์ให้ตรงตามภาพ */
+        /* Zebra Stripes */
+        #expenseTable tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        /* ปรับความกว้างและจัดตำแหน่งคอลัมน์ */
         #expenseTable td:nth-child(1) {
-            /* ลำดับ (ລຳດັບ) */
+            /* ລຳດັບ */
             width: 5%;
-            min-width: 40px;
             font-weight: normal;
-            color: #333;
-            text-align: center;
+            color: #6c757d;
         }
 
         #expenseTable td:nth-child(2) {
-            /* ວັນທີ (วันที่) */
+            /* ວັນທີ */
             width: 15%;
-            min-width: 100px;
-            text-align: center;
-        }
-
-        #expenseTable td:nth-child(3) {
-            /* ລາຍການ (รายการ) */
-            text-align: left;
-            padding-left: 10px;
-            width: 40%;
-            min-width: 150px;
-        }
-
-        #expenseTable td:nth-child(4) {
-            /* ລາຄາ (ราคา) - เพิ่มสีพื้นหลังอ่อนๆ และเน้นข้อความชิดขวา*/
-            text-align: right;
-            padding-right: 15px;
-            width: 15%;
-            min-width: 90px;
-            font-weight: bold;
-            color: #d9534f;
-            background-color: #ffeaea;
-            /* สีชมพูอ่อนมากเพื่อไฮไลต์ราคา */
-        }
-
-        /* คอลัมน์ แก้ไข/ลบ */
-        #expenseTable td:nth-child(5),
-        #expenseTable td:nth-child(6) {
-            width: 10%;
-            min-width: 50px;
-        }
-
-        /* 🔥 NEW: ปรับสไตล์ปุ่มแก้ไขและลบให้เป็นสี่เหลี่ยมเล็กๆ เหมือนในภาพ */
-        #expenseTable button {
-            background-color: white;
-            color: #333;
-            border: 1px solid #ccc;
-            padding: 5px 8px;
-            /* ปรับขนาดให้เล็กลง */
-            border-radius: 2px;
-            /* ขอบมนเล็กน้อย */
-            cursor: pointer;
-            width: 30px;
-            height: 30px;
-            line-height: 1;
-            /* จัดตำแหน่งข้อความตรงกลาง */
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
             font-size: 14px;
         }
 
-        .summary {
-            margin-top: 20px;
-            padding: 15px;
-            background: white;
-            border-radius: 5px;
+        #expenseTable td:nth-child(3) {
+            /* ເວລາ */
+            width: 10%;
+            font-weight: bold;
+            color: #007bff;
         }
 
+        #expenseTable td:nth-child(4) {
+            /* ລາຍການ */
+            text-align: left;
+            padding-left: 15px;
+            width: 30%;
+        }
+
+        #expenseTable td:nth-child(5) {
+            /* ລາຄາ */
+            text-align: right;
+            padding-right: 15px;
+            width: 15%;
+            font-weight: bold;
+            color: #dc3545;
+            background-color: #ffeaea;
+        }
+
+        /* 5. 💡 ไอคอนและปุ่ม (Icons and Buttons) */
+        #expenseTable button {
+            background-color: #f1f1f1;
+            color: #495057;
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            line-height: 1;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            font-size: 16px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        #expenseTable button:hover {
+            background-color: #e2e6ea;
+            color: #000;
+        }
+
+        /* ปุ่ม Export Excel */
+        .export-btn {
+            background: #28a745 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 5px !important;
+            font-size: 16px;
+            padding: 10px 20px !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+        }
+
+        .export-btn:hover {
+            background: #1e7e34 !important;
+        }
+
+        /* ส่วนกรอง (Filter) */
+        .filter-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            transition: opacity 0.5s;
+            max-width: 300px;
+        }
+
+        .daily-reminder {
+            background-color: #ffc107;
+            color: #343a40;
+        }
+
+        .save-complete {
+            background-color: #28a745;
+            color: white;
+        }
+
+        /* Popups */
         #editBox,
         #deleteConfirmBox {
             position: fixed;
@@ -159,38 +326,35 @@
             border-radius: 8px;
         }
 
+        #editContent button,
         #deleteContent button {
-            width: 45%;
-        }
-
-        /* Style สำหรับ Notification (จำลอง) */
-        .notification {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background-color: #5cb85c;
-            color: white;
-            padding: 15px;
+            padding: 10px 20px;
             border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            display: none;
-            /* เริ่มต้นซ่อนไว้ */
-            transition: opacity 0.5s;
-            max-width: 300px;
+            font-weight: bold;
+            margin-top: 10px;
         }
 
-        .daily-reminder {
-            background-color: #f0ad4e;
-            /* สีส้มสำหรับแจ้งเตือนตอนเช้า */
+        #editContent button:first-of-type {
+            background: #007bff;
+            color: white;
         }
 
-        .save-complete {
-            background-color: #5cb85c;
-            /* สีเขียวสำหรับแจ้งเตือนหลังบันทึก */
+        #editContent button:last-of-type {
+            background: #6c757d;
+            color: white;
         }
 
-        /* Custom Alert Modal Style (คงเดิม) */
+        #deleteContent button:first-of-type {
+            background: #dc3545;
+            color: white;
+        }
+
+        #deleteContent button:last-of-type {
+            background: #6c757d;
+            color: white;
+        }
+
+        /* Custom Alert Style */
         #customAlertBox {
             position: fixed;
             top: 0;
@@ -199,13 +363,10 @@
             bottom: 0;
             background: rgba(0, 0, 0, .6);
             display: none;
-            /* ซ่อนไว้ตั้งแต่แรก */
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            /* ให้แสดงทับทุกอย่าง */
             backdrop-filter: blur(2px);
-            /* เพิ่มความสวยงาม */
         }
 
         #customAlertContent {
@@ -215,56 +376,14 @@
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             text-align: center;
-            animation: fadeIn 0.3s ease-out;
-            /* เพิ่ม Animation */
         }
 
-        #customAlertContent p {
-            font-size: 16px;
-            margin-bottom: 20px;
-            color: #333;
-            font-weight: bold;
-        }
-
-        #customAlertContent button {
-            background: #28a745;
-            /* สีเขียวเหมือนปุ่ม OK ในภาพ */
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        #customAlertContent button:hover {
-            background: #1e7e34;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* --- 🔥 NEW: Style สำหรับปุ่มแชร์สังคมออนไลน์ --- */
+        /* --- Share Style --- */
         .share-container {
             margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid #ddd;
             text-align: center;
-        }
-
-        .share-container h4 {
-            margin-top: 0;
-            color: #555;
         }
 
         .share-list {
@@ -274,10 +393,6 @@
             justify-content: center;
             flex-wrap: wrap;
             gap: 10px;
-        }
-
-        .share-list li {
-            display: inline;
         }
 
         .share-btn {
@@ -304,15 +419,6 @@
             background: #55acee;
         }
 
-        .btn-googleplus {
-            background: #dd4b39;
-        }
-
-        .btn-linkedin {
-            background: #007bb5;
-        }
-
-        /* สำหรับปุ่มอื่นๆ ที่คุณอาจต้องการเพิ่ม */
         .btn-line {
             background: #00c300;
         }
@@ -321,63 +427,118 @@
             background: #25d366;
         }
 
+        .btn-linkedin {
+            background: #007bb5;
+        }
+
         /* --- End Share Style --- */
+
+        /* 6. 🦶 Footer Style */
+        .footer {
+            margin-top: 40px;
+            padding: 15px 0;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+            border-top: 1px solid #dee2e6;
+        }
     </style>
 </head>
 
 <body>
-    <div class="navbar"> <a href="index.html">🏠 ກັບໜ້າຫຼັກ</a> 
-    <a href="https://prisan664-coder.github.io/sale.com/">🏠 ກົດໄປຫນ້າຂາຍສິນຄ້າ</a>
-    <a href="docu-note.html">ບັນທຶກເລື່ອງລາວ</a> </div>
-    <h2>💰 ລະບົບບັນທຶກລາຍຈ່າຍປະຈຳວັນ</h2>
-    <label>ວັນທີ:</label> <input type="date" id="dateInput"><br>
-    <label>ລາຍການ:</label> <input type="text" id="itemInput" placeholder="ຊື້ຫຍັງ?"><br>
-    <label>ລາຄາ:</label> <input type="number" id="priceInput" placeholder="0"><br>
-    <button onclick="saveExpense()">➕ ບັນທຶກລາຍການ</button>
-    <hr>
-    <label>ເລືອກເດືອນ:</label> <select id="monthSelect" onchange="loadMonth()"></select>
-    <div class="summary">
-        <h3>📊 ສະຫຼຸບລາຍຈ່າຍເດືອນ</h3>
-        <p id="todayTotalText" style="color:#d9534f;font-weight:bold;"></p>
-        <p id="totalText">รวมทั้งหมด: 0 ກີບ</p>
+    <div class="navbar">
+        <a href="index.html"><i class="bi bi-house-door-fill"></i> ກັບໜ້າຫຼັກ</a>
+        <a href="https://prisan664-coder.github.io/sale.com/"><i class="bi bi-cart-fill"></i> ກົດໄປຫນ້າຂາຍສິນຄ້າ</a>
+        <a href="docu-note.html"><i class="bi bi-book-fill"></i> ບັນທຶກເລື່ອງລາວ</a>
     </div>
-    <button onclick="exportExcel()" style="background:#1f7cff;color:white;border:none;border-radius:5px;"> 📥 Export
-        Excel </button>
+
+    <div class="header-container">
+        <h2>💰 ລະບົບບັນທຶກລາຍຈ່າຍປະຈຳວັນ</h2>
+        <span id="liveClock"><i class="bi bi-clock-fill"></i> Loading...</span>
+    </div>
+    <div
+        style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); margin-bottom: 20px;">
+        <label>ວັນທີ:</label> <input type="date" id="dateInput"><br>
+        <label>ລາຍການ:</label> <input type="text" id="itemInput" placeholder="ຊື້ຫຍັງ?"><br>
+        <label>ລາຄາ:</label> <input type="number" id="priceInput" placeholder="0"><br>
+        <button onclick="saveExpense()" style="background:#007bff;color:white; font-weight: bold;">
+            <i class="bi bi-plus-circle-fill"></i> ບັນທຶກລາຍການ
+        </button>
+    </div>
+
+    <hr>
+
+    <div class="filter-section">
+        <label style="font-weight: 600;">ເລືອກເດືອນ:</label>
+        <select id="monthSelect" onchange="loadMonth()"></select>
+    </div>
+
+    <div class="summary-container">
+        <div class="summary-card" id="todayTotalTextCard">
+            <h3>📈 ລວມລາຍຈ່າຍວັນນີ້</h3>
+            <p id="todayTotalText">0 ກີບ</p>
+        </div>
+        <div class="summary-card" id="totalTextCard">
+            <h3>💰 ລວມທັງໝົດໃນເດືອນ</h3>
+            <p id="totalText">0 ກີບ</p>
+        </div>
+    </div>
+
+    <button onclick="exportExcel()" class="export-btn">
+        <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Excel
+    </button>
+
     <table>
         <thead>
             <tr>
-                <th>ລຳດັບ</th>
+                <th>ລ/ດ</th>
                 <th>ວັນທີ</th>
+                <th>ເວລາ</th>
                 <th>ລາຍການ</th>
                 <th>ລາຄາ</th>
                 <th>ແກ້ໄຂ</th>
                 <th>ລຶບ</th>
             </tr>
         </thead>
-        <tbody id="expenseTable"></tbody>
+        <tbody id="expenseTable">
+        </tbody>
     </table>
+
     <div id="editBox">
         <div id="editContent">
-            <h3>✏ ແກ້ໄຂລາຍການ</h3>
+            <h3><i class="bi bi-pencil-fill"></i> ແກ້ໄຂລາຍການ</h3>
             <label>ວັນທີ:</label> <input type="date" id="editDate"><br>
             <label>ລາຍການ:</label> <input type="text" id="editItem"><br>
             <label>ລາຄາ:</label> <input type="number" id="editPrice"><br>
-            <button onclick="saveEdit()">💾 ບັນທຶກ</button> <button onclick="closeEdit()">❌ ປິດ</button>
+            <button onclick="saveEdit()">
+                <i class="bi bi-save-fill"></i> ບັນທຶກ
+            </button>
+            <button onclick="closeEdit()">
+                <i class="bi bi-x-circle-fill"></i> ປິດ
+            </button>
         </div>
     </div>
+
     <div id="deleteConfirmBox">
         <div id="deleteContent">
-            <h3 style="color:red;">⚠ ຢືນຢັນການລົບ</h3>
-            <p>ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລົບລາຍການນີ້?</p> <button onclick="confirmDelete()"
-                style="background:#d9534f;color:white;">ລົບ</button> <button onclick="cancelDelete()">ຍົກເລີກ</button>
+            <h3 style="color:red;"><i class="bi bi-exclamation-triangle-fill"></i> ຢືນຢັນການລົບ</h3>
+            <p>ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລົບລາຍການນີ້?</p>
+            <button onclick="confirmDelete()">
+                <i class="bi bi-trash-fill"></i> ລົບ
+            </button>
+            <button onclick="cancelDelete()">
+                <i class="bi bi-x-lg"></i> ຍົກເລີກ
+            </button>
         </div>
     </div>
+
     <div id="customAlertBox">
         <div id="customAlertContent">
             <p id="customAlertMessage">ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ</p>
             <button onclick="closeCustomAlert()">OK</button>
         </div>
     </div>
+
     <div id="appNotification" class="notification daily-reminder"></div>
 
     <div class="share-container">
@@ -385,33 +546,36 @@
         <ul class="share-list">
             <li>
                 <a href="#" class="share-btn btn-facebook" onclick="sharePage('facebook'); return false;"><i
-                        class="fa fa-facebook"></i> Facebook</a>
+                        class="bi bi-facebook"></i> Facebook</a>
             </li>
             <li>
                 <a href="#" class="share-btn btn-twitter" onclick="sharePage('twitter'); return false;"><i
-                        class="fa fa-twitter"></i> Twitter</a>
+                        class="bi bi-twitter"></i> Twitter</a>
             </li>
             <li>
                 <a href="#" class="share-btn btn-line" onclick="sharePage('line'); return false;"><i
-                        class="fa fa-commenting-o"></i> Line</a>
+                        class="bi bi-chat-fill"></i> Line</a>
             </li>
             <li>
                 <a href="#" class="share-btn btn-whatsapp" onclick="sharePage('whatsapp'); return false;"><i
-                        class="fa fa-whatsapp"></i> WhatsApp</a>
+                        class="bi bi-whatsapp"></i> WhatsApp</a>
             </li>
             <li>
                 <a href="#" class="share-btn btn-linkedin" onclick="sharePage('linkedin'); return false;"><i
-                        class="fa fa-linkedin"></i> LinkedIn</a>
+                        class="bi bi-linkedin"></i> LinkedIn</a>
             </li>
         </ul>
         <p style="font-size: 12px; color: #888; margin-top: 10px;">
             *ກົດແບ່ງປັນເພື່ອແນະນຳລະບົບບັນທຶກລາຍຈ່າຍນີ້ໃຫ້ໝູ່ຂອງທ່ານ</p>
     </div>
+    <div class="footer">
+        Update version 5.5
+    </div>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
-        // ใช้ Global variable 'firebase' แทนการ import
+        // 🚨 ตรวจสอบค่านี้ให้ตรงกับ Firebase Project ของคุณก่อนนำไปใช้จริง!
         const firebaseConfig = {
             apiKey: "AIzaSyC8b0h8yyTo5th6UMrI4_dKUB1ZnvCwZBw",
             authDomain: "fuji-mobile-shop.firebaseapp.com",
@@ -422,29 +586,41 @@
             appId: "1:753053073037:web:7c9cb46e055b91a4cf2cc4"
         };
 
-        // ใช้ firebase.initializeApp() และ firebase.database()
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         const monthSelect = document.getElementById("monthSelect");
         const currentYear = new Date().getFullYear();
-        let EDIT_Y = "",
-            EDIT_M = "",
-            EDIT_KEY = "";
-        let DELETE_Y = "",
-            DELETE_M = "",
-            DELETE_KEY = "";
+        let EDIT_Y = "", EDIT_M = "", EDIT_KEY = "";
+        let DELETE_Y = "", DELETE_M = "", DELETE_KEY = "";
+        const liveClockElement = document.getElementById("liveClock");
 
-        // --- 🔥 NEW: Text-to-Speech Function ---
+        // 🟢 Live Clock Function: แสดงเวลาและวันที่แบบเรียลไทม์
+        function updateLiveClock() {
+            const now = new Date();
+            // รูปแบบเวลา: HH:mm:ss
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+
+            // รูปแบบวันที่: MM/DD/YYYY (อ้างอิงจากตัวอย่างที่คุณให้มา)
+            const dateStr = now.toLocaleDateString('en-US', {
+                month: '2-digit',
+                day: '2-digit',
+                year: 'numeric'
+            });
+
+            // แสดงผลในรูปแบบ HH:mm:ss | MM/DD/YYYY
+            liveClockElement.innerHTML = `<i class="bi bi-clock-fill"></i> ${timeStr} | ${dateStr}`;
+        }
+
+
+        // Text-to-Speech Function (TTS)
         function speakText(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'th-TH';
+                utterance.lang = 'th-TH'; // ใช้ภาษาไทยในการออกเสียง
                 utterance.rate = 1.0;
                 window.speechSynthesis.speak(utterance);
-            } else {
-                console.log("Speech Synthesis ไม่รองรับในเบราว์เซอร์นี้");
             }
         }
 
@@ -452,15 +628,14 @@
         function showCustomAlert(message) {
             document.getElementById("customAlertMessage").textContent = message;
             document.getElementById("customAlertBox").style.display = "flex";
-            // 🔥 MODIFIED: ออกเสียง Alert เป็นภาษาไทย
-            speakText("กรุณากรอกข้อมูลให้ครบถ้วน");
+            speakText("ท่านยังไม่ได้ป้อนข้อมูลค่ะ รบกวนใส่ข้อมูลให้ครบก่อนนะคะ");
         }
 
         window.closeCustomAlert = function () {
             document.getElementById("customAlertBox").style.display = "none";
         };
 
-        // ฟังก์ชันสำหรับแสดง Notification (จำลอง)
+        // Notification Functions
         function showNotification(message, type) {
             const notifBox = document.getElementById("appNotification");
             notifBox.textContent = message;
@@ -474,40 +649,71 @@
             }, 5000);
         }
 
-        // Morning Reminder
+        // Initial Load and Setup
         document.addEventListener('DOMContentLoaded', () => {
+            // เริ่ม Live Clock ทันทีและตั้งเวลาอัปเดต
+            updateLiveClock();
+            setInterval(updateLiveClock, 1000); // อัปเดตทุก 1 วินาที
+
+            // ตั้งวันที่เริ่มต้น
             document.getElementById("dateInput").value = new Date().toISOString().split('T')[0];
             const reminderMsg = "🔔 ວັນນີ້ຢ່າລືມບັນທຶກລາຍການປະຈຳວັນດ້ວຍນະ";
             showNotification(reminderMsg, "daily-reminder");
-
-            // 🔥 MODIFIED: ออกเสียงเตือนตอนเช้าเป็นภาษาไทย
             speakText("วันนี้อย่าลืมบันทึกรายการประจำวันนะครับ");
         });
 
-        async function loadAvailableMonths() {
-            // 🔥 MODIFIED: ใช้ db.ref().once() แทน ref(db, ...)/get()
+        // Load Available Months
+        window.loadAvailableMonths = async function (monthToSelect = null) {
             const yearRef = db.ref(`expenses/${currentYear}`);
             const snapshot = await yearRef.once('value');
 
             monthSelect.innerHTML = "";
+            let months = [];
+
             if (!snapshot.exists()) {
                 monthSelect.innerHTML = `<option value="">-- ບໍ່ມີຂໍ້ມູນ --</option>`;
+                document.getElementById("todayTotalText").textContent = "0 ກີບ";
+                document.getElementById("totalText").textContent = "0 ກີບ";
+                loadMonth();
                 return;
             }
+
             snapshot.forEach(child => {
-                const mm = child.key;
+                months.push(child.key);
+            });
+
+            months.sort(); // เรียงเดือน
+
+            months.forEach(mm => {
                 const opt = document.createElement("option");
                 opt.value = mm;
                 opt.textContent = `ເດືອນ ${mm} / ${currentYear}`;
                 monthSelect.appendChild(opt);
             });
+
+            let monthToSet = '';
+            if (monthToSelect && months.includes(monthToSelect)) {
+                monthToSet = monthToSelect;
+            } else if (months.length > 0) {
+                monthToSet = months[months.length - 1];
+            }
+
+            if (monthToSet) {
+                monthSelect.value = monthToSet;
+            }
+
             loadMonth();
         }
 
+        // Save Expense
         window.saveExpense = async function () {
             const date = dateInput.value;
             const item = itemInput.value;
             const price = Number(priceInput.value);
+
+            // 🟢 ดึงเวลาปัจจุบัน (HH:mm:ss)
+            const now = new Date();
+            const currentTime = now.toTimeString().split(' ')[0];
 
             if (!date || !item || !price) {
                 showCustomAlert("ກະ​ລຸ​ນາ​ກອກ​ຂໍ້​ມູນ​ໃຫ້​ຄົບ");
@@ -516,21 +722,23 @@
             const y = date.split("-")[0];
             const m = date.split("-")[1];
 
-            // 1. บันทึกข้อมูล
-            // 🔥 MODIFIED: ใช้ db.ref().push().set() แทน push(ref(db, ...))/set()
+            if (y !== currentYear.toString()) {
+                showCustomAlert("📢 ຂໍອະໄພ, ລະບົບຍັງຮອງຮັບສະເພາະປີປັດຈຸບັນນີ້ເທົ່ານັ້ນ! ກະລຸນາເລືອກວັນທີພາຍໃນປີນີ້.");
+                return;
+            }
+
             const monthRef = db.ref(`expenses/${y}/${m}`);
             await monthRef.push().set({
                 date,
+                time: currentTime, // บันทึกเวลาที่แน่นอน
                 item,
                 price
             });
 
-            // 2. ดึงข้อมูลรวมของวันนี้อีกครั้งหลังบันทึก
-            // 🔥 MODIFIED: ใช้ monthRef.once() แทน get(todayRef)
+            // Re-calculate Today's Total for Notification
             const snapshot = await monthRef.once('value');
             let todayTotal = 0;
             const todayStr = dateInput.value;
-
             if (snapshot.exists()) {
                 snapshot.forEach(child => {
                     const data = child.val();
@@ -540,34 +748,32 @@
                 });
             }
 
-            // 3. Post-Save Total Notification
             const totalTextFormatted = todayTotal.toLocaleString("lo-LA");
-
             const speechMessage = `เพิ่มรายการสำเร็จแล้ว. วันนี้คุณใช้จ่ายไปทั้งหมด ${totalTextFormatted} กีบ`;
-
             const notificationMsg = `✔ ທ່ານໄດ້ບັນທຶກລາຍການສຳເລັດແລ້ວ\nວັນນີ້ທ່ານໃຊ້ຈ່າຍໄປທັງໝົດ ${totalTextFormatted} ກີບ`;
             showNotification(notificationMsg, "save-complete");
-
             speakText(speechMessage);
 
-            // 4. โหลดข้อมูลใหม่
-            loadAvailableMonths();
-            loadMonth();
+            loadAvailableMonths(m);
 
-            // 5. ล้างช่องกรอกข้อมูล
             itemInput.value = "";
             priceInput.value = "";
         };
 
+        // Load Month Data
         window.loadMonth = function () {
             const m = monthSelect.value;
             const y = currentYear;
             const tableBody = document.getElementById("expenseTable");
             tableBody.innerHTML = "";
-            if (!m) return;
+            if (!m) {
+                document.getElementById("todayTotalText").textContent = "0 ກີບ";
+                document.getElementById("totalText").textContent = "0 ກີບ";
+                return;
+            }
 
-            // 🔥 MODIFIED: ใช้ db.ref().on('value', ...) แทน onValue(...)
             const monthRef = db.ref(`expenses/${y}/${m}`);
+            monthRef.off();
             monthRef.on('value', (snapshot) => {
                 tableBody.innerHTML = "";
                 let index = 1;
@@ -575,36 +781,60 @@
                 let todayTotal = 0;
                 const todayStr = document.getElementById("dateInput").value;
 
+                // 🟢 โหลดข้อมูลมาเรียงตามวันที่และเวลา
+                let expenses = [];
                 snapshot.forEach(child => {
-                    const key = child.key;
-                    const data = child.val();
+                    expenses.push({ key: child.key, ...child.val() });
+                });
+
+                // เรียงตามวันที่ (date) แล้วเรียงตามเวลา (time)
+                expenses.sort((a, b) => {
+                    if (a.date !== b.date) {
+                        return a.date.localeCompare(b.date);
+                    }
+                    // เรียงตามเวลา (ถ้ามี)
+                    return (a.time || '00:00:00').localeCompare(b.time || '00:00:00');
+                });
+
+
+                expenses.forEach(data => {
                     total += Number(data.price);
+
                     if (data.date === todayStr) {
                         todayTotal += Number(data.price);
                     }
 
-                    // ใช้ toLocaleString("lo-LA") สำหรับการแสดงผลตัวเลขเป็นลาว
-                    tableBody.innerHTML += `<tr> <td>${index++}</td> <td>${data.date}</td> <td>${data.item}</td> <td>${Number(data.price).toLocaleString("lo-LA")}</td> <td><button onclick="openEdit('${y}','${m}','${key}','${data.date}','${data.item}','${data.price}')">✏</button></td> <td><button onclick="askDelete('${y}','${m}','${key}')">🗑</button></td> </tr>`;
+                    // ดึงค่าเวลา (data.time) มาแสดง
+                    const displayTime = data.time ? data.time.substring(0, 5) : '-'; // ตัดเหลือ HH:mm
+
+                    tableBody.innerHTML += `<tr> 
+                        <td>${index++}</td> 
+                        <td>${data.date}</td> 
+                        <td>${displayTime}</td> 
+                        <td>${data.item}</td> 
+                        <td>${Number(data.price).toLocaleString("lo-LA")}</td> 
+                        <td><button onclick="openEdit('${y}','${m}','${data.key}','${data.date}','${data.item}','${data.price}','${data.time || ''}')"><i class="bi bi-pencil"></i></button></td> 
+                        <td><button onclick="askDelete('${y}','${m}','${data.key}')"><i class="bi bi-trash"></i></button></td> 
+                    </tr>`;
                 });
 
-                todayTotalText.textContent = "ລວມວັນນີ້: " + todayTotal.toLocaleString("lo-LA") + " ກີບ";
-                totalText.textContent = "ລວມທັງໝົດ: " + total.toLocaleString("lo-LA") + " ກີບ";
+                // อัปเดต Summary Cards
+                todayTotalText.textContent = todayTotal.toLocaleString("lo-LA") + " ກີບ";
+                totalText.textContent = total.toLocaleString("lo-LA") + " ກີບ";
             });
         };
 
-        /** 🔥 ฟังก์ชันเปิด Popup ลบ */
+        // Delete Functions
         window.askDelete = function (y, m, key) {
             DELETE_Y = y;
             DELETE_M = m;
             DELETE_KEY = key;
             document.getElementById("deleteConfirmBox").style.display = "flex";
-            const thaiConfirmation = "ท่านต้องการยืนยันที่จะลบรายการนี้ไหม ถ้ายืนยันกดลบ ถ้ายกเลิกกดปุ่มยกเลิก";
-            speakText(thaiConfirmation);
+            const deleteConfirmation = "ถ้าท่านต้องการลบรายการให้กดลบ และไม่ต้องการลบให้กดยกเลิก เมื่อลบรายการแล้วข้อมูลจะหายไปในฐานข้อมูลค่ะ";
+            speakText(deleteConfirmation);
         };
 
-        /** 🔥 กดลบจริง */
         window.confirmDelete = function () {
-            // 🔥 MODIFIED: ใช้ db.ref().child().remove() แทน remove(ref(db, ...))
             db.ref(`expenses/${DELETE_Y}/${DELETE_M}/${DELETE_KEY}`).remove().then(() => {
                 document.getElementById("deleteConfirmBox").style.display = "none";
                 loadMonth();
@@ -612,26 +842,28 @@
             });
         };
 
-        /** ❌ ยกเลิก */
         window.cancelDelete = function () {
             document.getElementById("deleteConfirmBox").style.display = "none";
         };
 
-        window.openEdit = function (y, m, key, date, item, price) {
+        // Edit Functions
+        window.openEdit = function (y, m, key, date, item, price, time) {
             EDIT_Y = y;
             EDIT_M = m;
             EDIT_KEY = key;
             editDate.value = date;
             editItem.value = item;
             editPrice.value = price;
+            // ไม่ต้องแสดงเวลาในช่องแก้ไข
             document.getElementById("editBox").style.display = "flex";
+            speakText("ตอนนี้ท่านกำลังเข้าสู่การแก้ไขรายการค่ะ");
         };
 
         window.closeEdit = function () {
             document.getElementById("editBox").style.display = "none";
         };
 
-        window.saveEdit = function () {
+        window.saveEdit = async function () {
             const newDate = editDate.value;
             const newItem = editItem.value;
             const newPrice = Number(editPrice.value);
@@ -640,11 +872,21 @@
                 showCustomAlert("ກະ​ລຸ​ນາ​ກອກ​ຂໍ້​ມູນ​ໃຫ້​ຄົບ");
                 return;
             }
-            // 🔥 MODIFIED: ใช้ db.ref().child().update() แทน update(ref(db, ...))
+
+            // ดึงข้อมูลเดิมเพื่อเอาค่า Time เก่า (หรือใช้เวลาใหม่ ถ้าไม่มี)
+            let existingTime = '';
+            const oldDataSnapshot = await db.ref(`expenses/${EDIT_Y}/${EDIT_M}/${EDIT_KEY}`).once('value');
+            if (oldDataSnapshot.exists()) {
+                existingTime = oldDataSnapshot.val().time || new Date().toTimeString().split(' ')[0];
+            } else {
+                existingTime = new Date().toTimeString().split(' ')[0];
+            }
+
             db.ref(`expenses/${EDIT_Y}/${EDIT_M}/${EDIT_KEY}`).update({
                 date: newDate,
                 item: newItem,
-                price: newPrice
+                price: newPrice,
+                time: existingTime
             }).then(() => {
                 speakText("แก้ไขรายการสำเร็จแล้ว");
                 closeEdit();
@@ -652,6 +894,7 @@
             });
         };
 
+        // Export to Excel
         window.exportExcel = async function () {
             const m = monthSelect.value;
             const y = currentYear;
@@ -660,7 +903,6 @@
                 return;
             }
 
-            // 🔥 MODIFIED: ใช้ db.ref().once() แทน get(monthRef)
             const monthRef = db.ref(`expenses/${y}/${m}`);
             const snapshot = await monthRef.once('value');
 
@@ -668,61 +910,43 @@
                 speakText("ไม่มีข้อมูลในเดือนนี้");
                 return;
             }
+            // 🟢 เพิ่มคอลัมน์เวลาใน Excel
             let data = [
-                ["ວັນທີ", "ລາຍການ", "ລາຄາ"]
+                ["ວັນທີ", "ເວລາ", "ລາຍການ", "ລາຄາ"]
             ];
             snapshot.forEach(child => {
                 const d = child.val();
-                data.push([d.date, d.item, d.price]);
+                const timeStr = d.time ? d.time.substring(0, 8) : '-'; // ใช้เวลาเต็ม
+                data.push([d.date, timeStr, d.item, d.price]);
             });
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Expenses");
+            XLSX.utils.book_append_sheet(wb, ws, `ລາຍຈ່າຍ ເດືອນ ${m} ປີ ${y}`);
             const filename = `expenses_${y}_${m}.xlsx`;
             XLSX.writeFile(wb, filename);
 
             speakText("Export Excel สำเร็จแล้ว");
         };
 
-
-        // ********** 🔥 NEW: Share Function **********
-        // ฟังก์ชันจัดการการแชร์ไปยัง Social Media
+        // Share Function
         function sharePage(platform) {
             const url = encodeURIComponent(window.location.href);
             const title = encodeURIComponent("💰 ລະບົບບັນທຶກລາຍຈ່າຍປະຈຳວັນ (Expense Tracker)");
             const text = encodeURIComponent("มาใช้ระบบบันทึกรายจ่ายง่ายๆ นี้กันเถอะ!");
 
             let shareUrl = '';
-
             switch (platform) {
-                case 'facebook':
-                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-                    break;
-                case 'twitter':
-                    shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
-                    break;
-                case 'line':
-                    // สำหรับ Line บนมือถือจะใช้ line://msg/text/
-                    shareUrl = `https://social-plugins.line.me/lineit/share?url=${url}&text=${text}`;
-                    break;
-                case 'whatsapp':
-                    // สำหรับ WhatsApp ใช้ wapp.me สำหรับ web browser, whatsapp://send สำหรับ mobile
-                    shareUrl = `https://wa.me/?text=${text}%20${url}`;
-                    break;
-                case 'linkedin':
-                    shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}&summary=${text}`;
-                    break;
-                default:
-                    return;
+                case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`; break;
+                case 'twitter': shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`; break;
+                case 'line': shareUrl = `https://social-plugins.line.me/lineit/share?url=${url}&text=${text}`; break;
+                case 'whatsapp': shareUrl = `https://wa.me/?text=${text}%20${url}`; break;
+                case 'linkedin': shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}&summary=${text}`; break;
+                default: return;
             }
 
-            // เปิดหน้าต่างใหม่สำหรับการแชร์
             window.open(shareUrl, 'shareWindow', 'width=600,height=450,scrollbars=yes,resizable=yes');
         }
-        // ผูกฟังก์ชันเข้ากับ Global scope
         window.sharePage = sharePage;
-        // ************************************************************
-
 
         loadAvailableMonths();
     </script>
