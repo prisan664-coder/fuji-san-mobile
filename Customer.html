@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Records - ບັນທຶກລູກຄ້າ (Search Enabled)</title>
+    <title id="titleTag">Customer Records - ບັນທຶກລູກຄ້າ</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@100..900&display=swap" rel="stylesheet">
@@ -147,7 +147,7 @@
 
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="#" data-lang-key="nav_title">
                 <i class="bi bi-person-lines-fill"></i> ບັນທຶກລູກຄ້າ
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -155,9 +155,21 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item me-3">
+                        <div class="btn-group" role="group" aria-label="Language switch">
+                            <button type="button" class="btn btn-sm btn-light" id="langLao"
+                                onclick="setLanguage('lao')">
+                                🇱🇦 ລາວ
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-light" id="langEng"
+                                onclick="setLanguage('eng')">
+                                🇺🇸 ENG
+                            </button>
+                        </div>
+                    </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="note.html">
+                        <a class="nav-link active" href="index.html" data-lang-key="nav_back">
                             <i class="bi bi-arrow-left-circle-fill"></i> ກັບໜ້າບັນທຶກລາຍຈ່າຍ
                         </a>
                     </li>
@@ -167,58 +179,67 @@
     </nav>
 
     <div class="container mt-4 mb-5">
-        <h2 class="text-primary mb-4"><i class="bi bi-file-earmark-person-fill"></i> ຟອມບັນທຶກລູກຄ້າ</h2>
+        <h2 class="text-primary mb-4" data-lang-key="main_header">
+            <i class="bi bi-file-earmark-person-fill"></i> ຟອມບັນທຶກລູກຄ້າ
+        </h2>
 
         <div class="card shadow-sm mb-4">
-            <div class="card-header card-header-custom">
+            <div class="card-header card-header-custom" data-lang-key="card_header_detail">
                 ລາຍລະອຽດຂໍ້ມູນ
             </div>
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label for="nameInput" class="form-label">ຊື່ ແລະ ນາມສະກຸມ</label>
-                        <input type="text" class="form-control" id="nameInput" placeholder="ຊື່ລູກຄ້າ">
+                        <label for="nameInput" class="form-label" data-lang-key="label_name">ຊື່ ແລະ ນາມສະກຸມ</label>
+                        <input type="text" class="form-control" id="nameInput" data-lang-key="ph_name"
+                            data-lang-prop="placeholder" placeholder="ຊື່ລູກຄ້າ">
                     </div>
                     <div class="col-md-6">
-                        <label for="phoneInput" class="form-label">ເບີໂທລະສັບ</label>
-                        <input type="text" class="form-control" id="phoneInput" placeholder="ເບີໂທ (ທາງເລືອກ)">
+                        <label for="phoneInput" class="form-label" data-lang-key="label_phone">ເບີໂທລະສັບ</label>
+                        <input type="text" class="form-control" id="phoneInput" data-lang-key="ph_phone"
+                            data-lang-prop="placeholder" placeholder="ເບີໂທ (ທາງເລືອກ)">
                     </div>
                     <div class="col-md-6">
-                        <label for="modelInput" class="form-label">ລຸ້ນໂທລະສັບ</label>
-                        <input type="text" class="form-control" id="modelInput" placeholder="iPhone 13 / Samsung A54">
+                        <label for="modelInput" class="form-label" data-lang-key="label_model">ລຸ້ນໂທລະສັບ</label>
+                        <input type="text" class="form-control" id="modelInput" data-lang-key="ph_model"
+                            data-lang-prop="placeholder" placeholder="iPhone 13 / Samsung A54">
                     </div>
                     <div class="col-md-6">
-                        <label for="typeSelect" class="form-label">ປະເພດລາຍການ</label>
+                        <label for="typeSelect" class="form-label" data-lang-key="label_type">ປະເພດລາຍການ</label>
                         <select class="form-select" id="typeSelect">
-                            <option value="ຈຳນຳ" selected>ຈຳນຳໂທລະສັບ</option>
-                            <option value="ຂາຍ">ຂາຍໂທລະສັບ (ມືສອງ)</option>
+                            <option value="ຈຳນຳ" data-lang-key="opt_pawn">ຈຳນຳໂທລະສັບ</option>
+                            <option value="ຂາຍ" data-lang-key="opt_sell">ຂາຍໂທລະສັບ (ມືສອງ)</option>
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label for="priceInput" class="form-label">ລາຄາຊື້ / ມູນຄ່າຈຳນຳ</label>
-                        <input type="number" class="form-control" id="priceInput" placeholder="0">
+                        <label for="priceInput" class="form-label" data-lang-key="label_price">ລາຄາຊື້ /
+                            ມູນຄ່າຈຳນຳ</label>
+                        <input type="number" class="form-control" id="priceInput" data-lang-key="ph_zero"
+                            data-lang-prop="placeholder" placeholder="0">
                     </div>
                     <div class="col-md-6">
-                        <label for="dateInput" class="form-label">ວັນທີເດືອນປີຊື້/ຈຳນຳ</label>
+                        <label for="dateInput" class="form-label"
+                            data-lang-key="label_date">ວັນທີເດືອນປີຊື້/ຈຳນຳ</label>
                         <input type="date" class="form-control" id="dateInput">
                     </div>
                     <div class="col-12 d-flex flex-wrap gap-2 pt-2">
-                        <button class="btn btn-warning text-white" onclick="openCameraModal()">
+                        <button class="btn btn-warning text-white" onclick="openCameraModal()"
+                            data-lang-key="btn_camera">
                             <i class="bi bi-camera-fill"></i> ຖ່າຍຮູບ (ໃຊ້ກ້ອງ)
                         </button>
                         <div class="upload-container">
-                            <button class="btn btn-success" id="uploadBtn">
+                            <button class="btn btn-success" id="uploadBtn" data-lang-key="btn_upload">
                                 <i class="bi bi-upload"></i> ອັບໂຫຼດຮູບ
                             </button>
                             <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload()">
                         </div>
-                        <span id="fileStatus" class="align-self-center text-muted ms-3">
+                        <span id="fileStatus" class="align-self-center text-muted ms-3" data-lang-key="status_no_file">
                             (ຍັງບໍ່ມີຮູບພາບ)
                         </span>
                     </div>
 
                     <div class="col-12 pt-3">
-                        <button class="btn btn-primary btn-lg w-100" onclick="saveCustomer()">
+                        <button class="btn btn-primary btn-lg w-100" onclick="saveCustomer()" data-lang-key="btn_save">
                             <i class="bi bi-save-fill"></i> ກົດບັນທຶກ
                         </button>
                     </div>
@@ -228,11 +249,12 @@
 
         <div class="card shadow-sm mt-5">
             <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-                <span>ລາຍການບັນທຶກລູກຄ້າທັງໝົດ</span>
+                <span data-lang-key="card_header_list">ລາຍການບັນທຶກລູກຄ້າທັງໝົດ</span>
                 <div class="input-group w-50">
                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control border-start-0" id="searchInput"
-                        placeholder="ຄົ້ນຫາ (ຊື່, ໂທລະສັບ, ລຸ້ນ, ວັນທີ)" onkeyup="filterCustomers()">
+                    <input type="text" class="form-control border-start-0" id="searchInput" data-lang-key="ph_search"
+                        data-lang-prop="placeholder" placeholder="ຄົ້ນຫາ (ຊື່, ໂທລະສັບ, ລຸ້ນ, ວັນທີ)"
+                        onkeyup="filterCustomers()">
                 </div>
             </div>
             <div class="card-body p-0">
@@ -240,18 +262,19 @@
                     <table class="table table-striped table-hover m-0">
                         <thead>
                             <tr>
-                                <th style="width: 5%;">ລ/ດ</th>
-                                <th style="width: 15%;">ວັນທີ</th>
-                                <th style="width: 15%;">ປະເພດ</th>
-                                <th style="width: 25%;">ລູກຄ້າ/ໂທລະສັບ</th>
-                                <th style="width: 15%;">ລາຄາ</th>
-                                <th style="width: 15%;">ຮູບພາບ</th>
-                                <th style="width: 10%;">ແກ້ໄຂ/ລຶບ</th>
+                                <th style="width: 5%;" data-lang-key="th_no">ລ/ດ</th>
+                                <th style="width: 15%;" data-lang-key="th_date">ວັນທີ</th>
+                                <th style="width: 15%;" data-lang-key="th_type">ປະເພດ</th>
+                                <th style="width: 25%;" data-lang-key="th_customer">ລູກຄ້າ/ໂທລະສັບ</th>
+                                <th style="width: 15%;" data-lang-key="th_price">ລາຄາ</th>
+                                <th style="width: 15%;" data-lang-key="th_image">ຮູບພາບ</th>
+                                <th style="width: 10%;" data-lang-key="th_action">ແກ້ໄຂ/ລຶບ</th>
                             </tr>
                         </thead>
                         <tbody id="customerTableBody">
                             <tr>
-                                <td colspan="7" class="text-center text-muted">ກຳລັງໂຫຼດຂໍ້ມູນ...</td>
+                                <td colspan="7" class="text-center text-muted" data-lang-key="loading_data">
+                                    ກຳລັງໂຫຼດຂໍ້ມູນ...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -262,7 +285,7 @@
 
     <div id="customAlertBox">
         <div id="customAlertContent">
-            <p id="customAlertMessage">ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ</p>
+            <p id="customAlertMessage" data-lang-key="alert_required">ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ</p>
             <button class="btn btn-primary mt-3" onclick="closeCustomAlert()">OK</button>
         </div>
     </div>
@@ -271,21 +294,25 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-warning text-white">
-                    <h5 class="modal-title" id="cameraModalLabel"><i class="bi bi-camera-fill"></i> ຖ່າຍຮູບ (ບັນທຶກເປັນ
-                        Base64)</h5>
+                    <h5 class="modal-title" id="cameraModalLabel" data-lang-key="modal_camera_title">
+                        <i class="bi bi-camera-fill"></i> ຖ່າຍຮູບ (ບັນທຶກເປັນ Base64)
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         onclick="closeCamera()"></button>
                 </div>
                 <div class="modal-body text-center">
                     <video id="videoElement" autoplay playsinline style="display: none;"></video>
                     <canvas id="cameraCanvas" width="360" height="270" style="display: none;"></canvas>
-                    <p id="cameraStatus" class="text-danger">ກະລຸນາອະນຸຍາດການໃຊ້ງານກ້ອງ</p>
+                    <p id="cameraStatus" class="text-danger" data-lang-key="camera_status">ກະລຸນາອະນຸຍາດການໃຊ້ງານກ້ອງ
+                    </p>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closeCamera()">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closeCamera()"
+                        data-lang-key="btn_cancel">
                         <i class="bi bi-x-circle-fill"></i> ຍົກເລີກ
                     </button>
-                    <button type="button" class="btn btn-warning text-white" id="snapButton" onclick="takePhoto()">
+                    <button type="button" class="btn btn-warning text-white" id="snapButton" onclick="takePhoto()"
+                        data-lang-key="btn_snap">
                         <i class="bi bi-camera"></i> ຖ່າຍຮູບ
                     </button>
                 </div>
@@ -297,44 +324,47 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="editModalLabel"><i class="bi bi-pencil-fill"></i> ແກ້ໄຂລາຍການລູກຄ້າ</h5>
+                    <h5 class="modal-title" id="editModalLabel" data-lang-key="modal_edit_title">
+                        <i class="bi bi-pencil-fill"></i> ແກ້ໄຂລາຍການລູກຄ້າ
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="editCustomerKey">
                     <div class="mb-3">
-                        <label for="editName" class="form-label">ຊື່ ແລະ ນາມສະກຸມ</label>
+                        <label for="editName" class="form-label" data-lang-key="label_name">ຊື່ ແລະ ນາມສະກຸມ</label>
                         <input type="text" class="form-control" id="editName">
                     </div>
                     <div class="mb-3">
-                        <label for="editPhone" class="form-label">ເບີໂທລະສັບ</label>
+                        <label for="editPhone" class="form-label" data-lang-key="label_phone">ເບີໂທລະສັບ</label>
                         <input type="text" class="form-control" id="editPhone">
                     </div>
                     <div class="mb-3">
-                        <label for="editModel" class="form-label">ລຸ້ນໂທລະສັບ</label>
+                        <label for="editModel" class="form-label" data-lang-key="label_model">ລຸ້ນໂທລະສັບ</label>
                         <input type="text" class="form-control" id="editModel">
                     </div>
                     <div class="mb-3">
-                        <label for="editType" class="form-label">ປະເພດລາຍການ</label>
+                        <label for="editType" class="form-label" data-lang-key="label_type">ປະເພດລາຍການ</label>
                         <select class="form-select" id="editType">
-                            <option value="ຈຳນຳ">ຈຳນຳໂທລະສັບ</option>
-                            <option value="ຂາຍ">ຂາຍໂທລະສັບ (ມືສອງ)</option>
+                            <option value="ຈຳນຳ" data-lang-key="opt_pawn">ຈຳນຳໂທລະສັບ</option>
+                            <option value="ຂາຍ" data-lang-key="opt_sell">ຂາຍໂທລະສັບ (ມືສອງ)</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="editPrice" class="form-label">ລາຄາຊື້ / ມູນຄ່າຈຳນຳ</label>
+                        <label for="editPrice" class="form-label" data-lang-key="label_price">ລາຄາຊື້ /
+                            ມູນຄ່າຈຳນຳ</label>
                         <input type="number" class="form-control" id="editPrice">
                     </div>
                     <div class="mb-3">
-                        <label for="editDate" class="form-label">ວັນທີເດືອນປີຊື້/ຈຳນຳ</label>
+                        <label for="editDate" class="form-label" data-lang-key="label_date">ວັນທີເດືອນປີຊື້/ຈຳນຳ</label>
                         <input type="date" class="form-control" id="editDate">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">ຮູບພາບປັດຈຸບັນ:</label><br>
+                        <label class="form-label" data-lang-key="label_current_image">ຮູບພາບປັດຈຸບັນ:</label><br>
                         <img id="currentImageThumb" src="" alt="ຮູບ" class="table-image-thumb mb-2"
                             style="width: 100px; height: 100px;">
                         <div class="upload-container">
-                            <button class="btn btn-sm btn-info text-white">
+                            <button class="btn btn-sm btn-info text-white" data-lang-key="btn_change_image">
                                 <i class="bi bi-cloud-arrow-up-fill"></i> ປ່ຽນຮູບພາບ
                             </button>
                             <input type="file" id="editFileInput" accept="image/*" onchange="handleEditFileUpload()">
@@ -342,8 +372,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ປິດ</button>
-                    <button type="button" class="btn btn-success" onclick="saveEdit()">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        data-lang-key="btn_close">ປິດ</button>
+                    <button type="button" class="btn btn-success" onclick="saveEdit()" data-lang-key="btn_save_edit">
                         <i class="bi bi-save-fill"></i> ບັນທຶກການແກ້ໄຂ
                     </button>
                 </div>
@@ -355,16 +386,18 @@
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteModalLabel"><i class="bi bi-exclamation-triangle-fill"></i>
-                        ຢືນຢັນການລຶບ</h5>
+                    <h5 class="modal-title" id="deleteModalLabel" data-lang-key="modal_delete_title">
+                        <i class="bi bi-exclamation-triangle-fill"></i> ຢືນຢັນການລຶບ
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <p>ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບລາຍການນີ້?</p>
+                    <p data-lang-key="msg_delete_confirm">ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບລາຍການນີ້?</p>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ຍົກເລີກ</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        data-lang-key="btn_cancel">ຍົກເລີກ</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn" data-lang-key="btn_delete">
                         <i class="bi bi-trash-fill"></i> ລຶບ
                     </button>
                 </div>
@@ -377,7 +410,8 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="imagePreviewModalLabel">ຮູບພາບລູກຄ້າ</h5>
+                    <h5 class="modal-title" id="imagePreviewModalLabel" data-lang-key="modal_image_preview_title">
+                        ຮູບພາບລູກຄ້າ</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
@@ -389,7 +423,8 @@
 
 
     <div class="footer">
-        Customer Records Version 1.2 (Search & Base64 Data URL)
+        <span data-lang-key="footer_version">Customer Records Version 1.4 (Fixed Price Loading & Language
+            Support)</span>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -397,6 +432,149 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
+        // ---------------------------------------------------------------------
+        // 🌍 LANGUAGE CONFIGURATION
+        // ---------------------------------------------------------------------
+
+        const translations = {
+            lao: {
+                // Nav & Header
+                titleTag: "Customer Records - ບັນທຶກລູກຄ້າ",
+                nav_title: "ບັນທຶກລູກຄ້າ",
+                nav_back: "ກັບໜ້າບັນທຶກລາຍຈ່າຍ",
+                main_header: "ຟອມບັນທຶກລູກຄ້າ",
+                card_header_detail: "ລາຍລະອຽດຂໍ້ມູນ",
+                card_header_list: "ລາຍການບັນທຶກລູກຄ້າທັງໝົດ",
+                // Labels & Placeholders
+                label_name: "ຊື່ ແລະ ນາມສະກຸມ",
+                ph_name: "ຊື່ລູກຄ້າ",
+                label_phone: "ເບີໂທລະສັບ",
+                ph_phone: "ເບີໂທ (ທາງເລືອກ)",
+                label_model: "ລຸ້ນໂທລະສັບ",
+                ph_model: "iPhone 13 / Samsung A54",
+                label_type: "ປະເພດລາຍການ",
+                opt_pawn: "ຈຳນຳໂທລະສັບ",
+                opt_sell: "ຂາຍໂທລະສັບ (ມືສອງ)",
+                label_price: "ລາຄາຊື້ / ມູນຄ່າຈຳນຳ",
+                ph_zero: "0",
+                label_date: "ວັນທີເດືອນປີຊື້/ຈຳນຳ",
+                ph_search: "ຄົ້ນຫາ (ຊື່, ໂທລະສັບ, ລຸ້ນ, ວັນທີ)",
+                // Buttons & Status
+                btn_camera: "ຖ່າຍຮູບ (ໃຊ້ກ້ອງ)",
+                btn_upload: "ອັບໂຫຼດຮູບ",
+                status_no_file: "(ຍັງບໍ່ມີຮູບພາບ)",
+                btn_save: "ກົດບັນທຶກ",
+                // Table Headers
+                th_no: "ລ/ດ",
+                th_date: "ວັນທີ",
+                th_type: "ປະເພດ",
+                th_customer: "ລູກຄ້າ/ໂທລະສັບ",
+                th_price: "ລາຄາ",
+                th_image: "ຮູບພາບ",
+                th_action: "ແກ້ໄຂ/ລຶບ",
+                // Alerts & Modals
+                loading_data: "ກຳລັງໂຫຼດຂໍ້ມູນ...",
+                alert_required: "ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ",
+                alert_save_success: "✅ ບັນທຶກລູກຄ້າສຳເລັດແລ້ວ!",
+                alert_save_fail: "❌ ບັນທຶກບໍ່ສຳເລັດ:",
+                alert_edit_success: "✅ ແກ້ໄຂລາຍການສຳເລັດແລ້ວ!",
+                alert_edit_fail: "❌ ບັນທຶກການແກ້ໄຂບໍ່ສຳເລັດ:",
+                alert_delete_success: "✅ ລຶບລາຍການສຳເລັດແລ້ວ!",
+                alert_delete_fail: "❌ ລຶບບໍ່ສຳເລັດ:",
+                alert_file_too_large: "⚠️ ຂະໜາດໄຟລ໌ໃຫຍ່ເກີນໄປ. Base64 ຕ້ອງການໄຟລ໌ທີ່ນ້ອຍກວ່າ 500KB.",
+                alert_customer_not_found: "❌ ບໍ່ພົບຂໍ້ມູນລູກຄ້າທີ່ຈະແກ້ໄຂ.",
+                alert_no_records: "❌ ບໍ່ພົບລາຍການລູກຄ້າ.",
+                alert_camera_unsupported: "❌ ໂປຣແກຣມທ່ອງເວັບຂອງທ່ານບໍ່ຮອງຮັບການໃຊ້ງານກ້ອງ.",
+                alert_no_camera_connection: "❌ ບໍ່ມີການເຊື່ອມຕໍ່ກ້ອງ.",
+                alert_photo_success: "✅ ຖ່າຍຮູບສຳເລັດແລ້ວ! ພ້ອມບັນທຶກລາຍການ.",
+                alert_new_image_selected: "✅ ຮູບພາບໃໝ່ຖືກເລືອກສຳລັບການແກ້ໄຂ.",
+                modal_camera_title: "ຖ່າຍຮູບ (ບັນທຶກເປັນ Base64)",
+                camera_status: "ກະລຸນາອະນຸຍາດການໃຊ້ງານກ້ອງ",
+                btn_cancel: "ຍົກເລີກ",
+                btn_snap: "ຖ່າຍຮູບ",
+                modal_edit_title: "ແກ້ໄຂລາຍການລູກຄ້າ",
+                label_current_image: "ຮູບພາບປັດຈຸບັນ:",
+                btn_change_image: "ປ່ຽນຮູບພາບ",
+                btn_close: "ປິດ",
+                btn_save_edit: "ບັນທຶກການແກ້ໄຂ",
+                modal_delete_title: "ຢືນຢັນການລຶບ",
+                msg_delete_confirm: "ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບລາຍການນີ້?",
+                btn_delete: "ລຶບ",
+                modal_image_preview_title: "ຮູບພາບລູກຄ້າ",
+                th_no_image: "ບໍ່ມີຮູບ",
+                footer_version: "Customer Records Version 1.4 (Fixed Price Loading & Language Support)"
+            },
+            eng: {
+                // Nav & Header
+                titleTag: "Customer Records - Customer Registration",
+                nav_title: "Customer Records",
+                nav_back: "Back to Expense Tracker",
+                main_header: "Customer Registration Form",
+                card_header_detail: "Details",
+                card_header_list: "All Customer Records",
+                // Labels & Placeholders
+                label_name: "Name and Surname",
+                ph_name: "Customer Name",
+                label_phone: "Phone Number",
+                ph_phone: "Phone (Optional)",
+                label_model: "Phone Model",
+                ph_model: "iPhone 13 / Samsung A54",
+                label_type: "Transaction Type",
+                opt_pawn: "Pawn Phone",
+                opt_sell: "Sell Phone (Used)",
+                label_price: "Purchase Price / Pawn Value",
+                ph_zero: "0",
+                label_date: "Date of Purchase/Pawn",
+                ph_search: "Search (Name, Phone, Model, Date)",
+                // Buttons & Status
+                btn_camera: "Take Photo (Use Camera)",
+                btn_upload: "Upload Photo",
+                status_no_file: "(No photo selected)",
+                btn_save: "Save Record",
+                // Table Headers
+                th_no: "No.",
+                th_date: "Date",
+                th_type: "Type",
+                th_customer: "Customer/Phone",
+                th_price: "Price",
+                th_image: "Image",
+                th_action: "Action",
+                // Alerts & Modals
+                loading_data: "Loading data...",
+                alert_required: "Please fill in all required fields.",
+                alert_save_success: "✅ Customer saved successfully!",
+                alert_save_fail: "❌ Save failed:",
+                alert_edit_success: "✅ Record updated successfully!",
+                alert_edit_fail: "❌ Update failed:",
+                alert_delete_success: "✅ Record deleted successfully!",
+                alert_delete_fail: "❌ Delete failed:",
+                alert_file_too_large: "⚠️ File size is too large. Base64 requires files under 500KB.",
+                alert_customer_not_found: "❌ Customer record not found for editing.",
+                alert_no_records: "❌ No customer records found.",
+                alert_camera_unsupported: "❌ Your browser does not support camera usage.",
+                alert_no_camera_connection: "❌ No camera connection.",
+                alert_photo_success: "✅ Photo taken successfully! Ready to save.",
+                alert_new_image_selected: "✅ New image selected for editing.",
+                modal_camera_title: "Take Photo (Save as Base64)",
+                camera_status: "Please allow camera access",
+                btn_cancel: "Cancel",
+                btn_snap: "Snap Photo",
+                modal_edit_title: "Edit Customer Record",
+                label_current_image: "Current Image:",
+                btn_change_image: "Change Image",
+                btn_close: "Close",
+                btn_save_edit: "Save Changes",
+                modal_delete_title: "Confirm Deletion",
+                msg_delete_confirm: "Are you sure you want to delete this record?",
+                btn_delete: "Delete",
+                modal_image_preview_title: "Customer Image",
+                th_no_image: "No image",
+                footer_version: "Customer Records Version 1.4 (Fixed Price Loading & Language Support)"
+            }
+        };
+
+        let currentLang = localStorage.getItem('appLang') || 'lao'; // Default to Lao
+
         // ---------------------------------------------------------------------
         // 🚨 FIREBASE CONFIGURATION
         // ---------------------------------------------------------------------
@@ -426,7 +604,7 @@
         let currentStream = null;
         let pendingFileBase64 = null;
         let pendingFileName = null;
-        let customersData = {}; // Cache to store loaded data (key -> customer object)
+        let customersData = {};
 
         // Bootstrap Modals Initialization
         const cameraModal = new bootstrap.Modal(document.getElementById('cameraModal'));
@@ -439,14 +617,18 @@
         // ---------------------------------------------------------------------
 
         function formatNumber(num) {
-            return parseFloat(num).toLocaleString('lo-LA', {
+            // Ensure num is treated as a number
+            const number = parseFloat(num) || 0;
+            // Formatting uses Lao locale for number grouping and 'ກີບ' currency sign
+            return number.toLocaleString('lo-LA', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             });
         }
 
-        window.showCustomAlert = function (message) {
-            document.getElementById('customAlertMessage').innerText = message;
+        window.showCustomAlert = function (messageKey, details = '') {
+            const message = translations[currentLang][messageKey] || messageKey;
+            document.getElementById('customAlertMessage').innerText = `${message} ${details}`;
             document.getElementById('customAlertBox').style.display = 'flex';
         }
 
@@ -454,11 +636,6 @@
             document.getElementById('customAlertBox').style.display = 'none';
         }
 
-        /**
-         * Reads a File object and converts it to a Base64 Data URL.
-         * @param {File} file 
-         * @returns {Promise<string>} Base64 Data URL string
-         */
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -469,10 +646,9 @@
         }
 
         async function setPendingFile(file) {
-            // Check file size limit (500 KB recommended for Base64 in RTDB)
             const maxSize = 500 * 1024;
             if (file.size > maxSize) {
-                showCustomAlert("⚠️ ຂະໜາດໄຟລ໌ໃຫຍ່ເກີນໄປ. Base64 ຕ້ອງການໄຟລ໌ທີ່ນ້ອຍກວ່າ 500KB.");
+                showCustomAlert("alert_file_too_large", "");
                 resetPendingFile();
                 return;
             }
@@ -480,7 +656,10 @@
             pendingFileBase64 = await fileToBase64(file);
             pendingFileName = file.name;
 
-            document.getElementById('fileStatus').innerText = `✅ ຮູບພາບພ້ອມບັນທຶກ: ${pendingFileName}`;
+            const uploadText = translations[currentLang].btn_upload.split('(')[0].trim();
+            const successMessage = `✅ ${uploadText} ${translations[currentLang].alert_photo_success.includes('ຖ່າຍຮູບສຳເລັດແລ້ວ') ? translations[currentLang].alert_photo_success.split('!')[0] : 'Photo Ready'}: ${pendingFileName}`;
+
+            document.getElementById('fileStatus').innerText = successMessage;
             document.getElementById('fileStatus').classList.remove('text-muted');
             document.getElementById('fileStatus').classList.add('text-success');
         }
@@ -491,9 +670,96 @@
             fileInput.value = null;
             editFileInput.value = null;
 
-            document.getElementById('fileStatus').innerText = `(ຍັງບໍ່ມີຮູບພາບ)`;
+            document.getElementById('fileStatus').innerText = translations[currentLang].status_no_file;
             document.getElementById('fileStatus').classList.remove('text-success');
             document.getElementById('fileStatus').classList.add('text-muted');
+        }
+
+        /**
+         * Sets the language of the entire page based on data-lang-key attributes.
+         * @param {string} lang 'lao' or 'eng'
+         */
+        window.setLanguage = function (lang) {
+            currentLang = lang;
+            localStorage.setItem('appLang', lang);
+
+            const texts = translations[lang];
+
+            // 1. Update all elements with data-lang-key
+            document.querySelectorAll('[data-lang-key]').forEach(el => {
+                const key = el.getAttribute('data-lang-key');
+                if (texts[key]) {
+                    const prop = el.getAttribute('data-lang-prop');
+
+                    if (prop === 'placeholder') {
+                        el.setAttribute('placeholder', texts[key]);
+                    } else if (el.tagName === 'TITLE') {
+                        el.textContent = texts[key];
+                    } else if (el.tagName === 'OPTION') {
+                        el.textContent = texts[key];
+                    } else {
+                        // Attempt to preserve icons/internal HTML structure
+                        let innerHtml = el.innerHTML;
+                        const textContent = el.textContent.trim();
+
+                        if (textContent && el.querySelector('i') && el.querySelector('i').outerHTML) {
+                            const icon = el.querySelector('i').outerHTML;
+                            el.innerHTML = icon + ' ' + texts[key];
+                        } else if (textContent) {
+                            el.textContent = texts[key];
+                        }
+                    }
+                }
+            });
+
+            // 2. Update the main page title (title tag)
+            document.getElementById('titleTag').textContent = texts.titleTag;
+
+            // 3. Update the dynamic content like file status and table content
+            resetPendingFile(); // Updates status_no_file text
+            updateTableLanguage();
+
+            // 4. Update Button Styles
+            document.getElementById('langLao').className = lang === 'lao' ? 'btn btn-sm btn-light' : 'btn btn-sm btn-outline-light';
+            document.getElementById('langEng').className = lang === 'eng' ? 'btn btn-sm btn-light' : 'btn btn-sm btn-outline-light';
+        }
+
+        /**
+         * Updates the dynamic content in the table body (Types and No Image status).
+         */
+        function updateTableLanguage() {
+            const tableBody = document.getElementById('customerTableBody');
+
+            // 1. Update default loading/no record messages
+            const loadingRow = tableBody.querySelector('td[data-lang-key="loading_data"]');
+            if (loadingRow) {
+                loadingRow.textContent = translations[currentLang].loading_data;
+            } else if (tableBody.querySelector('td.text-danger')) {
+                tableBody.querySelector('td.text-danger').textContent = translations[currentLang].alert_no_records;
+            }
+
+            // 2. Loop through actual data rows to update 'Type' and 'Image' status
+            tableBody.querySelectorAll('tr[data-key]').forEach(row => {
+                // Update Type
+                const typeCell = row.cells[2];
+                const customerKey = row.dataset.key;
+                const originalType = customersData[customerKey] ? customersData[customerKey].type : 'ຈຳນຳ'; // Use original type saved in DB
+
+                if (originalType === 'ຈຳນຳ') {
+                    typeCell.textContent = translations[currentLang].opt_pawn;
+                } else if (originalType === 'ຂາຍ') {
+                    typeCell.textContent = translations[currentLang].opt_sell;
+                }
+
+                // Update No Image text
+                const imageCell = row.cells[5];
+                const noImageSpan = imageCell.querySelector('span.text-muted');
+                if (noImageSpan) {
+                    // Get icon if exists
+                    const icon = noImageSpan.querySelector('i') ? noImageSpan.querySelector('i').outerHTML + ' ' : '';
+                    noImageSpan.innerHTML = `${icon}${translations[currentLang].th_no_image}`;
+                }
+            });
         }
 
 
@@ -502,16 +768,16 @@
         // ---------------------------------------------------------------------
 
         window.openCameraModal = async function () {
-            // ... (Camera setup logic)
             if (!('mediaDevices' in navigator) || !('getUserMedia' in navigator.mediaDevices)) {
-                showCustomAlert("❌ ໂປຣແກຣມທ່ອງເວັບຂອງທ່ານບໍ່ຮອງຮັບການໃຊ້ງານກ້ອງ.");
+                showCustomAlert("alert_camera_unsupported", "");
                 return;
             }
 
             cameraModal.show();
 
             try {
-                document.getElementById('cameraStatus').innerText = 'ກຳລັງຂໍສິດການເຂົ້າເຖິງກ້ອງ...';
+                // Note: The camera status text is intentionally kept simple here.
+                document.getElementById('cameraStatus').innerText = translations[currentLang].camera_status;
 
                 const constraints = {
                     video: {
@@ -529,14 +795,14 @@
 
             } catch (err) {
                 console.error("Error accessing camera: ", err);
-                document.getElementById('cameraStatus').innerText = '⚠️ ບໍ່ສາມາດເຂົ້າເຖິງກ້ອງໄດ້. ກະລຸນາອະນຸຍາດ.';
+                document.getElementById('cameraStatus').innerText = `⚠️ ${translations[currentLang].camera_status}`;
                 document.getElementById('cameraStatus').style.display = 'block';
             }
         }
 
         window.takePhoto = function () {
             if (!currentStream) {
-                showCustomAlert("❌ ບໍ່ມີການເຊື່ອມຕໍ່ກ້ອງ.");
+                showCustomAlert("alert_no_camera_connection", "");
                 return;
             }
 
@@ -551,7 +817,6 @@
             context.drawImage(videoElement, 0, 0, width, height);
             context.setTransform(1, 0, 0, 1, 0, 0);
 
-            // Convert Canvas to a Blob (File)
             cameraCanvas.toBlob(async (blob) => {
                 const capturedFile = new File([blob], 'photo_capture.png', { type: 'image/png' });
 
@@ -559,12 +824,11 @@
 
                 cameraModal.hide();
                 closeCamera();
-                showCustomAlert("✅ ຖ່າຍຮູບສຳເລັດແລ້ວ! ພ້ອມບັນທຶກລາຍການ.");
+                showCustomAlert("alert_photo_success", "");
             }, 'image/png');
         }
 
         window.closeCamera = function () {
-            // ... (Camera closing logic)
             if (currentStream) {
                 currentStream.getTracks().forEach(track => track.stop());
                 currentStream = null;
@@ -572,7 +836,7 @@
             videoElement.style.display = 'none';
             videoElement.srcObject = null;
             document.getElementById('cameraStatus').style.display = 'block';
-            document.getElementById('cameraStatus').innerText = 'ກະລຸນາອະນຸຍາດການໃຊ້ງານກ້ອງ';
+            document.getElementById('cameraStatus').innerText = translations[currentLang].camera_status;
         }
 
         // ---------------------------------------------------------------------
@@ -591,8 +855,8 @@
             if (file) {
                 const maxSize = 500 * 1024;
                 if (file.size > maxSize) {
-                    showCustomAlert("⚠️ ຂະໜາດໄຟລ໌ໃຫຍ່ເກີນໄປ. Base64 ຕ້ອງການໄຟລ໌ທີ່ນ້ອຍກວ່າ 500KB.");
-                    editFileInput.value = null; // Clear input
+                    showCustomAlert("alert_file_too_large", "");
+                    editFileInput.value = null;
                     return;
                 }
 
@@ -602,7 +866,7 @@
                 document.getElementById('currentImageThumb').src = base64String;
                 document.getElementById('currentImageThumb').onclick = () => previewImage(base64String);
 
-                showCustomAlert(`✅ ຮູບພາບໃໝ່ຖືກເລືອກສຳລັບການແກ້ໄຂ.`);
+                showCustomAlert("alert_new_image_selected", "");
             }
         }
 
@@ -620,7 +884,7 @@
             const type = document.getElementById('typeSelect').value;
 
             if (!name || !model || !price || !date || isNaN(parseFloat(price))) {
-                showCustomAlert("ກະລຸນາກອກຂໍ້ມູນ ຊື່, ລຸ້ນໂທລະສັບ, ລາຄາ, ແລະ ວັນທີ ໃຫ້ຄົບຖ້ວນ");
+                showCustomAlert("alert_required", "");
                 return;
             }
 
@@ -630,7 +894,8 @@
                 name: name,
                 phone: phone,
                 model: model,
-                price: parseFloat(price),
+                // **FIX:** Ensure price is saved as a number
+                price: parseFloat(price) || 0,
                 date: date,
                 type: type,
                 imageUrl: imageUrl,
@@ -639,7 +904,7 @@
 
             db.ref('Customer_rents').push(customerData)
                 .then(() => {
-                    showCustomAlert("✅ ບັນທຶກລູກຄ້າສຳເລັດແລ້ວ!");
+                    showCustomAlert("alert_save_success", "");
                     document.getElementById('nameInput').value = '';
                     document.getElementById('phoneInput').value = '';
                     document.getElementById('modelInput').value = '';
@@ -648,7 +913,7 @@
                     resetPendingFile();
                 })
                 .catch(error => {
-                    showCustomAlert(`❌ ບັນທຶກບໍ່ສຳເລັດ: ${error.message}`);
+                    showCustomAlert("alert_save_fail", error.message);
                     console.error("Firebase save error:", error);
                 });
         }
@@ -658,14 +923,14 @@
         // ---------------------------------------------------------------------
 
         window.loadCustomers = function () {
-            customerTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">ກຳລັງໂຫຼດຂໍ້ມູນ...</td></tr>';
+            customerTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted" data-lang-key="loading_data">${translations[currentLang].loading_data}</td></tr>`;
 
             db.ref('Customer_rents').on('value', (snapshot) => {
-                customersData = {}; // Reset cache
+                customersData = {};
                 customerTableBody.innerHTML = '';
 
                 if (!snapshot.exists()) {
-                    customerTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">❌ ບໍ່ພົບລາຍການລູກຄ້າ.</td></tr>';
+                    customerTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${translations[currentLang].alert_no_records}</td></tr>`;
                     return;
                 }
 
@@ -673,40 +938,43 @@
                 snapshot.forEach((childSnapshot) => {
                     const customer = childSnapshot.val();
                     customer.key = childSnapshot.key;
-                    customersData[customer.key] = customer; // Cache the data
+                    customersData[customer.key] = customer;
                     customersArray.push(customer);
                 });
 
-                // Sort by timestamp (newest first)
                 customersArray.sort((a, b) => b.timestamp - a.timestamp);
 
                 let rowCount = 0;
                 customersArray.forEach((customer) => {
                     rowCount++;
+
+                    // **FIX:** Ensure customer.price is accessed correctly and formatted
                     const priceFormatted = formatNumber(customer.price || 0);
                     const imageUrl = customer.imageUrl || null;
 
-                    const row = customerTableBody.insertRow();
-                    row.dataset.key = customer.key; // Store key for filtering
+                    const typeText = customer.type === 'ຈຳນຳ' ? translations[currentLang].opt_pawn : translations[currentLang].opt_sell;
+                    const imageStatus = imageUrl ? `<img src="${imageUrl}" class="table-image-thumb" onclick="previewImage('${imageUrl}')">` :
+                        `<span class="text-muted"><i class="bi bi-x-circle"></i> ${translations[currentLang].th_no_image}</span>`;
 
-                    // Fields used for searching (Data attributes for easy filtering)
+
+                    const row = customerTableBody.insertRow();
+                    row.dataset.key = customer.key;
+
                     row.dataset.search = (
-                        `${customer.name} ${customer.phone} ${customer.model} ${customer.type} ${customer.date}`
+                        `${customer.name} ${customer.phone} ${customer.model} ${customer.type} ${customer.date} ${customer.type === 'ຈຳນຳ' ? 'pawn' : (customer.type === 'ຂາຍ' ? 'sell' : '')}`
                     ).toLowerCase();
 
                     row.innerHTML = `
                         <td>${rowCount}</td>
                         <td>${customer.date}</td>
-                        <td class="${customer.type === 'ຈຳນຳ' ? 'text-warning' : 'text-success'}">${customer.type}</td>
+                        <td class="${customer.type === 'ຈຳນຳ' ? 'text-warning' : 'text-success'}">${typeText}</td>
                         <td>
                             <strong>${customer.name}</strong><br>
                             <small class="text-muted">${customer.model}</small>
                         </td>
                         <td class="text-end text-danger"><strong>${priceFormatted} ກີບ</strong></td>
                         <td>
-                            ${imageUrl ?
-                            `<img src="${imageUrl}" class="table-image-thumb" onclick="previewImage('${imageUrl}')">` :
-                            `<span class="text-muted"><i class="bi bi-x-circle"></i> ບໍ່ມີຮູບ</span>`}
+                            ${imageStatus}
                         </td>
                         <td>
                             <button class="btn btn-sm btn-success table-action-btn me-1" onclick="openEditModal('${customer.key}')">
@@ -719,11 +987,10 @@
                     `;
                 });
 
-                // Ensure the current filter is applied after a fresh load/update
                 filterCustomers();
 
             }, (error) => {
-                customerTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">⚠️ ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດຂໍ້ມູນ: ${error.message}</td></tr>`;
+                customerTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">⚠️ ${translations[currentLang].loading_data.replace('...', ': Error loading data')}: ${error.message}</td></tr>`;
                 console.error("Firebase load error:", error);
             });
         }
@@ -735,7 +1002,6 @@
             const filterValue = document.getElementById('searchInput').value.toLowerCase().trim();
             const rows = customerTableBody.getElementsByTagName('tr');
 
-            // If the search box is empty, show all rows
             if (filterValue === '') {
                 for (let row of rows) {
                     row.style.display = '';
@@ -743,20 +1009,16 @@
                 return;
             }
 
-            // Loop through all rows (except the initial "Loading" row if it exists)
             for (let row of rows) {
-                // Check if the row has the data-search attribute (i.e., it's a customer data row)
                 const searchData = row.dataset.search;
 
                 if (searchData) {
-                    // Check if any of the search fields contain the filter value
                     if (searchData.includes(filterValue)) {
-                        row.style.display = ''; // Show row
+                        row.style.display = '';
                     } else {
-                        row.style.display = 'none'; // Hide row
+                        row.style.display = 'none';
                     }
                 } else if (row.cells.length === 1) {
-                    // Hide the "No Records" row if it's visible, as we are searching
                     row.style.display = 'none';
                 }
             }
@@ -769,7 +1031,7 @@
         window.openEditModal = function (key) {
             const customer = customersData[key];
             if (!customer) {
-                showCustomAlert("❌ ບໍ່ພົບຂໍ້ມູນລູກຄ້າທີ່ຈະແກ້ໄຂ.");
+                showCustomAlert("alert_customer_not_found", "");
                 return;
             }
 
@@ -781,7 +1043,8 @@
             document.getElementById('editPhone').value = customer.phone;
             document.getElementById('editModel').value = customer.model;
             document.getElementById('editType').value = customer.type;
-            document.getElementById('editPrice').value = customer.price;
+            // **FIX:** Ensure the price is loaded correctly into the edit field
+            document.getElementById('editPrice').value = customer.price || 0;
             document.getElementById('editDate').value = customer.date;
 
             const currentImageThumb = document.getElementById('currentImageThumb');
@@ -790,6 +1053,14 @@
             currentImageThumb.src = customer.imageUrl || placeholder;
             currentImageThumb.onclick = customer.imageUrl ? () => previewImage(customer.imageUrl) : null;
             currentImageThumb.style.cursor = customer.imageUrl ? 'pointer' : 'default';
+
+            // Ensure select options display the correct language text
+            document.getElementById('editType').querySelectorAll('option').forEach(opt => {
+                const key = opt.getAttribute('data-lang-key');
+                if (key) {
+                    opt.textContent = translations[currentLang][key];
+                }
+            });
 
             editModal.show();
         }
@@ -808,7 +1079,7 @@
             let newImageUrl = editFileInput.dataset.base64 || customer.imageUrl;
 
             if (!newName || !newModel || !newPrice || !newDate || isNaN(parseFloat(newPrice))) {
-                showCustomAlert("ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ");
+                showCustomAlert("alert_required", "");
                 return;
             }
 
@@ -816,7 +1087,8 @@
                 name: newName,
                 phone: newPhone,
                 model: newModel,
-                price: parseFloat(newPrice),
+                // **FIX:** Ensure price is updated as a number
+                price: parseFloat(newPrice) || 0,
                 date: newDate,
                 type: newType,
                 imageUrl: newImageUrl
@@ -824,13 +1096,13 @@
 
             db.ref(`Customer_rents/${key}`).update(updates)
                 .then(() => {
-                    showCustomAlert("✅ ແກ້ໄຂລາຍການສຳເລັດແລ້ວ!");
+                    showCustomAlert("alert_edit_success", "");
                     editModal.hide();
                     delete editFileInput.dataset.base64;
                     resetPendingFile();
                 })
                 .catch(error => {
-                    showCustomAlert(`❌ ບັນທຶກການແກ້ໄຂບໍ່ສຳເລັດ: ${error.message}`);
+                    showCustomAlert("alert_edit_fail", error.message);
                     console.error("Firebase update error:", error);
                 });
         }
@@ -854,11 +1126,11 @@
 
             db.ref(`Customer_rents/${key}`).remove()
                 .then(() => {
-                    showCustomAlert("✅ ລຶບລາຍການສຳເລັດແລ້ວ!");
+                    showCustomAlert("alert_delete_success", "");
                     keyToDelete = null;
                 })
                 .catch(error => {
-                    showCustomAlert(`❌ ລຶບບໍ່ສຳເລັດ: ${error.message}`);
+                    showCustomAlert("alert_delete_fail", error.message);
                     console.error("Firebase delete error:", error);
                 });
         }
@@ -868,7 +1140,7 @@
         // ---------------------------------------------------------------------
 
         window.previewImage = function (imageUrl) {
-            document.getElementById('previewImage').src = imageUrl;ห
+            document.getElementById('previewImage').src = imageUrl;
             imagePreviewModal.show();
         }
 
@@ -877,10 +1149,17 @@
         // ---------------------------------------------------------------------
 
         function initialize() {
+            // 1. Set default language based on saved preference or 'lao'
+            setLanguage(currentLang);
+
+            // 2. Set default date
             document.getElementById('dateInput').valueAsDate = new Date();
+
+            // 3. Load initial customers and listen for changes
             loadCustomers();
         }
 
+        // Initialize the app when the page loads
         document.addEventListener('DOMContentLoaded', initialize);
     </script>
 </body>
