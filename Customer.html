@@ -140,6 +140,21 @@
             font-size: 14px;
             border-top: 1px solid #dee2e6;
         }
+
+        /* Spin animation for refresh button */
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -156,6 +171,13 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item me-3">
+                        <button class="btn btn-sm btn-light text-primary" onclick="triggerManualRefresh()"
+                            data-lang-key="btn_refresh" id="refreshButton">
+                            <i class="bi bi-arrow-clockwise" id="refreshIcon"></i> ໂຫຼດໃໝ່
+                        </button>
+                    </li>
+
                     <li class="nav-item me-3">
                         <div class="btn-group" role="group" aria-label="Language switch">
                             <button type="button" class="btn btn-sm btn-light" id="langLao"
@@ -423,8 +445,7 @@
 
 
     <div class="footer">
-        <span data-lang-key="footer_version">Customer Records Version 1.4 (Fixed Price Loading & Language
-            Support)</span>
+        <span data-lang-key="footer_version">Customer Records Version 1.5 (Added Refresh Button)</span>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -442,6 +463,7 @@
                 titleTag: "Customer Records - ບັນທຶກລູກຄ້າ",
                 nav_title: "ບັນທຶກລູກຄ້າ",
                 nav_back: "ກັບໜ້າບັນທຶກລາຍຈ່າຍ",
+                btn_refresh: "ໂຫຼດໃໝ່",
                 main_header: "ຟອມບັນທຶກລູກຄ້າ",
                 card_header_detail: "ລາຍລະອຽດຂໍ້ມູນ",
                 card_header_list: "ລາຍການບັນທຶກລູກຄ້າທັງໝົດ",
@@ -502,13 +524,14 @@
                 btn_delete: "ລຶບ",
                 modal_image_preview_title: "ຮູບພາບລູກຄ້າ",
                 th_no_image: "ບໍ່ມີຮູບ",
-                footer_version: "Customer Records Version 1.4 (Fixed Price Loading & Language Support)"
+                footer_version: "Customer Records Version 1.5 (Added Refresh Button)"
             },
             eng: {
                 // Nav & Header
                 titleTag: "Customer Records - Customer Registration",
                 nav_title: "Customer Records",
                 nav_back: "Back to Expense Tracker",
+                btn_refresh: "Refresh Data",
                 main_header: "Customer Registration Form",
                 card_header_detail: "Details",
                 card_header_list: "All Customer Records",
@@ -569,7 +592,7 @@
                 btn_delete: "Delete",
                 modal_image_preview_title: "Customer Image",
                 th_no_image: "No image",
-                footer_version: "Customer Records Version 1.4 (Fixed Price Loading & Language Support)"
+                footer_version: "Customer Records Version 1.5 (Added Refresh Button)"
             }
         };
 
@@ -605,6 +628,7 @@
         let pendingFileBase64 = null;
         let pendingFileName = null;
         let customersData = {};
+        let isListening = false; // To control whether Firebase is actively listening
 
         // Bootstrap Modals Initialization
         const cameraModal = new bootstrap.Modal(document.getElementById('cameraModal'));
@@ -617,9 +641,7 @@
         // ---------------------------------------------------------------------
 
         function formatNumber(num) {
-            // Ensure num is treated as a number
             const number = parseFloat(num) || 0;
-            // Formatting uses Lao locale for number grouping and 'ກີບ' currency sign
             return number.toLocaleString('lo-LA', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
@@ -698,11 +720,11 @@
                     } else if (el.tagName === 'OPTION') {
                         el.textContent = texts[key];
                     } else {
-                        // Attempt to preserve icons/internal HTML structure
                         let innerHtml = el.innerHTML;
                         const textContent = el.textContent.trim();
 
-                        if (textContent && el.querySelector('i') && el.querySelector('i').outerHTML) {
+                        // Handle button texts with icons
+                        if (el.querySelector('i')) {
                             const icon = el.querySelector('i').outerHTML;
                             el.innerHTML = icon + ' ' + texts[key];
                         } else if (textContent) {
@@ -716,7 +738,7 @@
             document.getElementById('titleTag').textContent = texts.titleTag;
 
             // 3. Update the dynamic content like file status and table content
-            resetPendingFile(); // Updates status_no_file text
+            resetPendingFile();
             updateTableLanguage();
 
             // 4. Update Button Styles
@@ -740,10 +762,13 @@
 
             // 2. Loop through actual data rows to update 'Type' and 'Image' status
             tableBody.querySelectorAll('tr[data-key]').forEach(row => {
+                const customerKey = row.dataset.key;
+                const customer = customersData[customerKey];
+                if (!customer) return;
+
                 // Update Type
                 const typeCell = row.cells[2];
-                const customerKey = row.dataset.key;
-                const originalType = customersData[customerKey] ? customersData[customerKey].type : 'ຈຳນຳ'; // Use original type saved in DB
+                const originalType = customer.type;
 
                 if (originalType === 'ຈຳນຳ') {
                     typeCell.textContent = translations[currentLang].opt_pawn;
@@ -755,7 +780,6 @@
                 const imageCell = row.cells[5];
                 const noImageSpan = imageCell.querySelector('span.text-muted');
                 if (noImageSpan) {
-                    // Get icon if exists
                     const icon = noImageSpan.querySelector('i') ? noImageSpan.querySelector('i').outerHTML + ' ' : '';
                     noImageSpan.innerHTML = `${icon}${translations[currentLang].th_no_image}`;
                 }
@@ -776,7 +800,6 @@
             cameraModal.show();
 
             try {
-                // Note: The camera status text is intentionally kept simple here.
                 document.getElementById('cameraStatus').innerText = translations[currentLang].camera_status;
 
                 const constraints = {
@@ -894,7 +917,6 @@
                 name: name,
                 phone: phone,
                 model: model,
-                // **FIX:** Ensure price is saved as a number
                 price: parseFloat(price) || 0,
                 date: date,
                 type: type,
@@ -919,15 +941,59 @@
         }
 
         // ---------------------------------------------------------------------
-        // 📋 CUSTOMER LOGIC (READ & FILTER)
+        // 📋 CUSTOMER LOGIC (READ & FILTER & REFRESH)
         // ---------------------------------------------------------------------
 
+        /**
+         * 🔄 Stops the ongoing Firebase listener (if running) and re-attaches it.
+         * Used for manual refresh.
+         */
+        window.triggerManualRefresh = function () {
+            const ref = db.ref('Customer_rents');
+            const refreshIcon = document.getElementById('refreshIcon');
+
+            // 1. Start spinning animation
+            refreshIcon.classList.add('spinning');
+
+            // 2. Detach old listener (if attached)
+            if (isListening) {
+                ref.off('value');
+                isListening = false;
+                console.log("Firebase listener detached.");
+            }
+
+            // 3. Re-attach the listener with a timeout to allow new data to settle (Optional, but good practice)
+            // We use setTimeout to ensure the detachment finishes first.
+            setTimeout(() => {
+                console.log("Re-attaching Firebase listener...");
+                loadCustomers();
+
+                // 4. Stop spinning animation after a delay (simulating load time)
+                setTimeout(() => {
+                    refreshIcon.classList.remove('spinning');
+                }, 1000);
+
+            }, 100);
+        }
+
         window.loadCustomers = function () {
+            const ref = db.ref('Customer_rents');
+
+            // If we are already listening, skip setup to avoid multiple listeners
+            if (isListening) {
+                // If a manual refresh was triggered, it would have detached the listener, 
+                // so the code below will re-attach it.
+                // If this is called multiple times without detachment (which is normal Firebase behavior), 
+                // we only want to proceed if it's the initial call or after detachment.
+            }
+
             customerTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted" data-lang-key="loading_data">${translations[currentLang].loading_data}</td></tr>`;
 
-            db.ref('Customer_rents').on('value', (snapshot) => {
+            ref.on('value', (snapshot) => {
+                // This block runs every time data changes or the listener is attached/re-attached
                 customersData = {};
                 customerTableBody.innerHTML = '';
+                isListening = true; // Mark as listening
 
                 if (!snapshot.exists()) {
                     customerTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${translations[currentLang].alert_no_records}</td></tr>`;
@@ -948,7 +1014,6 @@
                 customersArray.forEach((customer) => {
                     rowCount++;
 
-                    // **FIX:** Ensure customer.price is accessed correctly and formatted
                     const priceFormatted = formatNumber(customer.price || 0);
                     const imageUrl = customer.imageUrl || null;
 
@@ -1043,7 +1108,6 @@
             document.getElementById('editPhone').value = customer.phone;
             document.getElementById('editModel').value = customer.model;
             document.getElementById('editType').value = customer.type;
-            // **FIX:** Ensure the price is loaded correctly into the edit field
             document.getElementById('editPrice').value = customer.price || 0;
             document.getElementById('editDate').value = customer.date;
 
@@ -1054,7 +1118,6 @@
             currentImageThumb.onclick = customer.imageUrl ? () => previewImage(customer.imageUrl) : null;
             currentImageThumb.style.cursor = customer.imageUrl ? 'pointer' : 'default';
 
-            // Ensure select options display the correct language text
             document.getElementById('editType').querySelectorAll('option').forEach(opt => {
                 const key = opt.getAttribute('data-lang-key');
                 if (key) {
@@ -1087,7 +1150,6 @@
                 name: newName,
                 phone: newPhone,
                 model: newModel,
-                // **FIX:** Ensure price is updated as a number
                 price: parseFloat(newPrice) || 0,
                 date: newDate,
                 type: newType,
