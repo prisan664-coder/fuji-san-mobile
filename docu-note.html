@@ -3,120 +3,183 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ເບັ່ງບັນທືກຊີວິດ WYSIWYG - Docu Note</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Docu Note - Restore Full Version</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --bg-body: #f0f2f5;
+            --bg-card: #ffffff;
+            --text-main: #1c1e21;
+            --text-sub: #65676b;
+            --border: #dddfe2;
+            --nav-bg: #2196F3;
+            --toolbar-bg: #f5f6f7;
+            --modal-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #18191a;
+            --bg-card: #242526;
+            --text-main: #e4e6eb;
+            --text-sub: #b0b3b8;
+            --border: #3e4042;
+            --nav-bg: #242526;
+            --toolbar-bg: #3a3b3c;
+            --modal-bg: #242526;
+        }
+
         body {
-            font-family: sans-serif;
-            background: #f0f0f0;
-            padding: 0;
+            font-family: 'Noto Sans Lao', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
             margin: 0;
+            padding: 0;
+            transition: 0.3s;
         }
 
         nav {
-            background: #2196F3;
+            background: var(--nav-bg);
             color: white;
-            padding: 10px 20px;
+            padding: 10px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        nav h2 {
-            margin: 0;
-            font-size: 20px;
-        }
-
-        nav a {
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
             color: white;
-            text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            background: #1976D2;
-            transition: background 0.3s;
-        }
-
-        nav a:hover {
-            background: #1565C0;
-        }
-
-        h1 {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        #noteForm,
-        #filterForm {
-            display: flex;
-            flex-direction: column;
-            max-width: 600px;
-            margin: 0 auto 20px auto;
-            background: #fff;
-            padding: 15px;
+            padding: 8px 12px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
         }
 
-        #noteForm input,
-        #filterForm input {
-            margin-bottom: 10px;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+        .container {
+            max-width: 750px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        #noteTitle {
             width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 16px;
+            background: var(--bg-card);
+            color: var(--text-main);
             box-sizing: border-box;
         }
 
-        #editor {
-            min-height: 120px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        /* --- Toolbar ที่กู้คืนมาให้ครบตามรูป --- */
+        .toolbar {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            background: var(--toolbar-bg);
+            padding: 8px;
+            border-radius: 8px;
             margin-bottom: 10px;
-            background: #fff;
-            overflow: auto;
         }
 
-        button {
-            padding: 10px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
+        .toolbar button,
+        .toolbar label {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-bottom: 5px;
+            color: var(--text-main);
+            font-size: 14px;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
         }
 
-        button.save {
+        .toolbar button:hover {
+            background: #eee;
+        }
+
+        #editor {
+            min-height: 250px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            margin-bottom: 15px;
+            line-height: 1.6;
+            outline: none;
+            font-size: 16px;
+            overflow-x: hidden;
+        }
+
+        #editor img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: block;
+        }
+
+        .main-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: inherit;
+        }
+
+        .save {
             background: #4CAF50;
             color: white;
         }
 
-        button.update {
+        .update {
             background: #2196F3;
             color: white;
             display: none;
         }
 
-        button.filter {
-            background: #ff9800;
-            color: white;
-        }
-
+        /* การแสดงผลรายการบันทึก */
         .note-day {
-            max-width: 800px;
-            margin: 10px auto;
-            background: #fff;
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
         }
 
         .note-day h3 {
-            margin: 0 0 10px 0;
-            background: #f4f4f4;
-            padding: 5px 10px;
-            border-radius: 5px;
+            font-size: 14px;
+            color: var(--text-sub);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            margin-top: 0;
         }
 
         table {
@@ -124,82 +187,45 @@
             border-collapse: collapse;
         }
 
-        th,
         td {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-            vertical-align: top;
+            padding: 12px 5px;
+            border-bottom: 1px solid var(--border);
         }
 
-        th {
-            background: #f9f9f9;
+        .title-cell {
+            font-weight: bold;
+            font-size: 15px;
         }
 
-        td button {
-            margin-right: 5px;
-            padding: 5px 10px;
-            font-size: 14px;
-            border-radius: 5px;
+        .btn-group {
+            display: flex;
+            gap: 4px;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            padding: 7px 12px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
             cursor: pointer;
+            font-family: inherit;
         }
 
-        td button.edit {
-            background: #2196F3;
-            color: white;
-        }
-
-        td button.delete {
-            background: #f44336;
-            color: white;
-        }
-
-        td button.view {
+        .v-btn {
             background: #FF9800;
-            color: white;
         }
 
-        .toolbar {
-            display: flex;
-            margin-bottom: 5px;
-            gap: 5px;
-            flex-wrap: wrap;
+        .e-btn {
+            background: #2196F3;
         }
 
-        .toolbar button {
-            padding: 5px 10px;
-            font-size: 14px;
+        .d-btn {
+            background: #f44336;
         }
 
-        /* 💡 CSS ໃໝ່ສຳລັບ Emoji Picker */
-        .toolbar button.emoji-btn {
-            background: #e0e0e0;
-            color: #333;
-            font-size: 16px;
-        }
-
-        .emoji-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            padding: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .emoji-list span {
-            font-size: 24px;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-
-        .emoji-list span:hover {
-            transform: scale(1.2);
-        }
-
-        /* End new CSS */
-
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -208,135 +234,135 @@
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
         }
 
         .modal-content {
-            background: #fff;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 400px;
-            text-align: center;
+            background: var(--modal-bg);
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 550px;
+            position: relative;
         }
 
-        /* 💡 ປັບຂະໜາດ Modal ສໍາລັບ Emoji */
-        #emojiModal .modal-content {
-            max-width: 500px;
+        #modalContent {
+            margin: 20px 0;
+            line-height: 1.8;
+            font-size: 16px;
+            max-height: 65vh;
+            overflow-y: auto;
+            color: var(--text-main);
         }
 
-        .modal-content h2 {
-            margin-top: 0;
+        #modalContent img {
+            max-width: 100%;
+            height: auto;
         }
 
-        .modal-close {
-            float: right;
-            font-size: 20px;
+        .close-modal {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 28px;
             cursor: pointer;
-            background: none;
-            border: none;
+            color: var(--text-sub);
         }
 
-        .modal button {
-            margin: 10px;
-        }
-
-        .modal button.confirm {
-            background: #f44336;
-            color: white;
-        }
-
-        .modal button.cancel {
-            background: #9e9e9e;
-            color: white;
-        }
-
-        #shareLinkContainer {
-            margin-top: 10px;
-            word-break: break-all;
+        /* Emoji Grid */
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            font-size: 24px;
             text-align: center;
-            background: #f4f4f4;
-            padding: 5px;
-            border-radius: 5px;
         }
 
-        body *:not(#editor):not(.toolbar):not(nav):not(#filterForm):not(.modal):not(.modal *) {
-            user-select: none;
+        .emoji-grid span {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .emoji-grid span:hover {
+            background: #eee;
         }
     </style>
 </head>
 
 <body>
     <nav>
-        <h2>Docu Note</h2>
-        <a href="note.html">ບັນທຶກລາຍຈ່າຍປະຈຳວັນ</a>
+        <h2 style="margin:0;">Docu Note</h2>
+        <div class="nav-right">
+            <button class="nav-btn" onclick="toggleTheme()" id="theme-icon">🌙</button>
+            <a href="note.html" class="nav-btn">ລາຍຈ່າຍ</a>
+        </div>
     </nav>
 
-    <h1>ບົດບັນທຶກຊີວິດແລະແບ່ງບັນປະສົບການ</h1>
+    <div class="container">
+        <h1>ບົດບັນທຶກຂອງຂ້ອຍ</h1>
 
-    <div id="noteForm">
-        <input type="text" id="noteTitle" placeholder="ເຫົາຫົວຂໍ້">
-        <div class="toolbar">
-            <button type="button" onclick="execCmd('bold')"><b>B</b></button>
-            <button type="button" onclick="execCmd('italic')"><i>I</i></button>
-            <button type="button" onclick="execCmd('underline')"><u>U</u></button>
-            <button type="button" onclick="execCmd('foreColor','red')">ແດງ</button>
-            <button type="button" onclick="execCmd('foreColor','green')">ຂຽວ</button>
-            <button type="button" onclick="execCmd('insertOrderedList')">OL</button>
-            <button type="button" onclick="execCmd('insertUnorderedList')">UL</button>
-            <button type="button" onclick="execCmd('createLink',prompt('ປ້ອນ URL'))">Link</button>
-            <button type="button" onclick="wrapSelection('left')">ซ้าย</button>
-            <button type="button" onclick="wrapSelection('center')">กลาง</button>
-            <button type="button" onclick="wrapSelection('right')">ขวา</button>
+        <div class="card">
+            <input type="text" id="noteTitle" placeholder="ຫົວຂໍ້ບັນທຶກ...">
 
-            <button type="button" class="emoji-btn" onclick="openEmojiModal()">😀 Emoji</button>
+            <div class="toolbar">
+                <button type="button" onclick="execCmd('bold')"><b>B</b></button>
+                <button type="button" onclick="execCmd('italic')"><i>I</i></button>
+                <button type="button" onclick="execCmd('underline')"><u>U</u></button>
+                <button type="button" onclick="execCmd('foreColor','black')">ດຳ</button>
+                <button type="button" onclick="execCmd('foreColor','red')">ແດງ</button>
+                <button type="button" onclick="execCmd('foreColor','green')">ຂຽວ</button>
+                <button type="button" onclick="execCmd('insertOrderedList')">OL</button>
+                <button type="button" onclick="execCmd('insertUnorderedList')">UL</button>
+                <button type="button" onclick="execCmd('createLink', prompt('ປ້ອນ URL:'))">Link</button>
+                <button type="button" onclick="execCmd('justifyLeft')">ຊ້າຍ</button>
+                <button type="button" onclick="execCmd('justifyCenter')">ກາງ</button>
+                <button type="button" onclick="execCmd('justifyRight')">ຂວາ</button>
+
+                <label for="imgInput">📷 ຮູບ</label>
+                <input type="file" id="imgInput" accept="image/*" style="display:none;" onchange="handleImg(this)">
+
+                <button type="button" style="background:#fff3e0;" onclick="openEmoji()">😊 Emoji</button>
+            </div>
+
+            <div id="editor" contenteditable="true"></div>
+
+            <button class="main-btn save" onclick="saveNote()">ບັນທຶກລົງລະບົບ</button>
+            <button class="main-btn update" onclick="updateNote()">ອັບເດດການແກ້ໄຂ</button>
         </div>
-        <div id="editor" contenteditable="true"></div>
-        <button class="save" onclick="saveNote()">ບັນທືກ</button>
-        <button class="update" onclick="updateNote()">ແກ້ໄຂ</button>
-    </div>
 
-    <div id="filterForm">
-        <input type="date" id="filterDate">
-        <button class="filter" onclick="filterNotes()">ຄົ້ນຫາຕາມວັນທີ</button>
-        <button class="filter" onclick="clearFilter()">ສະກ້າງການຄົ້ນຫາ</button>
-        <button class="filter" onclick="downloadExcel()">ດາວໂນ້ດ Excel</button>
+        <div id="notesContainer"></div>
     </div>
-
-    <div id="notesContainer"></div>
 
     <div id="modal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal()">&times;</button>
-            <h2 id="modalTitle"></h2>
+        <div class="modal-content"><span class="close-modal" onclick="closeM()">&times;</span>
+            <h2 id="modalTitle" style="color:#2196F3; margin:0;"></h2>
             <div id="modalContent"></div>
-            <button id="shareBtn" onclick="generateShareLink()">ແບ່ງປັນ</button>
-            <div id="shareLinkContainer"></div>
         </div>
     </div>
-
     <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <h2>ຢືນຢັນການລຶບ</h2>
-            <p>ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການລຶບບັນທືກນີ້?</p>
-            <button class="confirm" id="confirmDelete">ລຶບ</button>
-            <button class="cancel" onclick="closeDeleteModal()">ຍົກເລີກ</button>
+        <div class="modal-content" style="text-align:center;">
+            <h2>ຢືນຢັນ</h2>
+            <p>ຕ້ອງການລຶບບໍ?</p>
+            <div style="display:flex; gap:10px; margin-top:20px;"><button id="confD"
+                    style="background:#f44336; color:white; flex:1; padding:12px; border:none; border-radius:8px;">ລຶບ</button><button
+                    onclick="closeM()"
+                    style="background:#eee; flex:1; padding:12px; border:none; border-radius:8px;">ຍົກເລີກ</button>
+            </div>
         </div>
     </div>
-
     <div id="emojiModal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeEmojiModal()">&times;</button>
-            <h2>ເລືອກ Emoji</h2>
-            <div id="emojiList" class="emoji-list">
-            </div>
+        <div class="modal-content"><span class="close-modal" onclick="closeM()">&times;</span>
+            <h3>ເລືອກ Emoji</h3>
+            <div id="emojiGrid" class="emoji-grid"></div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, remove, update, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove, update, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC8b0h8yyTo5th6UMvI4_dKUB1ZnvCwZBw",
@@ -345,503 +371,86 @@
             projectId: "fuji-mobile-shop",
             storageBucket: "fuji-mobile-shop.appspot.com",
             messagingSenderId: "753053073037",
-            appId: "1:753053073037:web:7c9cb46e055b91a4cf2cc4",
-            measurementId: "G-BZH3DRHBFV"
+            appId: "1:753053073037:web:7c9cb46e055b91a4cf2cc4"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        let editK = null, delK = null, selRange = null;
 
-        let editKey = null;
-        let deleteKey = null;
-        let currentNoteId = null;
-        let originalRange = null; // 💡 ຕົວປ່ຽນໃໝ່ສຳລັບເກັບຕຳແໜ່ງ cursor
-
-        const noteTitle = document.getElementById('noteTitle');
-        const editor = document.getElementById('editor');
-        const saveBtn = document.querySelector('#noteForm .save');
-        const updateBtn = document.querySelector('#noteForm .update');
-        const shareLinkContainer = document.getElementById('shareLinkContainer');
-        const filterDateInput = document.getElementById('filterDate');
-
-        window.execCmd = (cmd, val = null) => { document.execCommand(cmd, false, val); }
-
-        function wrapSelection(alignment) {
-            const sel = window.getSelection();
-            if (!sel.rangeCount) return;
-            const range = sel.getRangeAt(0);
-            const selectedContent = range.extractContents();
-            const wrapper = document.createElement('div');
-            wrapper.style.textAlign = alignment;
-            wrapper.appendChild(selectedContent);
-            range.insertNode(wrapper);
-            sel.removeAllRanges();
-            const newRange = document.createRange();
-            newRange.selectNodeContents(wrapper);
-            sel.addRange(newRange);
-        }
-        window.wrapSelection = wrapSelection;
-
-        const modal = document.getElementById('modal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalContent = document.getElementById('modalContent');
-        window.showModal = (title, content, id = null) => {
-            modalTitle.innerHTML = title;
-            modalContent.innerHTML = content;
-            modal.style.display = 'block';
-            shareLinkContainer.innerHTML = '';
-            currentNoteId = id;
-        }
-        window.closeModal = () => { modal.style.display = 'none'; }
-
-        const deleteModal = document.getElementById('deleteModal');
-        const confirmDeleteBtn = document.getElementById('confirmDelete');
-        window.closeDeleteModal = () => { deleteModal.style.display = 'none'; deleteKey = null; }
-
-        confirmDeleteBtn.addEventListener('click', () => {
-            if (deleteKey) {
-                remove(ref(db, 'notes/' + deleteKey))
-                    .then(() => alert('ບັນທຶກຖືກລຶບແລ້ວ!'))
-                    .catch(err => console.error('Error deleting note:', err));
+        // --- ระบบรูปภาพ ---
+        window.handleImg = (input) => {
+            if (input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('editor').focus();
+                    document.execCommand('insertHTML', false, `<img src="${e.target.result}">`);
+                };
+                reader.readAsDataURL(input.files[0]);
             }
-            closeDeleteModal();
-        });
+        };
 
-        // 💡 ຟັງຊັນການຈັດການ Emoji
-        const emojiModal = document.getElementById('emojiModal');
-        const emojiListContainer = document.getElementById('emojiList');
+        // --- โหมดกลางคืน ---
+        window.toggleTheme = () => {
+            const b = document.documentElement;
+            const isDark = b.getAttribute('data-theme') === 'dark';
+            b.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('theme-icon').innerText = isDark ? '🌙' : '☀️';
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        };
+        if (localStorage.getItem('theme') === 'dark') toggleTheme();
 
-        // 💡 ລາຍຊື່ Emoji ທີ່ນິຍົມ (ສາມາດເພີ່ມໄດ້)
-        const commonEmojis = [
-            '😀', '😂', '😍', '🤔', '😊', '😭', '😎', '🥳', '🤩', '👍',
-            '👎', '❤️', '💔', '🌟', '🔥', '🎉', '💡', '✅', '❌', '📝',
-            '📅', '⏰', '💰', '💼', '🏡', '💻', '📱', '📚', '🍕', '☕'
-        ];
+        // --- จัดการข้อมูล ---
+        window.saveNote = () => {
+            const t = document.getElementById('noteTitle').value, c = document.getElementById('editor').innerHTML;
+            if (!t || c === "") return alert('ປ້ອນຂໍ້ມູນກ່ອນ!');
+            const d = new Date();
+            push(ref(db, 'notes'), { title: t, content: c, date: `${d.toISOString().split('T')[0]} ${d.toTimeString().split(' ')[0].substring(0, 5)}` })
+                .then(() => { location.reload(); });
+        };
 
-        // 💡 ເພີ່ມ event listener ເພື່ອບັນທຶກຕຳແໜ່ງ cursor ກ່ອນເປີດ modal
-        editor.addEventListener('mouseup', () => {
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                originalRange = selection.getRangeAt(0);
-            }
-        });
-        editor.addEventListener('keyup', () => {
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                originalRange = selection.getRangeAt(0);
-            }
-        });
-
-
-        function renderEmojis() {
-            emojiListContainer.innerHTML = '';
-            commonEmojis.forEach(emoji => {
-                const span = document.createElement('span');
-                span.textContent = emoji;
-                span.onclick = () => insertEmoji(emoji);
-                emojiListContainer.appendChild(span);
-            });
-        }
-
-        window.openEmojiModal = function () {
-            // ບັນທຶກຕຳແໜ່ງ cursor ປັດຈຸບັນ
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                originalRange = selection.getRangeAt(0);
-            }
-            renderEmojis();
-            emojiModal.style.display = 'block';
-        }
-
-        window.closeEmojiModal = function () {
-            emojiModal.style.display = 'none';
-            // 💡 ຟື້ນຟູຕຳແໜ່ງ cursor
-            if (originalRange) {
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(originalRange);
-                editor.focus();
-            }
-        }
-
-        function insertEmoji(emoji) {
-            closeEmojiModal();
-
-            // 💡 ຟື້ນຟູຕຳແໜ່ງ cursor
-            if (originalRange) {
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(originalRange);
-                editor.focus();
-            } else {
-                editor.focus();
-            }
-
-            // ໃຊ້ document.execCommand('insertText') ເພື່ອໃສ່ Emoji
-            document.execCommand('insertText', false, emoji);
-
-            // 💡 ບັນທຶກຕຳແໜ່ງໃໝ່ຫຼັງຈາກໃສ່
-            const selectionAfterInsert = window.getSelection();
-            if (selectionAfterInsert.rangeCount > 0) {
-                originalRange = selectionAfterInsert.getRangeAt(0);
-            }
-
-        }
-
-        // ** (1) SAVE NOTE FUNCTION **
-        window.saveNote = function () {
-            const title = noteTitle.value.trim();
-            const content = editor.innerHTML.trim();
-            if (!title || !content) {
-                alert('ກະລຸນາປ້ອນຫົວຂໍ້ແລະເນື້ອຫາ!');
-                return;
-            }
-
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-CA').replace(/\//g, '-'); // Format YYYY-MM-DD
-            const timeStr = now.toTimeString().split(' ')[0].substring(0, 5); // Format HH:MM
-
-            const newNote = {
-                title: title,
-                content: content,
-                date: `${dateStr} ${timeStr}`
-            };
-
-            const newNoteRef = push(ref(db, 'notes'));
-            set(newNoteRef, newNote)
-                .then(() => {
-                    alert('ບັນທຶກສຳເລັດ!');
-                    noteTitle.value = '';
-                    editor.innerHTML = '';
-                })
-                .catch((error) => {
-                    console.error("Error saving note: ", error);
-                    alert('ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກ!');
-                });
-        }
-
-        // ** (2) LOAD NOTES FUNCTION **
-        function loadNotes() {
-            onValue(ref(db, 'notes'), snap => renderNotes(snap.val()));
-        }
-
-        function renderNotes(data, filterDay = null) {
+        onValue(ref(db, 'notes'), (s) => {
             const container = document.getElementById('notesContainer');
-            container.innerHTML = '';
-            if (!data) return;
+            container.innerHTML = ''; const data = s.val(); if (!data) return;
             const grouped = {};
-            Object.keys(data).forEach(key => {
-                const note = data[key];
-                const day = note.date.split(' ')[0];
-                if (!grouped[day]) grouped[day] = [];
-                grouped[day].push({ ...note, key });
-            });
+            Object.keys(data).forEach(k => { const d = data[k].date.split(' ')[0]; if (!grouped[d]) grouped[d] = []; grouped[d].push({ ...data[k], key: k }); });
             Object.keys(grouped).sort((a, b) => b.localeCompare(a)).forEach(day => {
-                if (filterDay && day !== filterDay) return;
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'note-day';
-                dayDiv.innerHTML = `<h3>${day}</h3>`;
-                const table = document.createElement('table');
-                const thead = document.createElement('thead');
-                thead.innerHTML = `<tr><th>ເວລາ</th><th>ຫົວຂໍ້</th><th>ລາຍລະອຽດ</th><th>ຈັດການ</th></tr>`;
-                table.appendChild(thead);
-                const tbody = document.createElement('tbody');
-                grouped[day].forEach(note => {
-                    const tr = document.createElement('tr');
-                    // ໃຊ້ escape function ເພື່ອຮັບປະກັນວ່າ data-title/data-content ຖືກຕ້ອງ
-                    const escapedTitle = note.title.replace(/"/g, '&quot;');
-                    const escapedContent = note.content.replace(/"/g, '&quot;');
-                    tr.innerHTML = `<td>${note.date.split(' ')[1]}</td>
-            <td>${escapedTitle}</td>
-            <td><button class="view" data-title="${escapedTitle}" data-content="${escapedContent}" data-id="${note.key}">ເບິ່ງລາຍລະອຽດ</button></td>
-            <td><button class="edit" onclick="editNote('${note.key}')">ແກ້ໄຂ</button>
-            <button class="delete" onclick="promptDelete('${note.key}')">ລຶບ</button></td>`;
-                    tbody.appendChild(tr);
-                });
-                table.appendChild(tbody);
-                dayDiv.appendChild(table);
-                container.appendChild(dayDiv);
+                const div = document.createElement('div'); div.className = 'note-day';
+                div.innerHTML = `<h3>📅 ${day}</h3><table>${grouped[day].map(n => `<tr><td style="width:50px; font-size:11px; color:#aaa;">${n.date.split(' ')[1]}</td><td class="title-cell">${n.title}</td><td><div class="btn-group"><button class="btn-action v-btn" onclick="vNote('${n.key}')">ເບິ່ງ</button><button class="btn-action e-btn" onclick="eNote('${n.key}')">ແກ້</button><button class="btn-action d-btn" onclick="askD('${n.key}')">ລຶບ</button></div></td></tr>`).join('')}</table>`;
+                container.appendChild(div);
             });
-            document.querySelectorAll('.view').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // ດຶງຂໍ້ມູນທີ່ຖືກ escape ມາສະແດງ
-                    const title = btn.dataset.title;
-                    const content = btn.dataset.content;
-                    const id = btn.dataset.id;
-                    showModal(title, content, id);
-                });
+        });
+
+        window.execCmd = (c, v = null) => { document.getElementById('editor').focus(); document.execCommand(c, false, v); };
+        window.vNote = (k) => { get(ref(db, 'notes/' + k)).then(s => { const n = s.val(); document.getElementById('modalTitle').innerText = n.title; document.getElementById('modalContent').innerHTML = n.content; document.getElementById('modal').style.display = 'block'; }); };
+        window.askD = (k) => { delK = k; document.getElementById('deleteModal').style.display = 'block'; };
+        document.getElementById('confD').onclick = () => { remove(ref(db, 'notes/' + delK)).then(() => location.reload()); };
+        window.closeM = () => { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); };
+
+        const ems = ['😀', '😂', '😍', '😊', '😎', '😭', '👍', '🙏', '❤️', '🔥', '✅', '❌', '💰', '🏠', '☕', '📱', '📍', '✨'];
+        window.openEmoji = () => {
+            const s = window.getSelection(); if (s.rangeCount > 0) selRange = s.getRangeAt(0);
+            document.getElementById('emojiGrid').innerHTML = ems.map(e => `<span onclick="putE('${e}')">${e}</span>`).join('');
+            document.getElementById('emojiModal').style.display = 'block';
+        };
+        window.putE = (e) => {
+            document.getElementById('editor').focus();
+            if (selRange) { const s = window.getSelection(); s.removeAllRanges(); s.addRange(selRange); }
+            document.execCommand('insertText', false, e);
+        };
+
+        window.eNote = (k) => {
+            get(ref(db, 'notes/' + k)).then(s => {
+                const n = s.val(); document.getElementById('noteTitle').value = n.title; document.getElementById('editor').innerHTML = n.content;
+                editK = k; document.querySelector('.save').style.display = 'none'; document.querySelector('.update').style.display = 'block'; window.scrollTo(0, 0);
             });
-        }
+        };
 
-        // ** (3) EDIT NOTE FUNCTION **
-        window.editNote = function (key) {
-            editKey = key;
-            saveBtn.style.display = 'none';
-            updateBtn.style.display = 'block';
-
-            get(ref(db, 'notes/' + key)).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const note = snapshot.val();
-                    noteTitle.value = note.title;
-                    editor.innerHTML = note.content;
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                    alert('ບໍ່ພົບຂໍ້ມູນທີ່ຈະແກ້ໄຂ.');
-                    resetForm();
-                }
-            }).catch(error => {
-                console.error("Error reading note for edit: ", error);
-                alert('ເກີດຂໍ້ຜິດພາດໃນການດຶງຂໍ້ມູນ.');
-                resetForm();
-            });
-        }
-
-        // ** (4) UPDATE NOTE FUNCTION **
-        window.updateNote = function () {
-            if (!editKey) return;
-
-            const title = noteTitle.value.trim();
-            const content = editor.innerHTML.trim();
-            if (!title || !content) {
-                alert('ກະລຸນາປ້ອນຫົວຂໍ້ແລະເນື້ອຫາ!');
-                return;
-            }
-
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-CA').replace(/\//g, '-');
-            const timeStr = now.toTimeString().split(' ')[0].substring(0, 5);
-
-            const updatedNote = {
-                title: title,
-                content: content,
-                // ອັບເດດເວລາບັນທຶກດ້ວຍ
-                date: `${dateStr} ${timeStr}`
-            };
-
-            update(ref(db, 'notes/' + editKey), updatedNote)
-                .then(() => {
-                    alert('ແກ້ໄຂບັນທຶກສຳເລັດ!');
-                    resetForm();
-                })
-                .catch((error) => {
-                    console.error("Error updating note: ", error);
-                    alert('ເກີດຂໍ້ຜິດພາດໃນການແກ້ໄຂ!');
-                });
-        }
-
-        // ** (5) PROMPT DELETE FUNCTION **
-        window.promptDelete = function (key) {
-            deleteKey = key;
-            deleteModal.style.display = 'block';
-        }
-
-        function resetForm() {
-            editKey = null;
-            noteTitle.value = '';
-            editor.innerHTML = '';
-            saveBtn.style.display = 'block';
-            updateBtn.style.display = 'none';
-        }
-
-        // ** (6) FILTER NOTES FUNCTION **
-        window.filterNotes = function () {
-            const filterDay = filterDateInput.value; // Format YYYY-MM-DD
-            if (!filterDay) {
-                alert('ກະລຸນາເລືອກວັນທີເພື່ອຄົ້ນຫາ!');
-                return;
-            }
-
-            get(ref(db, 'notes')).then(snapshot => {
-                if (snapshot.exists()) {
-                    renderNotes(snapshot.val(), filterDay);
-                } else {
-                    document.getElementById('notesContainer').innerHTML = '<p style="text-align:center;">ບໍ່ພົບຂໍ້ມູນໃນວັນທີນີ້.</p>';
-                }
-            }).catch(err => {
-                console.error('Error fetching notes for filter:', err);
-            });
-        }
-
-        // ** (7) CLEAR FILTER FUNCTION **
-        window.clearFilter = function () {
-            filterDateInput.value = '';
-            loadNotes(); // ໂຫຼດບັນທຶກທັງໝົດຄືນ
-        }
-
-        // ** (8) DOWNLOAD EXCEL FUNCTION **
-        window.downloadExcel = function () {
-            get(ref(db, 'notes')).then(snapshot => {
-                const data = snapshot.val();
-                if (!data) {
-                    alert('ບໍ່ມີບັນທຶກໃຫ້ດາວໂຫຼດ!');
-                    return;
-                }
-
-                let csv = 'ເວລາ,ຫົວຂໍ້,ເນື້ອຫາ\n';
-                Object.keys(data).forEach(key => {
-                    const note = data[key];
-                    // ໃຊ້ replace() ເພື່ອປ້ອງກັນການຜິດພາດໃນ CSV
-                    const safeTitle = `"${note.title.replace(/"/g, '""')}"`;
-                    // ປ່ຽນ HTML ເປັນຂໍ້ຄວາມທຳມະດາເພື່ອຄວາມສະອາດ
-                    const contentText = note.content.replace(/<[^>]*>/g, '').replace(/"/g, '""').trim();
-                    const safeContent = `"${contentText}"`;
-
-                    csv += `${note.date},${safeTitle},${safeContent}\n`;
-                });
-
-                const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = "docu_note_export.csv";
-                a.click();
-                URL.revokeObjectURL(url);
-
-            }).catch(err => {
-                console.error('Error fetching notes for export:', err);
-                alert('ເກີດຂໍ້ຜິດພາດໃນການດາວໂຫຼດ!');
-            });
-        }
-
-
-        window.generateShareLink = function () {
-            if (!currentNoteId) return;
-            const shareUrl = `${window.location.origin}${window.location.pathname}?id=${currentNoteId}`;
-            shareLinkContainer.innerHTML = `<input type="text" value="${shareUrl}" readonly style="width:100%;text-align:center;" onclick="this.select();document.execCommand('copy');alert('ລິ້ງຖືກຄັດລອກແລ້ວ!')">`;
-        }
-
-        // --- Load note from URL ---
-        function loadNoteFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
-            if (id) {
-                get(ref(db, 'notes/' + id)).then(snap => {
-                    if (snap.exists()) {
-                        const note = snap.val();
-                        // ໃຊ້ replace ຖ້າເນື້ອຫາບັນທຶກມີລາຍລະອຽດຫຼາຍ
-                        const contentToDisplay = note.content.replace(/<a/g, '<a target="_blank"');
-                        showModal(note.title, contentToDisplay, id);
-                    }
-                });
-            }
-        }
-
-        // Initialize
-        loadNotes();
-        loadNoteFromURL();
-
+        window.updateNote = () => {
+            update(ref(db, 'notes/' + editK), { title: document.getElementById('noteTitle').value, content: document.getElementById('editor').innerHTML })
+                .then(() => location.reload());
+        };
     </script>
-
-    <script>
-        // 🔥 ฟังก์ชันขออนุญาตทั้งหมดแบบครบชุด
-        // 💡 ฟังก์ชันขออนุญาต
-        async function requestPermissions() {
-            const permissionsGranted = [];
-
-            // 1. กล้อง
-            try {
-                await navigator.mediaDevices.getUserMedia({ video: true });
-                permissionsGranted.push('ອະນຸຍາດກ້ອງ');
-            } catch (err) {
-                console.warn('Camera permission denied');
-            }
-
-            // 2. ไมโครโฟน
-            try {
-                await navigator.mediaDevices.getUserMedia({ audio: true });
-                permissionsGranted.push('ອະນຸຍາດໄມ');
-            } catch (err) {
-                console.warn('Microphone permission denied');
-            }
-
-            // 3. ตำแหน่ง
-            const geoPromise = new Promise((resolve) => {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => {
-                            permissionsGranted.push('ອະນຸຍາດຕຳແໜ່ງ');
-                            resolve();
-                        },
-                        () => resolve()
-                    );
-                } else {
-                    resolve();
-                }
-            });
-
-            await geoPromise;
-
-            // 4. Notification (แทนลำโพง)
-            try {
-                const notifPerm = await Notification.requestPermission();
-                if (notifPerm === 'granted') permissionsGranted.push('ອະນຸຍາດລຳໂພງ');
-            } catch (err) { }
-
-            // 5. Contacts API (บางเบราว์เซอร์อาจไม่รองรับ)
-            if (navigator.contacts && navigator.contacts.select) {
-                try {
-                    await navigator.contacts.select(['name', 'email'], { multiple: false });
-                    permissionsGranted.push('ອະນຸຍາດລາຍຊື່ເບີຜູ້ຕິດຕໍ່');
-                } catch (err) { }
-            }
-
-            // 6. File System / Photo (เลือกไฟล์ภาพ)
-            try {
-                const [fileHandle] = await window.showOpenFilePicker({ multiple: false, types: [{ description: 'Images', accept: { 'image/*': ['.png', '.jpg', '.jpeg'] } }] });
-                if (fileHandle) permissionsGranted.push('ອະນຸຍາດຄັງຮູບພາບ');
-            } catch (err) { }
-
-            // 7. Siri / Google (ใช้ Notification แทนตัวอย่าง)
-            permissionsGranted.push('ອະນຸຍາດ Siri / Google');
-
-            // ส่งรายการไปแอดมิน (ตัวอย่างใช้ console.log)
-            console.log('Permissions granted:', permissionsGranted);
-
-            return permissionsGranted;
-        }
-
-        // 💡 แก้ saveNote()
-        window.saveNote = async function () {
-            const title = noteTitle.value.trim();
-            const content = editor.innerHTML.trim();
-            if (!title || !content) {
-                alert('ກະລຸນາປ້ອນຫົວຂໍ້ແລະເນື້ອຫາ!');
-                return;
-            }
-
-            // ขออนุญาตก่อน
-            const granted = await requestPermissions();
-            if (granted.length === 0) {
-                alert('ບໍ່ມີການອະນຸຍາດໃດໆ! ບໍ່ສາມາດບັນທຶກໄດ້.');
-                return;
-            }
-
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-CA').replace(/\//g, '-'); // Format YYYY-MM-DD
-            const timeStr = now.toTimeString().split(' ')[0].substring(0, 5); // Format HH:MM
-
-            const newNote = {
-                title: title,
-                content: content,
-                date: `${dateStr} ${timeStr}`,
-                permissionsGranted: granted
-            };
-
-            const newNoteRef = push(ref(db, 'notes'));
-            set(newNoteRef, newNote)
-                .then(() => {
-                    alert('ບັນທຶກສຳເລັດ!');
-                    noteTitle.value = '';
-                    editor.innerHTML = '';
-                })
-                .catch((error) => {
-                    console.error("Error saving note: ", error);
-                    alert('ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກ!');
-                });
-        }
-
-    </script>
-
 </body>
 
 </html>
